@@ -1,48 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  static const title = 'salomon_bottom_bar';
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  var _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Thuê xe ',
+      title: MyApp.title,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const MyHomePage(title: 'Thuê xe'),
-    );
-  }
-}
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text(MyApp.title),
+        ),
+        bottomNavigationBar: SalomonBottomBar(
+          currentIndex: _currentIndex,
+          onTap: (i) => setState(() => _currentIndex = i),
+          items: [
+            /// Home
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.home),
+              title: const Text("Trang chủ"),
+              selectedColor: Colors.purple,
+            ),
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+            /// Likes
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.trip_origin),
+              title: const Text("Hành Trình"),
+              selectedColor: Colors.pink,
+            ),
 
-  final String title;
+            /// Search
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.search),
+              title: const Text("Thông báo"),
+              selectedColor: Colors.orange,
+            ),
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-
+            /// Profile
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.person),
+              title: const Text("Thông tin"),
+              selectedColor: Colors.teal,
+            ),
           ],
         ),
       ),
