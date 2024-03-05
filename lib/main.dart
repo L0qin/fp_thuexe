@@ -40,14 +40,14 @@ class _MyAppState extends State<MyApp> {
 
             /// Likes
             SalomonBottomBarItem(
-              icon: const Icon(Icons.trip_origin),
+              icon: const Icon(Icons.map),
               title: const Text("Hành Trình"),
               selectedColor: Colors.pink,
             ),
 
             /// Search
             SalomonBottomBarItem(
-              icon: const Icon(Icons.search),
+              icon: const Icon(Icons.doorbell),
               title: const Text("Thông báo"),
               selectedColor: Colors.orange,
             ),
