@@ -47,7 +47,7 @@ class _MyAppState extends State<MyApp> {
 
             /// Search
             SalomonBottomBarItem(
-              icon: const Icon(Icons.doorbell),
+              icon: const Icon(Icons.notifications),
               title: const Text("Thông báo"),
               selectedColor: Colors.orange,
             ),
