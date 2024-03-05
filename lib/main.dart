@@ -6,7 +6,7 @@ void main() {
 }
 
 class MyApp extends StatefulWidget {
-  static const title = 'salomon_bottom_bar';
+  static const title = 'Thuê xe';
 
   @override
   _MyAppState createState() => _MyAppState();
