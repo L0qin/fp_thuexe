@@ -39,14 +39,54 @@ class _DetailCarState extends State<DetailCar> {
               Padding(padding: EdgeInsets.all(12.0)),
               _sliderWidgetCard(sizingInformation),
               Card(
+                color: Colors.white,
+                // Màu của thẻ
                 margin: EdgeInsets.all(10),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 ),
+
                 child: Padding(
                   padding: EdgeInsets.all(12.0),
                   child: Column(
+
                     children: [
+                     Row(
+                       children: [
+                         Expanded(
+                           child: Center(
+                             child: SizedBox(
+                               width: 300,
+                               child:  CircleAvatar(
+                                 radius: 100,
+                                 backgroundImage: AssetImage('assets/images/icons/user.png'),
+                               ),
+                               // child: ClipRRect(
+                               //   borderRadius: BorderRadius.circular(500),
+                               //   child: Image.network(
+                               //     cocktail.strDrinkThumb,
+                               //     loadingBuilder: (BuildContext context, Widget child,
+                               //         ImageChunkEvent? loadingProgress) {
+                               //       if (loadingProgress == null) {
+                               //         return child;
+                               //       } else {
+                               //         return Center(
+                               //           child: CircularProgressIndicator(
+                               //             value: loadingProgress.expectedTotalBytes != null
+                               //                 ? loadingProgress.cumulativeBytesLoaded /
+                               //                 (loadingProgress.expectedTotalBytes ?? 1)
+                               //                 : null,
+                               //           ),
+                               //         );
+                               //       }
+                               //     },
+                               //   ),
+                               // ),
+                             ),
+                           ),
+                         ),
+                       ],
+                     ),
                       Row(
                         children: [
                           SizedBox(
