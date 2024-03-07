@@ -1,25 +1,18 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_thuexe/repository/repository.dart';
+import 'package:fp_thuexe/shared/widgets/BottomBar.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-import 'core.dart';
 
-void main() {
-  // runApp(Search());
-  runApp(MaterialApp(
-    title: 'My app', // used by the OS task switcher
-    home: MyApp(),
-  ));
-}
 
-class MyApp extends StatefulWidget {
+class HomePage extends StatefulWidget {
   static const title = 'Thuê xe';
 
   @override
-  _MyAppState createState() => _MyAppState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _HomePageState extends State<HomePage> {
   int _navBarPageSelector = 0;
   int _rowButtonController = 0;
   int _sliderIndex = 0;
