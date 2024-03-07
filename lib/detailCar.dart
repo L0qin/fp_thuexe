@@ -37,8 +37,15 @@ class _DetailCarState extends State<DetailCar>
                 children: [
                   Row(
                     children: [
-                      Text("Kia Moring",
-                          style: TextStyle(fontSize: 14, color: Colors.green)),
+                      SizedBox(
+                        width: 110,
+                        child: Text('Hãng Xe',
+                            style: TextStyle(fontSize: 25, color: Colors.green)),
+                      ),
+                      Expanded(
+                        child: Text("Kia Morning",
+                            style: TextStyle(fontSize: 20, color: Colors.black)),
+                      ),
                     ],
                   )
                 ],
