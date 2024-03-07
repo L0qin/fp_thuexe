@@ -7,7 +7,7 @@ void main() {
   // runApp(Search());
   runApp(MaterialApp(
     title: 'My app', // used by the OS task switcher
-    home: PostTheCar(),
+    home: MyApp(),
   ));
 }
 
