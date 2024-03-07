@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fp_thuexe/PostCar.dart';
 import 'core.dart';
 import 'search.dart';
 
@@ -6,7 +7,7 @@ void main() {
   // runApp(Search());
   runApp(MaterialApp(
     title: 'My app', // used by the OS task switcher
-    home: Search(),
+    home: PostTheCar(),
   ));
 }
 
