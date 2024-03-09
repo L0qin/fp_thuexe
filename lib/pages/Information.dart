@@ -183,7 +183,7 @@ class _InformationState extends State<Information>
                   Row(
                     children: [
                       Text(
-                        "Tài khoảng",
+                        "Tài khoản",
                         style: TextStyle(
                             fontSize: 15, fontWeight: FontWeight.normal),
                       )
@@ -412,10 +412,6 @@ class _InformationState extends State<Information>
                         Spacer(),
                         // Để tạo khoảng trống giữa text và hình ảnh
                         SizedBox(width: 8),
-                        Text(
-                          "đông ý",
-                          style: TextStyle(color: Colors.green),
-                        ),
                         // Khoảng trống giữa hình ảnh và nút
                         IconButton(
                           icon: Icon(Icons.arrow_forward),

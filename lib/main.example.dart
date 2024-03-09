@@ -10,7 +10,7 @@ void main() {
       primarySwatch: Colors.blue,
       visualDensity: VisualDensity.adaptivePlatformDensity,
     ),
-    home: Scaffold(
+    home: const Scaffold(
       bottomNavigationBar: BottomBar(),
     ),
   ));

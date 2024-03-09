@@ -12,7 +12,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _navBarPageSelector = 0;
   int _rowButtonController = 0;
   int _sliderIndex = 0;
 
@@ -38,7 +37,9 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(
                   height: 10,
                 ),
-                _cardTimeWidget(sizingInformation),
+                SizedBox(
+                  height: 100,
+                ), // _cardTimeWidget(sizingInformation),
                 const SizedBox(
                   height: 10,
                 ),
@@ -50,7 +51,8 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(
                   height: 15,
                 ),
-                _popularCarsHeadingWidget(),
+                // _popularCarsHeadingWidget(),
+                _sliderWidgetCard(sizingInformation), // Test UI, remove later
                 const SizedBox(
                   height: 15,
                 ),
@@ -104,66 +106,71 @@ class _HomePageState extends State<HomePage> {
 
   Widget _rowButtons() {
     return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          _rowButtonSingleItem(
-              image: "assets/images/icons/car.png",
-              title: "Ô tô",
-              selectedItemTextColor:
-                  _rowButtonController == 0 ? Colors.red : Colors.black,
-              selectedBgColor:
-                  _rowButtonController == 0 ? Colors.red : Colors.white,
-              selectedItemIconColor:
-                  _rowButtonController == 0 ? Colors.white : Colors.red,
-              onPressed: () {
-                setState(() {
-                  _rowButtonController = 0;
-                });
-              }),
-          _rowButtonSingleItem(
-              image: "assets/images/icons/electric_car.png",
-              title: "Ô tô đện",
-              selectedItemTextColor:
-                  _rowButtonController == 1 ? Colors.red : Colors.black,
-              selectedBgColor:
-                  _rowButtonController == 1 ? Colors.red : Colors.white,
-              selectedItemIconColor:
-                  _rowButtonController == 1 ? Colors.white : Colors.red,
-              onPressed: () {
-                setState(() {
-                  _rowButtonController = 1;
-                });
-              }),
-          _rowButtonSingleItem(
-              image: "assets/images/icons/scooter.png",
-              title: "Xe máy",
-              selectedItemTextColor:
-                  _rowButtonController == 3 ? Colors.red : Colors.black,
-              selectedBgColor:
-                  _rowButtonController == 3 ? Colors.red : Colors.white,
-              selectedItemIconColor:
-                  _rowButtonController == 3 ? Colors.white : Colors.red,
-              onPressed: () {
-                setState(() {
-                  _rowButtonController = 3;
-                });
-              }),
-          _rowButtonSingleItem(
-              image: "assets/images/icons/electric_scooter.png",
-              title: "Xe máy điện",
-              selectedItemTextColor:
-                  _rowButtonController == 4 ? Colors.red : Colors.black,
-              selectedBgColor:
-                  _rowButtonController == 4 ? Colors.red : Colors.white,
-              selectedItemIconColor:
-                  _rowButtonController == 4 ? Colors.white : Colors.red,
-              onPressed: () {
-                setState(() {
-                  _rowButtonController = 4;
-                });
-              }),
-        ],
+      // decoration: BoxDecoration(
+      //     borderRadius: BorderRadius.circular(5), color: Colors.teal),
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            _rowButtonSingleItem(
+                image: "assets/images/icons/car.png",
+                title: "Ô tô",
+                selectedItemTextColor:
+                    _rowButtonController == 0 ? Colors.white : Colors.black,
+                selectedBgColor:
+                    _rowButtonController == 0 ? Colors.teal : Colors.white,
+                selectedItemIconColor:
+                    _rowButtonController == 0 ? Colors.white : Colors.teal,
+                onPressed: () {
+                  setState(() {
+                    _rowButtonController = 0;
+                  });
+                }),
+            _rowButtonSingleItem(
+                image: "assets/images/icons/electric_car.png",
+                title: "Ô tô đện",
+                selectedItemTextColor:
+                    _rowButtonController == 1 ? Colors.white : Colors.black,
+                selectedBgColor:
+                    _rowButtonController == 1 ? Colors.teal : Colors.white,
+                selectedItemIconColor:
+                    _rowButtonController == 1 ? Colors.white : Colors.teal,
+                onPressed: () {
+                  setState(() {
+                    _rowButtonController = 1;
+                  });
+                }),
+            _rowButtonSingleItem(
+                image: "assets/images/icons/scooter.png",
+                title: "Xe máy",
+                selectedItemTextColor:
+                    _rowButtonController == 3 ? Colors.white : Colors.black,
+                selectedBgColor:
+                    _rowButtonController == 3 ? Colors.teal : Colors.white,
+                selectedItemIconColor:
+                    _rowButtonController == 3 ? Colors.white : Colors.teal,
+                onPressed: () {
+                  setState(() {
+                    _rowButtonController = 3;
+                  });
+                }),
+            _rowButtonSingleItem(
+                image: "assets/images/icons/electric_scooter.png",
+                title: "Xe máy điện",
+                selectedItemTextColor:
+                    _rowButtonController == 4 ? Colors.white : Colors.black,
+                selectedBgColor:
+                    _rowButtonController == 4 ? Colors.teal : Colors.white,
+                selectedItemIconColor:
+                    _rowButtonController == 4 ? Colors.white : Colors.teal,
+                onPressed: () {
+                  setState(() {
+                    _rowButtonController = 4;
+                  });
+                }),
+          ],
+        ),
       ),
     );
   }
@@ -176,36 +183,38 @@ class _HomePageState extends State<HomePage> {
     Color? selectedItemTextColor,
     VoidCallback? onPressed,
   }) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          GestureDetector(
-            onTap: onPressed,
-            child: Container(
-              width: 80,
-              height: 80,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  color: selectedBgColor,
-                  borderRadius: const BorderRadius.all(Radius.circular(50))),
-              child: Image.asset(
-                image,
-                color: selectedItemIconColor,
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        width: 100,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: selectedBgColor,
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              image,
+              color: selectedItemIconColor,
+              width: 40,
+              height: 40,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                color: selectedItemTextColor,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Text(
-            title,
-            style: TextStyle(
-                color: selectedItemTextColor, fontWeight: FontWeight.bold),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
+
 
   Widget _sliderWidgetCard(SizingInformation sizingInformation) {
     return Container(
@@ -269,7 +278,7 @@ class _HomePageState extends State<HomePage> {
                                   children: <Widget>[
                                     const Icon(
                                       Icons.star,
-                                      color: Colors.red,
+                                      color: Colors.teal,
                                     ),
                                     Text(
                                       sliderData.rating,
@@ -309,7 +318,7 @@ class _HomePageState extends State<HomePage> {
                                         color: _sliderIndex ==
                                                 FakeRepository.sliderData
                                                     .indexOf(sliderData)
-                                            ? Colors.red
+                                            ? Colors.teal
                                             : Colors.black,
                                       ),
                                     );
@@ -415,7 +424,7 @@ class _HomePageState extends State<HomePage> {
   //             children: <Widget>[
   //               Icon(
   //                 Icons.star,
-  //                 color: Colors.red,
+  //                 color: Colors.teal,
   //               ),
   //               Text(
   //                 FakeRepository.listViewData[index].rating,
