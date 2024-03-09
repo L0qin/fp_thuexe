@@ -4,7 +4,6 @@ import 'package:fp_thuexe/repository/repository.dart';
 import 'package:fp_thuexe/shared/widgets/BottomBar.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
-
 class HomePage extends StatefulWidget {
   static const title = 'Thuê xe';
 
@@ -19,61 +18,51 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Thuê xe",
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: Scaffold(
-        body: ResponsiveBuilder(
-          builder: (context, sizingInformation) {
-            return Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.white, Colors.grey, Colors.white],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+    return ResponsiveBuilder(
+      builder: (context, sizingInformation) {
+        return Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.white, Colors.grey, Colors.white],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: Container(
+            margin: const EdgeInsets.only(top: 15, right: 15, left: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                // HeaderWidget
+                _headerWidget(),
+                const SizedBox(
+                  height: 10,
                 ),
-              ),
-              child: Container(
-                margin: const EdgeInsets.only(top: 15, right: 15, left: 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    // HeaderWidget
-                    _headerWidget(),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    _cardTimeWidget(sizingInformation),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    _rowButtons(),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    _sliderWidgetCard(sizingInformation),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    _popularCarsHeadingWidget(),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    // _listCarWidgetHorizontal(sizingInformation),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                  ],
+                _cardTimeWidget(sizingInformation),
+                const SizedBox(
+                  height: 10,
                 ),
-              ),
-            );
-          },
-        ),
-        bottomNavigationBar: const BottomBar(),
-      ),
+                _rowButtons(),
+                const SizedBox(
+                  height: 15,
+                ),
+                _sliderWidgetCard(sizingInformation),
+                const SizedBox(
+                  height: 15,
+                ),
+                _popularCarsHeadingWidget(),
+                const SizedBox(
+                  height: 15,
+                ),
+                // _listCarWidgetHorizontal(sizingInformation),
+                const SizedBox(
+                  height: 15,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -122,11 +111,11 @@ class _HomePageState extends State<HomePage> {
               image: "assets/images/icons/car.png",
               title: "Ô tô",
               selectedItemTextColor:
-              _rowButtonController == 0 ? Colors.red : Colors.black,
+                  _rowButtonController == 0 ? Colors.red : Colors.black,
               selectedBgColor:
-              _rowButtonController == 0 ? Colors.red : Colors.white,
+                  _rowButtonController == 0 ? Colors.red : Colors.white,
               selectedItemIconColor:
-              _rowButtonController == 0 ? Colors.white : Colors.red,
+                  _rowButtonController == 0 ? Colors.white : Colors.red,
               onPressed: () {
                 setState(() {
                   _rowButtonController = 0;
@@ -136,11 +125,11 @@ class _HomePageState extends State<HomePage> {
               image: "assets/images/icons/electric_car.png",
               title: "Ô tô đện",
               selectedItemTextColor:
-              _rowButtonController == 1 ? Colors.red : Colors.black,
+                  _rowButtonController == 1 ? Colors.red : Colors.black,
               selectedBgColor:
-              _rowButtonController == 1 ? Colors.red : Colors.white,
+                  _rowButtonController == 1 ? Colors.red : Colors.white,
               selectedItemIconColor:
-              _rowButtonController == 1 ? Colors.white : Colors.red,
+                  _rowButtonController == 1 ? Colors.white : Colors.red,
               onPressed: () {
                 setState(() {
                   _rowButtonController = 1;
@@ -150,11 +139,11 @@ class _HomePageState extends State<HomePage> {
               image: "assets/images/icons/scooter.png",
               title: "Xe máy",
               selectedItemTextColor:
-              _rowButtonController == 3 ? Colors.red : Colors.black,
+                  _rowButtonController == 3 ? Colors.red : Colors.black,
               selectedBgColor:
-              _rowButtonController == 3 ? Colors.red : Colors.white,
+                  _rowButtonController == 3 ? Colors.red : Colors.white,
               selectedItemIconColor:
-              _rowButtonController == 3 ? Colors.white : Colors.red,
+                  _rowButtonController == 3 ? Colors.white : Colors.red,
               onPressed: () {
                 setState(() {
                   _rowButtonController = 3;
@@ -164,11 +153,11 @@ class _HomePageState extends State<HomePage> {
               image: "assets/images/icons/electric_scooter.png",
               title: "Xe máy điện",
               selectedItemTextColor:
-              _rowButtonController == 4 ? Colors.red : Colors.black,
+                  _rowButtonController == 4 ? Colors.red : Colors.black,
               selectedBgColor:
-              _rowButtonController == 4 ? Colors.red : Colors.white,
+                  _rowButtonController == 4 ? Colors.red : Colors.white,
               selectedItemIconColor:
-              _rowButtonController == 4 ? Colors.white : Colors.red,
+                  _rowButtonController == 4 ? Colors.white : Colors.red,
               onPressed: () {
                 setState(() {
                   _rowButtonController = 4;
@@ -233,8 +222,7 @@ class _HomePageState extends State<HomePage> {
                 setState(() {
                   _sliderIndex = index;
                 });
-              }
-          ),
+              }),
           items: FakeRepository.sliderData.map((sliderData) {
             return Builder(
               builder: (_) {
@@ -259,7 +247,8 @@ class _HomePageState extends State<HomePage> {
                               height: 190,
                               width: sizingInformation.screenSize.width,
                               child: ClipRRect(
-                                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(10)),
                                 child: Image.asset(
                                   "assets/images/cars/kiamorning.jpg",
                                   fit: BoxFit.cover,
@@ -269,12 +258,12 @@ class _HomePageState extends State<HomePage> {
                             Positioned(
                               right: 18,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 decoration: const BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(10)
-                                  ),
+                                      bottomLeft: Radius.circular(10)),
                                 ),
                                 child: Row(
                                   children: <Widget>[
@@ -284,7 +273,8 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     Text(
                                       sliderData.rating,
-                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     )
                                   ],
                                 ),
@@ -295,25 +285,30 @@ class _HomePageState extends State<HomePage> {
                               bottom: 0,
                               left: 18,
                               child: Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 135),
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 135),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 decoration: const BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.only(
                                       topRight: Radius.circular(10),
-                                      topLeft: Radius.circular(10)
-                                  ),
+                                      topLeft: Radius.circular(10)),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: FakeRepository.sliderData.map((sliderData) {
+                                  children: FakeRepository.sliderData
+                                      .map((sliderData) {
                                     return Container(
                                       height: 7.0,
                                       width: 7.0,
-                                      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 2.0),
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 4.0, horizontal: 2.0),
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        color: _sliderIndex == FakeRepository.sliderData.indexOf(sliderData)
+                                        color: _sliderIndex ==
+                                                FakeRepository.sliderData
+                                                    .indexOf(sliderData)
                                             ? Colors.red
                                             : Colors.black,
                                       ),
@@ -332,19 +327,25 @@ class _HomePageState extends State<HomePage> {
                                 height: 15,
                               ),
                               Container(
-                                width: sizingInformation.localWidgetSize.width * 0.80,
+                                width: sizingInformation.localWidgetSize.width *
+                                    0.80,
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: <Widget>[
                                     Text(
                                       sliderData.title,
-                                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     Row(
                                       children: <Widget>[
                                         Text(
                                           sliderData.totalStar,
-                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 24),
                                         ),
                                         const SizedBox(width: 5),
                                         const Text("star")
@@ -367,7 +368,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
 
   // Widget _listCarWidgetHorizontal(SizingInformation sizingInformation) {
   //   return Container(
