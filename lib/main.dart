@@ -5,8 +5,8 @@ import 'package:fp_thuexe/pages/PostCar.dart';
 import 'package:fp_thuexe/pages/detailCar.dart';
 import 'package:fp_thuexe/repository/repository.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-import '../core.dart';
-import 'search.dart';
+import 'core.dart';
+import 'pages/search.dart';
 
 void main() {
   // runApp(Search());
