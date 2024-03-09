@@ -1,5 +1,8 @@
+import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fp_thuexe/pages/search_page.dart';
 import 'package:fp_thuexe/repository/repository.dart';
 import 'package:fp_thuexe/shared/widgets/BottomBar.dart';
 import 'package:responsive_builder/responsive_builder.dart';
@@ -37,9 +40,7 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(
                   height: 10,
                 ),
-                SizedBox(
-                  height: 100,
-                ), // _cardTimeWidget(sizingInformation),
+                _searchWidget(),
                 const SizedBox(
                   height: 10,
                 ),
@@ -67,6 +68,7 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+
 
   Widget _headerWidget() {
     return Row(
@@ -101,6 +103,33 @@ class _HomePageState extends State<HomePage> {
         ),
         const Icon(Icons.image)
       ],
+    );
+  }
+
+  Widget _searchWidget() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SearchPage()),
+          );
+        },
+        child: TextField(
+          enabled: false,
+          decoration: InputDecoration(
+            hintText: 'Tìm xe...',
+            contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            border: InputBorder.none,
+            suffixIcon: Icon(Icons.search),
+          ),
+        ),
+      ),
     );
   }
 
@@ -214,7 +243,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
 
   Widget _sliderWidgetCard(SizingInformation sizingInformation) {
     return Container(
@@ -499,80 +527,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _cardTimeWidget(SizingInformation sizingInformation) {
-    return Container(
-      height: 150,
-      child: Stack(
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                height: 150,
-                width: sizingInformation.localWidgetSize.width * 0.45,
-                child: const Card(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        "10",
-                        style: TextStyle(
-                            fontSize: 38, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        "Sunday, May 25",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Text(
-                        "Time: 10:00",
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                height: 150,
-                width: sizingInformation.localWidgetSize.width * 0.45,
-                child: const Card(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        "11",
-                        style: TextStyle(
-                            fontSize: 38, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        "Sunday, Nov 26",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Text(
-                        "Time: 10:00",
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Align(
-            alignment: Alignment.center,
-            child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.all(Radius.circular(50))),
-              child: const Icon(
-                Icons.arrow_forward,
-                size: 28,
-                color: Colors.white,
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
 }
