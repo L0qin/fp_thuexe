@@ -1,18 +1,18 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:fp_thuexe/Information.dart';
-import 'package:fp_thuexe/PostCar.dart';
-import 'package:fp_thuexe/detailCar.dart';
+import 'package:fp_thuexe/pages/Information.dart';
+import 'package:fp_thuexe/pages/PostCar.dart';
+import 'package:fp_thuexe/pages/detailCar.dart';
 import 'package:fp_thuexe/repository/repository.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-import 'core.dart';
+import '../core.dart';
 import 'search.dart';
 
 void main() {
   // runApp(Search());
   runApp(MaterialApp(
     title: 'My app', // used by the OS task switcher
-    home: DetailCar(),
+    home: Information(),
     //test
   ));
 }
