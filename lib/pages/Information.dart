@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:fp_thuexe/core.dart';
+
+import '../shared/widgets/BottomBar.dart';
 
 class Information extends StatefulWidget {
   const Information({super.key});
