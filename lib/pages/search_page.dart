@@ -58,7 +58,7 @@ class SearchPage extends StatelessWidget {
         decoration: InputDecoration(
           hintText: 'Tìm xe...',
           hintStyle: const TextStyle(color: Colors.grey),
-          prefixIcon: const Icon(Icons.search, color: Colors.teal),
+          suffixIcon: const Icon(Icons.search, color: Colors.teal),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
             borderSide: const BorderSide(color: Colors.teal),

@@ -2,6 +2,7 @@ import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fp_thuexe/pages/login_page.dart';
 import 'package:fp_thuexe/pages/search_page.dart';
 import 'package:fp_thuexe/repository/repository.dart';
 import 'package:fp_thuexe/shared/widgets/BottomBar.dart';
@@ -69,40 +70,60 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
   Widget _headerWidget() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        SizedBox(
-          height: 40,
-          width: 40,
-          child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(40)),
-              child: Image.asset(
-                'assets/images/icons/user.png',
-              )),
-        ),
-        const Column(
-          children: <Widget>[
-            Text(
-              "Location",
-              style: TextStyle(fontSize: 18, color: Colors.black),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(
+            height: 45,
+            width: 45,
+            child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(100)),
+                child: Image.asset(
+                  'assets/images/icons/user.png',
+                )),
+          ),
+          const Column(
+            children: <Widget>[
+              Text(
+                "Location",
+                style: TextStyle(fontSize: 18, color: Colors.black),
+              ),
+              SizedBox(
+                height: 2,
+              ),
+              Row(
+                children: <Widget>[
+                  Text("W4, D8, HCMC"),
+                  Icon(Icons.arrow_drop_down),
+                ],
+              )
+            ],
+          ),
+          MaterialButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()),
+              );
+            },
+            minWidth: 45,
+            height: 50,
+            splashColor: Colors.white12,
+            color: Colors.teal,
+            child: const Text(
+              "Đăng nhập",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12),
             ),
-            SizedBox(
-              height: 2,
-            ),
-            Row(
-              children: <Widget>[
-                Text("Gulshan-e-Iqbalm, Karachi, Pakistan"),
-                Icon(Icons.arrow_drop_down),
-              ],
-            )
-          ],
-        ),
-        const Icon(Icons.image)
-      ],
+          )
+        ],
+      ),
     );
   }
 
@@ -526,5 +547,4 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
-
 }
