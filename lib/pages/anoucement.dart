@@ -11,13 +11,13 @@ class AnnouncementPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Thông Báo Thuê Xe'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
-        child: ListView(
+        child: Column(
           children: [
             buildAnnouncementCard(
               title: "Thuê Xe giá rẻ",
-              subtitle: "Dành cho các Khách Hàng muốn tiết kiêm hàng trăm triệu đồng",
+              subtitle: "Dành cho các Khách Hàng muốn tiết kiệm hàng trăm triệu đồng",
               imagePath: 'assets/images/icons/car.png',
             ),
             SizedBox(height: 16.0),
@@ -32,9 +32,11 @@ class AnnouncementPage extends StatelessWidget {
               subtitle: "Đội ngũ lái xe chuyên nghiệp và xe luôn được bảo dưỡng định kỳ",
               imagePath: 'assets/images/icons/car.png',
             ),
+            // Thêm nhiều thông báo khác nếu cần
           ],
         ),
       ),
+
     );
   }
 

@@ -7,9 +7,9 @@ class JourneyHistoryPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Hành Trình Thuê Xe'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
-        child: ListView(
+        child: Column(
           children: [
             JourneyHistoryItem(
               carType: "Kia",
@@ -26,10 +26,11 @@ class JourneyHistoryPage extends StatelessWidget {
               rentalDuration: "2 ngày",
               cost: "200VNĐ/Ngày",
             ),
-            // Add more items to the ListView as needed
+            // Add more items to the Column as needed
           ],
         ),
       ),
+
     );
   }
 }

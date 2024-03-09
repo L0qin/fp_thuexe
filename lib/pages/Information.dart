@@ -29,7 +29,7 @@ class _InformationState extends State<Information>
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Container(
+      child: SingleChildScrollView(
         child: Column(
           children: [
             Card(
