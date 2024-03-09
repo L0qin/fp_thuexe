@@ -28,12 +28,9 @@ class _DetailCarState extends State<DetailCar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // appBar: AppBar(
-        //   title: Text("Kia"),
-        // ),
         body: ResponsiveBuilder(
       builder: (context, sizingInformation) {
-        return Container(
+        return SingleChildScrollView(
           child: Column(
             children: [
               Padding(padding: EdgeInsets.all(12.0)),
