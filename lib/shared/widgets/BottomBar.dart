@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fp_thuexe/pages/anoucement.dart';
 import 'package:fp_thuexe/pages/home_page.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
@@ -18,7 +19,7 @@ class _BottomBarState extends State<BottomBar> {
     // HomePage content directly included here
     HomePage(),
     Container(),
-    Container(),
+    AnnouncementPage(),
     Information()
   ];
 
