@@ -2,20 +2,21 @@ import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fp_thuexe/pages/login_page.dart';
 import 'package:fp_thuexe/pages/search_page.dart';
 import 'package:fp_thuexe/repository/repository.dart';
 import 'package:fp_thuexe/shared/widgets/BottomBar.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
-class HomePage extends StatefulWidget {
+class ProductCars extends StatefulWidget {
   static const title = 'Thuê xe';
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _ProductCarsState createState() => _ProductCarsState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _ProductCarsState extends State<ProductCars> {
   int _rowButtonController = 0;
   int _sliderIndex = 0;
 
@@ -31,43 +32,163 @@ class _HomePageState extends State<HomePage> {
               end: Alignment.bottomCenter,
             ),
           ),
-          child: Container(
-            margin: const EdgeInsets.only(top: 15, right: 15, left: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                // HeaderWidget
-                _headerWidget(),
-                const SizedBox(
-                  height: 10,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              // HeaderWidget
+              _headerWidget(),
+              const SizedBox(
+                height: 10,
+              ),
+              _searchWidget(),
+              const SizedBox(
+                height: 10,
+              ),
+              _rowButtons(),
+              const SizedBox(
+                height: 15,
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: 4, // Set the number of items in the list (1 + 3 additional products)
+                  itemBuilder: (context, index) {
+                    return Container(
+                      margin: const EdgeInsets.only(top: 15, right: 15, left: 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(10.0),
+                              border: Border.all(
+                                color: Colors.green,
+                                width: 2.0,
+                              ),
+                            ),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    SizedBox(width: 25),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "đ 594,66",
+                                            style: TextStyle(
+                                              fontSize: 25,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.blueAccent,
+                                              backgroundColor: Colors.greenAccent,
+                                              decoration: TextDecoration.underline,
+                                              decorationColor: Colors.blueAccent,
+                                              decorationThickness: 2.0,
+                                            ),
+                                          ),
+                                          Text(
+                                            "Kia Morning",
+                                            style: TextStyle(
+                                              fontSize: 25,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "Like New ",
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                              Text(
+                                                "| ",
+                                                style: TextStyle(fontSize: 20),
+                                              ),
+                                              Text(
+                                                "Petrol ",
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                              Text(
+                                                "| ",
+                                                style: TextStyle(fontSize: 20),
+                                              ),
+                                              Text(
+                                                "7 chỗ ",
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.location_pin,
+                                                size: 30,
+                                                color: Colors.blue,
+                                              ),
+                                              Text(
+                                                " Cao Lỗ ",
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    ClipRect(
+                                      child: SizedBox(
+                                        height: 100,
+                                        width: 200,
+                                        child: Image.asset(
+                                          'assets/images/cars/honda_0.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-                _searchWidget(),
-                const SizedBox(
-                  height: 10,
-                ),
-                _rowButtons(),
-                const SizedBox(
-                  height: 15,
-                ),
-                _sliderWidgetCard(sizingInformation),
-                const SizedBox(
-                  height: 15,
-                ),
-                // _popularCarsHeadingWidget(),
-                _sliderWidgetCard(sizingInformation), // Test UI, remove later
-                const SizedBox(
-                  height: 15,
-                ),
-                // _listCarWidgetHorizontal(sizingInformation),
-                const SizedBox(
-                  height: 15,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
     );
+
+
+
   }
 
   Widget _headerWidget() {
