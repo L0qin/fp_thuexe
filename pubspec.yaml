@@ -48,7 +48,8 @@ dependencies:
   responsive_builder: ^0.7.0
   animate_do: ^3.3.4
   anim_search_bar: ^2.0.3
-
+  http: ^1.2.1
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

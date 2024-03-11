@@ -11,6 +11,7 @@ class _RegisterState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
+      appBar: AppBar(title: Text("Đăng nhập"),),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(

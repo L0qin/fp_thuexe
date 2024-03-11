@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:fp_thuexe/pages/register_page.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -7,10 +11,84 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _login() async {
+    String url = 'https://172.20.5.151:3000/login';
+    String username = _usernameController.text.trim();
+    String password = _passwordController.text.trim();
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer 1',
+        },
+        body: jsonEncode({
+          'username': "new_user",
+          'password': "password123",
+        }),
+      );
+
+
+      if (response.statusCode == 200) {
+        String token = jsonDecode(response.body)['token'];
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+
+        Navigator.pop(context);
+      } else {
+        // Handle error cases (e.g., incorrect credentials)
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text('Invalid username or password.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+      // Handle network errors
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text(e.toString()),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Đăng nhập"),
+      ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
@@ -24,97 +102,150 @@ class _LoginPageState extends State<LoginPage> {
                     top: -40,
                     height: 400,
                     width: width,
-                    child: FadeInUp(duration: Duration(seconds: 1), child: Container(
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage('assets/images/background.png'),
-                              fit: BoxFit.fill
-                          )
-                      ),
-                    )),
+                    child: FadeInUp(
+                        duration: const Duration(seconds: 1),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                  image: AssetImage(
+                                      'assets/images/background.png'),
+                                  fit: BoxFit.fill)),
+                        )),
                   ),
                   Positioned(
                     height: 400,
-                    width: width+20,
-                    child: FadeInUp(duration: Duration(milliseconds: 1000), child: Container(
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage('assets/images/background-2.png'),
-                              fit: BoxFit.fill
-                          )
-                      ),
-                    )),
+                    width: width + 20,
+                    child: FadeInUp(
+                        duration: const Duration(milliseconds: 1000),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                  image: AssetImage(
+                                      'assets/images/background2.png'),
+                                  fit: BoxFit.fill)),
+                        )),
                   )
                 ],
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 40),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  FadeInUp(duration: Duration(milliseconds: 1500), child: Text("Login", style: TextStyle(color: Color.fromRGBO(49, 39, 79, 1), fontWeight: FontWeight.bold, fontSize: 30),)),
-                  SizedBox(height: 30,),
-                  FadeInUp(duration: Duration(milliseconds: 1700), child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                        border: Border.all(color: Color.fromRGBO(196, 135, 198, .3)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color.fromRGBO(196, 135, 198, .3),
-                            blurRadius: 20,
-                            offset: Offset(0, 10),
-                          )
-                        ]
-                    ),
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              border: Border(bottom: BorderSide(
-                                  color: Color.fromRGBO(196, 135, 198, .3)
-                              ))
-                          ),
-                          child: TextField(
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Username",
-                                hintStyle: TextStyle(color: Colors.grey.shade700)
+                  FadeInUp(
+                      duration: const Duration(milliseconds: 1500),
+                      child: const Text(
+                        "Đăng Nhập",
+                        style: TextStyle(
+                            color: Colors.teal,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30),
+                      )),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  FadeInUp(
+                      duration: const Duration(milliseconds: 1700),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            border: Border.all(
+                                color: const Color.fromRGBO(196, 135, 198, .3)),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color.fromRGBO(196, 135, 198, .3),
+                                blurRadius: 20,
+                                offset: Offset(0, 10),
+                              )
+                            ]),
+                        child: Column(
+                          children: <Widget>[
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: const BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          color: Color.fromRGBO(
+                                              196, 135, 198, .3)))),
+                              child: TextField(
+                                controller: _usernameController,
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "Tên đăng nhập",
+                                    hintStyle:
+                                        TextStyle(color: Colors.grey.shade700)),
+                              ),
                             ),
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              child: TextField(
+                                controller: _passwordController,
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "Mật khẩu",
+                                    hintStyle:
+                                        TextStyle(color: Colors.grey.shade700)),
+                              ),
+                            )
+                          ],
+                        ),
+                      )),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  FadeInUp(
+                      duration: const Duration(milliseconds: 1700),
+                      child: Center(
+                          child: TextButton(
+                              onPressed: () {},
+                              child: const Text(
+                                "Quên mật khẩu?",
+                                style: TextStyle(
+                                    color: Color.fromRGBO(196, 135, 198, 1)),
+                              )))),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  FadeInUp(
+                      duration: const Duration(milliseconds: 1900),
+                      child: MaterialButton(
+                        onPressed: () {
+                          _login();
+                        },
+                        color: Colors.teal,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        height: 50,
+                        child: const Center(
+                          child: Text(
+                            "Đăng Nhập",
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          child: TextField(
-                            obscureText: true,
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Password",
-                                hintStyle: TextStyle(color: Colors.grey.shade700)
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  )),
-                  SizedBox(height: 20,),
-                  FadeInUp(duration: Duration(milliseconds: 1700), child: Center(child: TextButton(onPressed: () {}, child: Text("Forgot Password?", style: TextStyle(color: Color.fromRGBO(196, 135, 198, 1)),)))),
-                  SizedBox(height: 30,),
-                  FadeInUp(duration: Duration(milliseconds: 1900), child: MaterialButton(
-                    onPressed: () {},
-                    color: Color.fromRGBO(49, 39, 79, 1),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    height: 50,
-                    child: Center(
-                      child: Text("Login", style: TextStyle(color: Colors.white),),
-                    ),
-                  )),
-                  SizedBox(height: 30,),
-                  FadeInUp(duration: Duration(milliseconds: 2000), child: Center(child: TextButton(onPressed: () {}, child: Text("Create Account", style: TextStyle(color: Color.fromRGBO(49, 39, 79, .6)),)))),
+                      )),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  FadeInUp(
+                      duration: const Duration(milliseconds: 2000),
+                      child: Center(
+                          child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RegisterPage()),
+                                );
+                              },
+                              child: const Text(
+                                "Chưa có tài khoản? Đăng kí ngay",
+                                style: TextStyle(
+                                    color: Color.fromRGBO(49, 39, 79, .6)),
+                              )))),
                 ],
               ),
             )
