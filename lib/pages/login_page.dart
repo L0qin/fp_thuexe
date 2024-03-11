@@ -115,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                   Positioned(
                     height: 400,
                     width: width + 20,
-                    child: FadeInUp(
+                    child: FadeInDown(
                         duration: const Duration(milliseconds: 1000),
                         child: Container(
                           decoration: const BoxDecoration(
