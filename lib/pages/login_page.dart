@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_thuexe/pages/register_page.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fp_thuexe/services/AuthService.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -15,45 +13,46 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login() async {
-    String url = 'https://172.20.5.151:3000/login';
-    String username = _usernameController.text.trim();
-    String password = _passwordController.text.trim();
+    String username = _usernameController.text.trim() ?? "";
+    String password = _passwordController.text.trim() ?? "";
+
 
     try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer 1',
-        },
-        body: jsonEncode({
-          'username': "new_user",
-          'password': "password123",
-        }),
-      );
+      String? token = await AuthService.login(username, password);
 
-
-      if (response.statusCode == 200) {
-        String token = jsonDecode(response.body)['token'];
-
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);
-
+      if (token != null) {
+        // showDialog(
+        //   context: context,
+        //   builder: (BuildContext context) {
+        //     return AlertDialog(
+        //       title: const Text('Token'),
+        //       content: const Text("Token"),
+        //       actions: [
+        //         TextButton(
+        //           onPressed: () {
+        //             Navigator.pop(context);
+        //           },
+        //           child: const Text('OK'),
+        //         ),
+        //       ],
+        //     );
+        //   },
+        // );
         Navigator.pop(context);
+
       } else {
-        // Handle error cases (e.g., incorrect credentials)
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Error'),
-              content: Text('Invalid username or password.'),
+              title: const Text('Error'),
+              content: const Text('Sai thông tin đăng nhập'),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('OK'),
+                  child: const Text('OK'),
                 ),
               ],
             );
@@ -61,19 +60,19 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      // Handle network errors
+      // Handle network errors separately
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text(e.toString()),
+            title: const Text('Error'),
+            content: Text('Lỗi: $e'),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );
@@ -82,12 +81,13 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Đăng nhập"),
+        title: const Text("Đăng nhập"),
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -103,14 +103,23 @@ class _LoginPageState extends State<LoginPage> {
                     height: 400,
                     width: width,
                     child: FadeInUp(
-                        duration: const Duration(seconds: 1),
-                        child: Container(
-                          decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                  image: AssetImage(
-                                      'assets/images/background.png'),
-                                  fit: BoxFit.fill)),
-                        )),
+                      duration: const Duration(seconds: 1),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.teal.withOpacity(0.5),
+                          // Adjust opacity as needed
+                          image: DecorationImage(
+                            image: const AssetImage('assets/images/background.png'),
+                            fit: BoxFit.fill,
+                            colorFilter: ColorFilter.mode(
+                              Colors.teal.withOpacity(0.5),
+                              // Adjust opacity as needed
+                              BlendMode.srcATop,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                   Positioned(
                     height: 400,

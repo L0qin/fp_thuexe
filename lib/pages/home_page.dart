@@ -1,11 +1,9 @@
-import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_thuexe/pages/login_page.dart';
 import 'package:fp_thuexe/pages/search_page.dart';
 import 'package:fp_thuexe/repository/repository.dart';
-import 'package:fp_thuexe/shared/widgets/BottomBar.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
 class HomePage extends StatefulWidget {

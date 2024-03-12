@@ -11,7 +11,7 @@ void main() {
       visualDensity: VisualDensity.adaptivePlatformDensity,
     ),
     home: Scaffold(
-      bottomNavigationBar: ProductElectricCars(),
+      bottomNavigationBar: BottomBar(),
     ),
   ));
 }
