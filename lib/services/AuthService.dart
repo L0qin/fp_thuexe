@@ -33,6 +33,11 @@ class AuthService {
     }
   }
 
+  static Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('token'); // Remove the token from SharedPreferences
+  }
+
   static Future<bool> register(String username, String password,
       String fullName, String phoneNumber, String address) async {
     final url = '$baseUrl/register';
@@ -73,6 +78,36 @@ class AuthService {
 
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token');
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      return null; // No token found
+    }
+
+    // Decode the token to get its payload (assuming it's a JWT)
+    final parts = token.split('.');
+    if (parts.length != 3) {
+      // Invalid token format
+      prefs.remove('token'); // Remove invalid token
+      return null;
+    }
+
+    // Extract the payload from the token
+    final payload = jsonDecode(
+        utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))));
+
+    // Check if the token is expired
+    final int expiry = payload['exp'];
+    final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    if (expiry != null && expiry <= now) {
+      // Token has expired
+      prefs.remove('token'); // Remove expired token
+      return null;
+    }
+
+    // Token is valid
+    return token;
   }
+
+
 }
