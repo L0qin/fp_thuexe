@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:fp_thuexe/model/UserCar.dart';
 
 import '../shared/widgets/BottomBar.dart';
 
@@ -10,19 +11,59 @@ class Information extends StatefulWidget {
   State<Information> createState() => _InformationState();
 }
 
-class _InformationState extends State<Information>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+class _InformationState extends State<Information> {
+TextEditingController _UserNameController=TextEditingController();
+TextEditingController _DaddressController=TextEditingController();
+TextEditingController _phoneNumberController=TextEditingController();
+TextEditingController _profilePictureController=TextEditingController();
+List<User> _user=[];
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this);
+    fectData();
   }
+Future<void>fectData()async{
+await Future.delayed(Duration(seconds: 2));//ảo
+List<User> fecthUser=[
+  User(
+    1,
+    'api_username_1',
+    'api_password_hash_1',
+    'API User 1',
+    'assets/images/users/cv.png',
+    DateTime.now(),
+    9876543210,
+    'API Address 1',
+  ),
+  User(
+    2,
+    'api_username_2',
+    'api_password_hash_2',
+    'API User 2',
+    'assets/images/users/cv.png',
+    DateTime.now(),
+    9876543211,
+    'API Address 2',
+  ),
+];
+setState(() {
+  _user=fecthUser;
+});
+if (_user.isNotEmpty) {
+  loadFetchedData(_user[0]);
+}
 
+}
+void loadFetchedData(User user) {
+  _UserNameController.text=user.username;
+  _DaddressController.text = user.address;
+  _phoneNumberController.text = user.phoneNumber?.toString() ?? '';
+  _profilePictureController.text = user.profilePicture;
+}
   @override
   void dispose() {
-    _controller.dispose();
+   // _controller.dispose();
     super.dispose();
   }
 
@@ -63,8 +104,9 @@ class _InformationState extends State<Information>
                     },
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundImage:
-                          AssetImage('assets/images/icons/user.png'),
+                      //backgroundImage:
+                           //AssetImage('assets/images/users/cv.png'),
+                      backgroundImage: AssetImage(_profilePictureController.text),
                     ),
                   ),
                   ElevatedButton(
@@ -166,17 +208,17 @@ class _InformationState extends State<Information>
                   ),
                   SizedBox(height: 8.0),
                   Text(
-                    'Name: Kim Trường',
+                    'Name: ${_UserNameController.text}',
                     style: TextStyle(fontSize: 20.0),
                   ),
                   SizedBox(height: 5.0),
                   Text(
-                    'Email: ABC@example.com',
+                    'Email:  ${_DaddressController.text}',
                     style: TextStyle(fontSize: 16.0),
                   ),
                   SizedBox(height: 5.0),
                   Text(
-                    'Phone: +1 555-1234',
+                    'Phone: ${_phoneNumberController.text}',
                     style: TextStyle(fontSize: 16.0),
                   ),
                   SizedBox(height: 5.0),
