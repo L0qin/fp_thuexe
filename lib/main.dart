@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fp_thuexe/pages/Information.dart';
 import 'package:fp_thuexe/pages/ProductCar.dart';
 import 'package:fp_thuexe/pages/ProductElectricCar.dart';
+import 'package:fp_thuexe/pages/detailCar.dart';
 import 'package:fp_thuexe/shared/widgets/BottomBar.dart';
 
 void main() {
@@ -12,7 +13,7 @@ void main() {
       visualDensity: VisualDensity.adaptivePlatformDensity,
     ),
     home: Scaffold(
-      bottomNavigationBar: Information(),
+      bottomNavigationBar: DetailCar(),
     ),
   ));
 }
