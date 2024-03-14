@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fp_thuexe/pages/login_page.dart';
 import 'package:fp_thuexe/pages/search_page.dart';
 import 'package:fp_thuexe/repository/repository.dart';
+import 'package:fp_thuexe/services/AuthService.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,6 +17,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _rowButtonController = 0;
   int _sliderIndex = 0;
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Check if token exists initially
+    AuthService.getToken().then((token) {
+      setState(() {
+        _isLoggedIn = token != null;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +82,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _headerWidget() {
+    String buttonText = _isLoggedIn ? "Đăng xuất" : "Đăng nhập";
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Row(
@@ -79,10 +93,9 @@ class _HomePageState extends State<HomePage> {
             height: 45,
             width: 45,
             child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(100)),
-                child: Image.asset(
-                  'assets/images/icons/user.png',
-                )),
+              borderRadius: const BorderRadius.all(Radius.circular(100)),
+              child: Image.asset('assets/images/icons/user.png'),
+            ),
           ),
           const Column(
             children: <Widget>[
@@ -102,24 +115,36 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           MaterialButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-              );
+            onPressed: () async {
+              if (_isLoggedIn) {
+                await AuthService.logout();
+                setState(() {
+                  _isLoggedIn = false;
+                });
+              } else {
+                // Navigate to the login page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+                setState(() {
+                  _isLoggedIn = AuthService.getToken() != null;
+                });
+              }
             },
             minWidth: 45,
             height: 50,
             splashColor: Colors.white12,
             color: Colors.teal,
-            child: const Text(
-              "Đăng nhập",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12),
+            child: Text(
+              buttonText,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
