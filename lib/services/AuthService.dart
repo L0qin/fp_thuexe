@@ -22,7 +22,8 @@ class AuthService {
       );
       if (response.statusCode == 200) {
         final token = jsonDecode(response.body)['token'];
-        await _saveToken(token);
+        final userId = jsonDecode(response.body)['userId'];
+        await _saveInfo(token,userId.toString());
         return token;
       } else {
         return null;
@@ -71,9 +72,10 @@ class AuthService {
     }
   }
 
-  static Future<void> _saveToken(String token) async {
+  static Future<void> _saveInfo(String token,String userId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
+    await prefs.setString('userId', userId);
   }
 
   static Future<String?> getToken() async {
@@ -109,5 +111,10 @@ class AuthService {
     return token;
   }
 
+  static Future<int?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
 
+    return int.parse(userId != null ? userId :"-1") ;
+  }
 }

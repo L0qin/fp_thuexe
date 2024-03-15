@@ -1,7 +1,3 @@
-import 'dart:io';
-
-import 'package:http/http.dart';
-
 class User {
   int userId;
   String username;

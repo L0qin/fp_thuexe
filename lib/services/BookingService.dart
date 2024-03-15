@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 import 'ServiceConstants.dart';
 
-class APIService {
+class BookingService {
   final String baseUrl =ServiceConstants.baseUrl;
 
   Future<List<Map<String, dynamic>>?> getAllDatXe() async {
