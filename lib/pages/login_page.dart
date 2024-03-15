@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:fp_thuexe/pages/register_page.dart';
 import 'package:fp_thuexe/services/AuthService.dart';
 
+import '../models/User.dart';
+import '../services/UserService.dart';
+
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -21,24 +24,8 @@ class _LoginPageState extends State<LoginPage> {
       String? token = await AuthService.login(username, password);
 
       if (token != null) {
-        // showDialog(
-        //   context: context,
-        //   builder: (BuildContext context) {
-        //     return AlertDialog(
-        //       title: const Text('Token'),
-        //       content: const Text("Token"),
-        //       actions: [
-        //         TextButton(
-        //           onPressed: () {
-        //             Navigator.pop(context);
-        //           },
-        //           child: const Text('OK'),
-        //         ),
-        //       ],
-        //     );
-        //   },
-        // );
-        Navigator.pop(context);
+
+        // Navigator.pop(context);
 
       } else {
         showDialog(
@@ -79,6 +66,27 @@ class _LoginPageState extends State<LoginPage> {
         },
       );
     }
+
+    User? user = await UserService.getUserById(1);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Token'),
+          content:  Text(user.toString()),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+
   }
 
 

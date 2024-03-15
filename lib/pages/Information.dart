@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:fp_thuexe/model/UserCar.dart';
+import 'package:fp_thuexe/models/User.dart';
+import 'package:fp_thuexe/services/AuthService.dart';
+import 'package:fp_thuexe/services/UserService.dart';
 
 import '../shared/widgets/BottomBar.dart';
 
@@ -12,58 +14,34 @@ class Information extends StatefulWidget {
 }
 
 class _InformationState extends State<Information> {
-TextEditingController _UserNameController=TextEditingController();
-TextEditingController _DaddressController=TextEditingController();
-TextEditingController _phoneNumberController=TextEditingController();
-TextEditingController _profilePictureController=TextEditingController();
-List<User> _user=[];
+  TextEditingController _UserNameController = TextEditingController();
+  TextEditingController _DaddressController = TextEditingController();
+  TextEditingController _phoneNumberController = TextEditingController();
+  TextEditingController _profilePictureController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    fectData();
+    fetchData();
   }
-Future<void>fectData()async{
-await Future.delayed(Duration(seconds: 2));//ảo
-List<User> fecthUser=[
-  User(
-    1,
-    'api_username_1',
-    'api_password_hash_1',
-    'API User 1',
-    'assets/images/users/cv.png',
-    DateTime.now(),
-    9876543210,
-    'API Address 1',
-  ),
-  User(
-    2,
-    'api_username_2',
-    'api_password_hash_2',
-    'API User 2',
-    'assets/images/users/cv.png',
-    DateTime.now(),
-    9876543211,
-    'API Address 2',
-  ),
-];
-setState(() {
-  _user=fecthUser;
-});
-if (_user.isNotEmpty) {
-  loadFetchedData(_user[0]);
-}
 
-}
-void loadFetchedData(User user) {
-  _UserNameController.text=user.username;
-  _DaddressController.text = user.address;
-  _phoneNumberController.text = user.phoneNumber?.toString() ?? '';
-  _profilePictureController.text = user.profilePicture;
-}
+  Future<void> fetchData() async {
+    User? user = await UserService.getUserById(1);
+    setState(() {
+      loadFetchedData(user!);
+    });
+  }
+
+  void loadFetchedData(User user) {
+    _UserNameController.text = "user.username";
+    _DaddressController.text = "user.address";
+    _phoneNumberController.text = user.phoneNumber?.toString() ?? '';
+    _profilePictureController.text = "user.profilePicture";
+  }
+
   @override
   void dispose() {
-   // _controller.dispose();
+    // _controller.dispose();
     super.dispose();
   }
 
@@ -105,8 +83,9 @@ void loadFetchedData(User user) {
                     child: CircleAvatar(
                       radius: 50,
                       //backgroundImage:
-                           //AssetImage('assets/images/users/cv.png'),
-                      backgroundImage: AssetImage(_profilePictureController.text),
+                      //AssetImage('assets/images/users/cv.png'),
+                      backgroundImage:
+                          AssetImage(_profilePictureController.text),
                     ),
                   ),
                   ElevatedButton(
