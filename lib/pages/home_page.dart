@@ -44,6 +44,7 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                const SizedBox(height: 30,),
                 _headerWidget(),
                 const SizedBox(height: 10),
                 _searchWidget(),
@@ -54,7 +55,12 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 4),
                 _buildHeader('Most Rented'),
                 _buildCarList(),
-                const SizedBox(height: 10),
+                const SizedBox(height: 4),
+                _buildHeader('Most Popular'),
+                _buildMostPopularCars(),
+
+                // const SizedBox(height: 10), //Lịch sử thuê xe
+                // _buildRecentRentals(),
               ],
             ),
           ),
@@ -172,7 +178,7 @@ class _HomePageState extends State<HomePage> {
               fontWeight: FontWeight.w900,
             ),
           ),
-          SizedBox(width: 370,),
+          SizedBox(width: 200,),
           GestureDetector(
             onTap: () {},
             child: Text(
@@ -239,7 +245,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildViewAllButton() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.only(top:1),
       child: MaterialButton(
         onPressed: () {},
         child: Text('Xem tất cả'),
@@ -258,8 +264,9 @@ class _HomePageState extends State<HomePage> {
         // Thêm các item khác cho các mẫu xe khác
       ],
       options: CarouselOptions(
-        height: 175, // Chiều cao của CarouselSlider
-        viewportFraction: 2/4, // Hiển thị 80% tổng số item
+
+        height: 180, // Chiều cao của CarouselSlider
+        viewportFraction: 0.6, // Hiển thị 80% tổng số item
         enableInfiniteScroll: true, // Bật cuộn vô hạn
       ),
     );
@@ -269,8 +276,8 @@ class _HomePageState extends State<HomePage> {
   Widget _buildCarItem(String type, String name, int price) {
     return Container(
       width: 230,
-      margin: EdgeInsets.all(5),
-       padding: EdgeInsets.all(5),
+      margin: EdgeInsets.only(left: 1),
+       padding: EdgeInsets.all(7),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(10),
@@ -346,5 +353,94 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+  Widget _buildMostPopularCars() {
+    return CarouselSlider(
+      items: [
+        _buildCarItem('Sport', 'Hyundai i30 N 2021', 20),
+        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
+        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
+        // ... Add more car items here
+      ],
+      options: CarouselOptions(
+        height: 180, // Adjust height as desired
+        viewportFraction: 0.6, // Display a portion of total items
+        enableInfiniteScroll: true, // Enable infinite scrolling (optional)
+      ),
+    );
+  }
+  Widget _buildRecentRentals() {
+    return Container(
+      height: 180,
+      margin: EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Lịch sử thuê xe gần đây',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Divider(color: Colors.grey),
+          Expanded(
+            child: ListView.builder(
+              itemCount: 3, // Adjust number of recent rentals to display
+              itemBuilder: (context, index) {
+                return _buildRecentRentalItem(index);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecentRentalItem(int index) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        children: <Widget>[
+          Image.asset(
+            'assets/images/cars/land_rover_0.png',
+            width: 80,
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Hyundai i30 N 2021',
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  '12/03/2024 - 15/03/2024',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+                Text(
+                  '\$80',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
 }
