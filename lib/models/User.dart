@@ -5,18 +5,12 @@ class User {
   String fullName;
   String profilePicture;
   DateTime birthDate;
-  int phoneNumber;
+  String phoneNumber;
   String address;
 
-  User(
-      this.userId,
-      this.username,
-      this.passwordHash,
-      this.fullName,
-      this.profilePicture,
-      this.birthDate,
-      this.phoneNumber,
-      this.address);
+
+  User(this.userId, this.username, this.passwordHash, this.fullName,
+      this.profilePicture, this.birthDate, this.phoneNumber, this.address);
 
   @override
   String toString() {

@@ -27,7 +27,7 @@ class UserService {
         jsonData['ten_nguoi_dung'],
         jsonData['mat_khau_hash'],
         jsonData['ho_ten'],
-        jsonData['hinh_dai_dien'],
+        '$baseUrl/images/getimages/hinh1.jpg',
         DateTime.parse(jsonData['ngay_dang_ky']),
         jsonData['so_dien_thoai'],
         jsonData['dia_chi_nguoi_dung'],

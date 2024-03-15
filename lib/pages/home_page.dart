@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:fp_thuexe/pages/login_page.dart';
 import 'package:fp_thuexe/pages/search_page.dart';
 import 'package:fp_thuexe/services/AuthService.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class HomePage extends StatefulWidget {
   static const title = 'Thuê xe';

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fp_thuexe/models/User.dart';
 import 'package:fp_thuexe/services/AuthService.dart';
+import 'package:fp_thuexe/services/ImageService.dart';
 import 'package:fp_thuexe/services/UserService.dart';
 
 import '../shared/widgets/BottomBar.dart';
@@ -33,10 +34,10 @@ class _InformationState extends State<Information> {
   }
 
   void loadFetchedData(User user) {
-    _UserNameController.text = "user.username";
-    _DaddressController.text = "user.address";
+    _UserNameController.text = user.username;
+    _DaddressController.text = user.address;
     _phoneNumberController.text = user.phoneNumber?.toString() ?? '';
-    _profilePictureController.text = "user.profilePicture";
+    _profilePictureController.text = user.profilePicture;
   }
 
   @override
@@ -86,6 +87,10 @@ class _InformationState extends State<Information> {
                       //AssetImage('assets/images/users/cv.png'),
                       backgroundImage:
                           AssetImage(_profilePictureController.text),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: Image.network(_profilePictureController.text),
+                      ),
                     ),
                   ),
                   ElevatedButton(
@@ -124,6 +129,10 @@ class _InformationState extends State<Information> {
                                     radius: 50,
                                     backgroundImage: AssetImage(
                                         'assets/images/icons/user.png'),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(500),
+                                      child: Image.network(_profilePictureController.text),
+                                    ),
                                   ),
                                 ),
                                 SizedBox(

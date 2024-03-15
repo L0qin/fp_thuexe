@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (token != null) {
 
-        // Navigator.pop(context);
+        Navigator.pop(context);
 
       } else {
         showDialog(
