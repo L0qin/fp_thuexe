@@ -1,11 +1,11 @@
+import 'dart:ui';
+
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_thuexe/pages/login_page.dart';
 import 'package:fp_thuexe/pages/search_page.dart';
-import 'package:fp_thuexe/repository/repository.dart';
 import 'package:fp_thuexe/services/AuthService.dart';
-import 'package:responsive_builder/responsive_builder.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class HomePage extends StatefulWidget {
   static const title = 'Thuê xe';
@@ -15,9 +15,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _rowButtonController = 0;
-  int _sliderIndex = 0;
   bool _isLoggedIn = false;
+  bool _isRenting = false;
 
   @override
   void initState() {
@@ -32,55 +31,39 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveBuilder(
-      builder: (context, sizingInformation) {
-        return Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.white, Colors.grey, Colors.white],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+    return Scaffold(
+      body: ListView(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.white, Colors.grey, Colors.white],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
-          ),
-          child: Container(
-            margin: const EdgeInsets.only(top: 15, right: 15, left: 15),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                // HeaderWidget
                 _headerWidget(),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 _searchWidget(),
-                const SizedBox(
-                  height: 10,
-                ),
-                _rowButtons(),
-                const SizedBox(
-                  height: 15,
-                ),
-                _sliderWidgetCard(sizingInformation),
-                const SizedBox(
-                  height: 15,
-                ),
-                // _popularCarsHeadingWidget(),
-                _sliderWidgetCard(sizingInformation), // Test UI, remove later
-                const SizedBox(
-                  height: 15,
-                ),
-                // _listCarWidgetHorizontal(sizingInformation),
-                const SizedBox(
-                  height: 15,
-                ),
+                const SizedBox(height: 15),
+                _buildHeader('Top Brands'),
+                _buildBrandList(context),
+                _buildViewAllButton(),
+                const SizedBox(height: 4),
+                _buildHeader('Most Rented'),
+                _buildCarList(),
+                const SizedBox(height: 10),
               ],
             ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
-
+//Login
   Widget _headerWidget() {
     String buttonText = _isLoggedIn ? "Đăng xuất" : "Đăng nhập";
     return Container(
@@ -118,19 +101,15 @@ class _HomePageState extends State<HomePage> {
             onPressed: () async {
               if (_isLoggedIn) {
                 await AuthService.logout();
-                setState(() {
-                  _isLoggedIn = false;
-                });
               } else {
-                // Navigate to the login page
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),
                 );
-                setState(() {
-                  _isLoggedIn = AuthService.getToken() != null;
-                });
               }
+              setState(() {
+                _isLoggedIn = !_isLoggedIn;
+              });
             },
             minWidth: 45,
             height: 50,
@@ -149,7 +128,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
+//Search
   Widget _searchWidget() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -176,398 +155,197 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  Widget _rowButtons() {
+//Brands
+  Widget _buildHeader(String title) {
     return Container(
-      // decoration: BoxDecoration(
-      //     borderRadius: BorderRadius.circular(5), color: Colors.teal),
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            _rowButtonSingleItem(
-                image: "assets/images/icons/car.png",
-                title: "Ô tô",
-                selectedItemTextColor:
-                    _rowButtonController == 0 ? Colors.white : Colors.black,
-                selectedBgColor:
-                    _rowButtonController == 0 ? Colors.teal : Colors.white,
-                selectedItemIconColor:
-                    _rowButtonController == 0 ? Colors.white : Colors.teal,
-                onPressed: () {
-                  setState(() {
-                    _rowButtonController = 0;
-                  });
-                }),
-            _rowButtonSingleItem(
-                image: "assets/images/icons/electric_car.png",
-                title: "Ô tô đện",
-                selectedItemTextColor:
-                    _rowButtonController == 1 ? Colors.white : Colors.black,
-                selectedBgColor:
-                    _rowButtonController == 1 ? Colors.teal : Colors.white,
-                selectedItemIconColor:
-                    _rowButtonController == 1 ? Colors.white : Colors.teal,
-                onPressed: () {
-                  setState(() {
-                    _rowButtonController = 1;
-                  });
-                }),
-            _rowButtonSingleItem(
-                image: "assets/images/icons/scooter.png",
-                title: "Xe máy",
-                selectedItemTextColor:
-                    _rowButtonController == 3 ? Colors.white : Colors.black,
-                selectedBgColor:
-                    _rowButtonController == 3 ? Colors.teal : Colors.white,
-                selectedItemIconColor:
-                    _rowButtonController == 3 ? Colors.white : Colors.teal,
-                onPressed: () {
-                  setState(() {
-                    _rowButtonController = 3;
-                  });
-                }),
-            _rowButtonSingleItem(
-                image: "assets/images/icons/electric_scooter.png",
-                title: "Xe máy điện",
-                selectedItemTextColor:
-                    _rowButtonController == 4 ? Colors.white : Colors.black,
-                selectedBgColor:
-                    _rowButtonController == 4 ? Colors.teal : Colors.white,
-                selectedItemIconColor:
-                    _rowButtonController == 4 ? Colors.white : Colors.teal,
-                onPressed: () {
-                  setState(() {
-                    _rowButtonController = 4;
-                  });
-                }),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _rowButtonSingleItem({
-    required String image,
-    required String title,
-    Color? selectedBgColor,
-    Color? selectedItemIconColor,
-    Color? selectedItemTextColor,
-    VoidCallback? onPressed,
-  }) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: 100,
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: selectedBgColor,
-          borderRadius: const BorderRadius.all(Radius.circular(10)),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              image,
-              color: selectedItemIconColor,
-              width: 40,
-              height: 40,
+      height: 30,
+      width: double.infinity,
+      margin: EdgeInsets.only(left: 12),
+      child: Row(
+        // mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.blue[700],
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
             ),
-            const SizedBox(height: 8),
-            Text(
-              title,
+          ),
+          SizedBox(width: 370,),
+          GestureDetector(
+            onTap: () {},
+            child: Text(
+              'View All',
               style: TextStyle(
-                color: selectedItemTextColor,
-                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 16,
               ),
             ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+//Brand
+  Widget _buildLogoBrands(String brandName) {
+    if (brandName == null) {
+      return Container();
+    }
+    return InkWell(
+      onTap: () {
+        // Handle logo tap event (optional)
+        print("Logo $brandName is tapped!");
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 5),
+        width: 80,
+        height: 70,
+        decoration: BoxDecoration(
+          //color: Colors.white,
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(12.0),
         ),
+        child: Image.asset('assets/images/brands/$brandName.png'),
       ),
     );
   }
 
-  Widget _sliderWidgetCard(SizingInformation sizingInformation) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: CarouselSlider(
-          options: CarouselOptions(
-              height: 260.0,
-              aspectRatio: 0.10,
-              viewportFraction: 2.0,
-              autoPlay: true,
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _sliderIndex = index;
-                });
-              }),
-          items: FakeRepository.sliderData.map((sliderData) {
-            return Builder(
-              builder: (_) {
-                return InkWell(
-                  onTap: () {
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (_) => CarDetailPage(
-                    //         image: sliderData.sliderImage,
-                    //       ),
-                    //     ));
-                  },
-                  child: Card(
-                    child: Column(
-                      children: <Widget>[
-                        Stack(
-                          children: <Widget>[
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 5),
-                              height: 190,
-                              width: sizingInformation.screenSize.width,
-                              child: ClipRRect(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(10)),
-                                child: Image.asset(
-                                  "assets/images/cars/honda_0.png",
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              right: 18,
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(10)),
-                                ),
-                                child: Row(
-                                  children: <Widget>[
-                                    const Icon(
-                                      Icons.star,
-                                      color: Colors.teal,
-                                    ),
-                                    Text(
-                                      sliderData.rating,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              right: 18,
-                              bottom: 0,
-                              left: 18,
-                              child: Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 135),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(10),
-                                      topLeft: Radius.circular(10)),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: FakeRepository.sliderData
-                                      .map((sliderData) {
-                                    return Container(
-                                      height: 7.0,
-                                      width: 7.0,
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 4.0, horizontal: 2.0),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: _sliderIndex ==
-                                                FakeRepository.sliderData
-                                                    .indexOf(sliderData)
-                                            ? Colors.teal
-                                            : Colors.black,
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 30),
-                          child: Column(
-                            children: <Widget>[
-                              const SizedBox(
-                                height: 15,
-                              ),
-                              Container(
-                                width: sizingInformation.localWidgetSize.width *
-                                    0.80,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text(
-                                      sliderData.title,
-                                      style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Row(
-                                      children: <Widget>[
-                                        Text(
-                                          sliderData.totalStar,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 24),
-                                        ),
-                                        const SizedBox(width: 5),
-                                        const Text("star")
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                );
-              },
-            );
-          }).toList(),
-        ),
+  Widget _buildBrandList(BuildContext context) {
+    List<String> brandNames = ['honda', 'bmw', 'huydai', 'landrover', 'cheverolet', 'bmw', 'bmw', 'audi','huydai','huydai']; // Sample brand names
+
+      return CarouselSlider(
+      items: brandNames.map((name) => _buildLogoBrands(name ?? '')).toList(),
+    options: CarouselOptions(
+    height: 70, // Bạn có thể điều chỉnh chiều cao theo ý muốn
+    viewportFraction:1/5, // Hiển thị 50% tổng số item
+    enlargeCenterPage: true,
+        autoPlay: true,
+        autoPlayInterval: Duration(seconds: 3),
+        autoPlayAnimationDuration: Duration(milliseconds: 800),
+        autoPlayCurve: Curves.fastOutSlowIn,
+        pauseAutoPlayOnTouch: true,
+        onPageChanged: (index, reason) {
+          // Xử lý khi trang thay đổi (nếu cần)
+        },
+
+      ),
+
+    );
+  }
+
+
+
+
+  Widget _buildViewAllButton() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: MaterialButton(
+        onPressed: () {},
+        child: Text('Xem tất cả'),
       ),
     );
   }
 
-  // Widget _listCarWidgetHorizontal(SizingInformation sizingInformation) {
-  //   return Container(
-  //     height: 190,
-  //     padding: EdgeInsets.symmetric(horizontal: 5),
-  //     child: Card(
-  //       child: PageView.builder(
-  //         scrollDirection: Axis.horizontal,
-  //         itemCount: FakeRepository.listViewData.length,
-  //         itemBuilder: (BuildContext context, int index) {
-  //           return _listViewItem(index, sizingInformation);
-  //         },
-  //       ),
-  //     ),
-  //   );
-  // }
-  //
-  // Widget _listViewItem(int index, SizingInformation sizingInformation) {
-  //   return Stack(
-  //     children: <Widget>[
-  //       Column(
-  //         children: <Widget>[
-  //           Container(
-  //             padding: EdgeInsets.symmetric(horizontal: 10),
-  //             height: 130,
-  //             width: sizingInformation.localWidgetSize.width,
-  //             child: ClipRRect(
-  //                 borderRadius: BorderRadius.all(Radius.circular(10)),
-  //                 child: Image.asset(
-  //                   FakeRepository.listViewData[index].sliderImage,
-  //                   fit: BoxFit.cover,
-  //                 )),
-  //           ),
-  //         ],
-  //       ),
-  //       Positioned(
-  //         right: 0,
-  //         child: Container(
-  //           padding: EdgeInsets.symmetric(horizontal: 10),
-  //           decoration: BoxDecoration(
-  //               color: Colors.white,
-  //               borderRadius:
-  //                   BorderRadius.only(bottomLeft: Radius.circular(10))),
-  //           child: Row(
-  //             children: <Widget>[
-  //               Icon(
-  //                 Icons.star,
-  //                 color: Colors.teal,
-  //               ),
-  //               Text(
-  //                 FakeRepository.listViewData[index].rating,
-  //                 style: TextStyle(fontWeight: FontWeight.bold),
-  //               )
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //       Positioned(
-  //         bottom: 0,
-  //         left: 0,
-  //         right: 0,
-  //         child: Align(
-  //           alignment: Alignment.bottomCenter,
-  //           child: Container(
-  //             padding: EdgeInsets.symmetric(horizontal: 20),
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: <Widget>[
-  //                 SizedBox(
-  //                   height: 10,
-  //                 ),
-  //                 Row(
-  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                   children: <Widget>[
-  //                     Text(
-  //                       FakeRepository.listViewData[index].title,
-  //                       style: TextStyle(
-  //                           fontWeight: FontWeight.bold, fontSize: 18),
-  //                     ),
-  //                     Row(
-  //                       children: <Widget>[
-  //                         Text(
-  //                           FakeRepository.listViewData[index].totalStar,
-  //                           style: TextStyle(
-  //                               fontWeight: FontWeight.bold, fontSize: 24),
-  //                         ),
-  //                         Text("Star"),
-  //                       ],
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 Text(
-  //                     "${FakeRepository.listViewData[index].totalTrips} Trips"),
-  //                 SizedBox(
-  //                   height: 10,
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       )
-  //     ],
-  //   );
-  // }
+  Widget _buildCarList() {
+    return CarouselSlider(
+      items: [
+        _buildCarItem('Sport', 'Hyundai i30 N 2021', 20),
+        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
+        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15), _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
+        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
 
-  Widget _popularCarsHeadingWidget() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          "Popular Cars",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-        ),
-        SizedBox(
-          height: 5,
-        ),
-        Text("Popular Car: United Arab")
+        // Thêm các item khác cho các mẫu xe khác
       ],
+      options: CarouselOptions(
+        height: 175, // Chiều cao của CarouselSlider
+        viewportFraction: 2/4, // Hiển thị 80% tổng số item
+        enableInfiniteScroll: true, // Bật cuộn vô hạn
+      ),
     );
   }
+
+
+  Widget _buildCarItem(String type, String name, int price) {
+    return Container(
+      width: 230,
+      margin: EdgeInsets.all(5),
+       padding: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: <Widget>[
+          Image.asset(
+            'assets/images/cars/land_rover_0.png',
+            width: 100,
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  type,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  '\$$price/per day',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10),
+                _buildRentButton(price),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRentButton(int price) {
+    return MaterialButton(
+      onPressed: () {
+        if (_isRenting) {
+          // Xử lý việc hủy thuê xe
+          setState(() {
+            _isRenting = false;
+          });
+        } else {
+          // Xử lý việc thuê xe
+          // Hiển thị thông tin chi tiết, xác nhận
+          setState(() {
+            _isRenting = true;
+          });
+        }
+      },
+      minWidth: 100,
+      height: 40,
+      splashColor: Colors.white12,
+      color: _isRenting ? Colors.grey : Colors.teal,
+      child: Text(
+        _isRenting ? "Đã Thuê" : "Thuê Xe",
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
 }

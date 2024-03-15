@@ -13,7 +13,7 @@ void main() {
       visualDensity: VisualDensity.adaptivePlatformDensity,
     ),
     home: Scaffold(
-      bottomNavigationBar: DetailCar(),
+      bottomNavigationBar: BottomBar(),
     ),
   ));
 }

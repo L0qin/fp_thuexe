@@ -50,6 +50,7 @@ dependencies:
   anim_search_bar: ^2.0.3
   http: ^1.2.1
   shared_preferences: ^2.2.2
+  cached_network_image: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +82,7 @@ flutter:
     - assets/images/icons/
     - assets/images/cars/
     - assets/images/users/
+    - assets/images/brands/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
