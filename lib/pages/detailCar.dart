@@ -8,6 +8,7 @@ import 'package:responsive_builder/responsive_builder.dart';
 
 import '../models/Vehicle.dart';
 import '../services/VehicleService.dart';
+import 'confirm_page.dart';
 
 class DetailCar extends StatefulWidget {
   DetailCar(this.carId);
@@ -64,7 +65,8 @@ class _DetailCarState extends State<DetailCar> {
 
   Future<void> _getImageURLs() async {
     try {
-      List<String> imageURLs = await ImageService.getAllVehicleImageURLsById(carId);
+      List<String> imageURLs =
+          await ImageService.getAllVehicleImageURLsById(carId);
       setState(() {
         _imageURLs = imageURLs;
       });
@@ -76,36 +78,37 @@ class _DetailCarState extends State<DetailCar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _vehicle != null ? _vehicle!.carName : "...",
-          style: TextStyle(color: Colors.white),
+        appBar: AppBar(
+          title: Text(
+            _vehicle != null ? _vehicle!.carName : "...",
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.teal,
         ),
-        backgroundColor: Colors.teal,
-      ),
-      body: ResponsiveBuilder(
-        builder: (context, sizingInformation) {
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildCarouselSlider(),
-                _buildTextWithIconRow(_vehicle != null ? _vehicle!.model : "...", _vehicle != null ? "${_vehicle!.rentalPrice}VNĐ/Ngày" : "500VNĐ/Ngày"),
-                _buildDescription(_vehicle != null ? _vehicle!.description : "..."),
-                _buildInfoCardsRow("","",1),
-                _buildLocationSelection(_vehicle != null ? _vehicle!.address : "Katowice Airport"),
-                _buildElevatedButton(),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+        body: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              _buildCarouselSlider(),
+              _buildTextWithIconRow(
+                  _vehicle != null ? _vehicle!.carName : "...",
+                  _vehicle != null
+                      ? "${_vehicle!.rentalPrice}VNĐ/Ngày"
+                      : "500VNĐ/Ngày"),
+              _buildDescription(
+                  _vehicle != null ? _vehicle!.description : "..."),
+              _buildLocationSelection(
+                  _vehicle != null ? _vehicle!.address : "Katowice Airport"),
+              _buildElevatedButton(),
+            ],
+          ),
+        ));
   }
 
   Widget _buildCarouselSlider() {
     if (_imageURLs.isNotEmpty) {
       return Card(
-        margin: EdgeInsets.all(10),
+        margin: EdgeInsets.fromLTRB(0, 12, 0, 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
@@ -132,9 +135,11 @@ class _DetailCarState extends State<DetailCar> {
                       },
                     ),
                     items: _imageURLs.map((imageUrl) {
-                      return Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
+                      return Expanded(
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                        ),
                       );
                     }).toList(),
                   ),
@@ -168,12 +173,19 @@ class _DetailCarState extends State<DetailCar> {
         ),
       );
     } else {
-      return SizedBox
-          .shrink(); // Return an empty SizedBox if _imageURLs is empty
+      // Placeholder container to hold space when images are not loaded
+      return Container(
+        height: 300, // Set height of the placeholder container
+        margin: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.0),
+          color: Colors.grey[200], // Placeholder color
+        ),
+      );
     }
   }
 
-  Widget _buildTextWithIconRow(String text, String rating) {
+  Widget _buildTextWithIconRow(String title, String price) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: Row(
@@ -181,7 +193,7 @@ class _DetailCarState extends State<DetailCar> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            text,
+            title,
             style: TextStyle(
               color: Colors.blue,
               fontSize: 24,
@@ -191,13 +203,8 @@ class _DetailCarState extends State<DetailCar> {
           Spacer(),
           Row(
             children: [
-              Icon(
-                Icons.star,
-                color: Colors.yellow[800],
-                size: 24,
-              ),
               Text(
-                rating,
+                price,
                 style: TextStyle(
                   color: Colors.yellow[800],
                   fontSize: 24,
@@ -211,117 +218,70 @@ class _DetailCarState extends State<DetailCar> {
   }
 
   Widget _buildDescription(String description) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Mô tả",
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
-          ),
-          SizedBox(height: 1),
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(height: 1),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoCardsRow(String model, String rentalPrice, int seating) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildInfoCard(Icons.speed_sharp, "250 km/h", "Power"),
-        _buildInfoCard(Icons.build_circle_outlined, model, "Year"),
-        _buildInfoCard(
-            Icons.local_gas_station, rentalPrice, "Fuel Consumption"),
+        Text(
+          "Mô tả",
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+        ),
+        SizedBox(height: 1),
+        Text(
+          description,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+          ),
+        ),
+        SizedBox(height: 1),
       ],
     );
   }
 
-  Widget _buildInfoCard(IconData icon, String value, String label) {
-    return Card(
-      margin: EdgeInsets.all(10),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            size: 50,
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              color: Colors.yellow[800],
-              fontSize: 24,
-            ),
-          ),
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.yellow,
-              fontSize: 20,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildLocationSelection(String address) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 20),
+    return Container(
+      height: 300,
+      width: double.infinity,
+      margin: EdgeInsets.only(left: 12),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: <Widget>[
           Text(
-            "Select Location",
+            "Địa chỉ xe",
             style: TextStyle(
-              fontSize: 24,
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
+              color: Colors.teal[700],
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
             ),
           ),
-          SizedBox(height: 10),
-          // Thêm khoảng cách giữa tiêu đề và phần chọn vị trí
-          Center(
-            child: Container(
-                // Widget giả lập
-                ),
-          ),
+          Container(
+            height: 100,
+          )
         ],
       ),
     );
   }
 
   Widget _buildElevatedButton() {
-    return Padding(
-      padding: EdgeInsets.all(20),
-      child: ElevatedButton.icon(
-        icon: Icon(Icons.add, size: 32, color: Colors.white),
-        label: Text(
-          'Lựa chọn',
-          style: TextStyle(fontSize: 28, color: Colors.white),
-        ),
+    return Container(
+      margin: EdgeInsets.all(12),
+      child: MaterialButton(
         onPressed: () {
-          // Thực hiện hành động khi nút được nhấn
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ConfirmPage(_vehicle!)),
+          );
         },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          // Các thuộc tính khác như padding, shape, textStyle, ...
+        height: 50,
+        minWidth: double.infinity,
+        color: Colors.teal,
+        child: const Text(
+          "Thuê ngay",
+          style: TextStyle(color: Colors.white, fontSize: 25),
         ),
       ),
     );
