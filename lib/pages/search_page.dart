@@ -377,7 +377,7 @@ class VehicleItem extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    '${rentPrice.toDouble().toStringAsFixed(0)}\n/Ngày',
+                    '$rentPrice\n/Ngày',
                     style: TextStyle(
                       color: Colors.teal,
                       fontSize: 18.0,
