@@ -93,6 +93,9 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 4),
                 _buildHeader('Thuê nhiều'),
                 _buildCarList(),
+                const SizedBox(height: 4),
+                _buildHeader('News'),
+                _buildNewCar(),
                 const SizedBox(height: 10),
                 _buildHeaderNoExpand('Bạn có xe nhàn rỗi? Đăng ngay!'),
                 _buildPostCar(),
@@ -417,7 +420,63 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-
+  Widget _buildNewCar() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10), // Adjust the horizontal padding as needed
+      child: Center(
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white10, // Background color for the main container
+            borderRadius: BorderRadius.circular(10), // Border radius for the main container
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      '2021 Mazda 6 sedan adds standard Apple CarPlay',
+                      style: TextStyle(fontSize: 18,color: Colors.black,fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'By Blake Sep 18, 2020',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    SizedBox(height: 20),
+                    // ElevatedButton(
+                    //   onPressed: () {},
+                    //   child: Text('Xem thêm'),
+                    // ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 10), // Adjust the spacing between the text content and image
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black), // Border color for the image frame
+                  borderRadius: BorderRadius.circular(10),
+                  // Border radius for the image frame
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10), // Clip the image with border radius
+                  child: Image.asset(
+                    'assets/images/cars/land_rover_0.png',
+                    width: 120, // Adjust the width of the image as needed
+                    height: 120, // Adjust the height of the image as needed
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildHeaderNoExpand(String title) {
     return Container(

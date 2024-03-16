@@ -7,27 +7,31 @@ class AnnouncementPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Container(
       // ... other widgets ...
-      body: ListView(
+      child: Column(
         children: [
-          const SizedBox(height: 150,),
-          _buildPromotion(), // Add the promotion section
-          //_buildHeader(),
-          _buildPromotion(), // Use the updated _buildCarList function
-          const SizedBox(height: 10,),
-          // _buildCarList(),
-          const SizedBox(height: 5,),
-          _buildHeader('News'),
-          _buildNewCar(),
-          _buildHistoryItem(),
-          //_buildCarVideo(),
-
-          //_buildContent(),
+          SizedBox(height: 150,),
+          Expanded(
+            child: _buildPromotionList(),
+          ),
         ],
       ),
     );
   }
+
+  Widget _buildPromotionList() {
+    return ListView.builder(
+      itemCount: 5, // Số lượng promotion bạn muốn hiển thị
+      itemBuilder: (BuildContext context, int index) {
+        return SizedBox(
+          height: 200, // Đặt kích thước cố định cho mỗi Widget promotion
+          child: _buildPromotion(),
+        );
+      },
+    );
+  }
+
 
   Widget _buildPromotion() {
     return Container(
@@ -89,7 +93,7 @@ class AnnouncementPage extends StatelessWidget {
             right: 10,
             top: 0,
             child: Image.asset(
-              'assets/images/cars/land_rover_0.png',
+              'assets/images/icons/new.gif',
               width: 100,
               height: 70,
             ),
@@ -250,6 +254,7 @@ Widget _buildHeader(String title) {
     ),
   );
 }
+// 2021 mazda
 Widget _buildNewCar() {
   return Container(
     padding: EdgeInsets.symmetric(horizontal: 20), // Adjust the horizontal padding as needed
@@ -307,6 +312,7 @@ Widget _buildNewCar() {
     ),
   );
 }
+//lịch sử
 Widget _buildHistoryItem() {
   return Container(
     margin: EdgeInsets.all(13.0),
