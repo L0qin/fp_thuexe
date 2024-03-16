@@ -15,8 +15,8 @@ class _ConfirmPageState extends State<ConfirmPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Đăng xe",
+        title: const Text(
+          "Xác nhận thuê",
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.teal,
@@ -42,7 +42,7 @@ class _ConfirmPageState extends State<ConfirmPage> {
               minWidth: double.infinity,
               color: Colors.teal,
               child: Text(
-                "Đăng xe",
+                "Thuê",
                 style: TextStyle(color: Colors.white, fontSize: 25),
               ),
             ),

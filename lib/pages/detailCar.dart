@@ -179,7 +179,7 @@ class _DetailCarState extends State<DetailCar> {
         margin: EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.0),
-          color: Colors.grey[200], // Placeholder color
+          color: Colors.grey[120], // Placeholder color
         ),
       );
     }
@@ -187,7 +187,7 @@ class _DetailCarState extends State<DetailCar> {
 
   Widget _buildTextWithIconRow(String title, String price) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,7 +195,7 @@ class _DetailCarState extends State<DetailCar> {
           Text(
             title,
             style: TextStyle(
-              color: Colors.blue,
+              color: Colors.teal,
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
@@ -218,43 +218,52 @@ class _DetailCarState extends State<DetailCar> {
   }
 
   Widget _buildDescription(String description) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Mô tả",
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey,
+    return Padding(
+      padding: EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            child: Text(
+              "Mô tả",
+              style: TextStyle(
+                fontSize: 21,
+                color: Colors.teal,
+                fontWeight: FontWeight.bold
+              ),
+            ),
           ),
-        ),
-        SizedBox(height: 1),
-        Text(
-          description,
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.black,
+          SizedBox(height: 1),
+          Container(
+            width: double.infinity,
+            child: Text(
+              description,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+              ),
+            ),
           ),
-        ),
-        SizedBox(height: 1),
-      ],
+          SizedBox(height: 1),
+        ],
+      ),
     );
   }
-
 
   Widget _buildLocationSelection(String address) {
     return Container(
       height: 300,
       width: double.infinity,
-      margin: EdgeInsets.only(left: 12),
+      margin: EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
             "Địa chỉ xe",
             style: TextStyle(
-              color: Colors.teal[700],
-              fontSize: 20,
+              color: Colors.teal,
+              fontSize: 21,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -370,7 +379,7 @@ class _DetailCarState extends State<DetailCar> {
 //                     ),
 //                     SizedBox(height: 10), // Spacing between elements
 //                     Padding(
-//                       padding: EdgeInsets.symmetric(horizontal: 20),
+//                       padding: EdgeInsets.symmetric(horizontal: 12),
 //                       child: Row(
 //                         mainAxisAlignment: MainAxisAlignment.start,
 //                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,7 +414,7 @@ class _DetailCarState extends State<DetailCar> {
 //                     ),
 //                     SizedBox(height: 1),
 //                     Padding(
-//                       padding: EdgeInsets.symmetric(horizontal: 20),
+//                       padding: EdgeInsets.symmetric(horizontal: 12),
 //                       child: Row(
 //                         mainAxisAlignment: MainAxisAlignment.start,
 //                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -431,7 +440,7 @@ class _DetailCarState extends State<DetailCar> {
 //                     ),
 //                     SizedBox(height: 1),
 //                     Padding(
-//                       padding: EdgeInsets.symmetric(horizontal: 20),
+//                       padding: EdgeInsets.symmetric(horizontal: 12),
 //                       child: Row(
 //                         mainAxisAlignment: MainAxisAlignment.start,
 //                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -448,7 +457,7 @@ class _DetailCarState extends State<DetailCar> {
 //                     ),
 //                     SizedBox(height: 1),
 //                     Padding(
-//                       padding: EdgeInsets.symmetric(horizontal: 20),
+//                       padding: EdgeInsets.symmetric(horizontal: 12),
 //                       child: Row(
 //                         mainAxisAlignment: MainAxisAlignment.start,
 //                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,7 +503,7 @@ class _DetailCarState extends State<DetailCar> {
 //                           "Power",
 //                           style: TextStyle(
 //                             color: Colors.yellow,
-//                             fontSize: 20,
+//                             fontSize: 12,
 //                           ),
 //                         ),
 //                       ],
@@ -512,7 +521,7 @@ class _DetailCarState extends State<DetailCar> {
 //                           size: 50,
 //                         ),
 //                         Text(
-//                           "2024 Model",
+//                           "1224 Model",
 //                           style: TextStyle(
 //                             color: Colors.yellow[800],
 //                             fontSize: 24,
@@ -522,7 +531,7 @@ class _DetailCarState extends State<DetailCar> {
 //                           "Year",
 //                           style: TextStyle(
 //                             color: Colors.yellow,
-//                             fontSize: 20,
+//                             fontSize: 12,
 //                           ),
 //                         ),
 //                       ],
@@ -550,7 +559,7 @@ class _DetailCarState extends State<DetailCar> {
 //                           "Fuel Consumption",
 //                           style: TextStyle(
 //                             color: Colors.yellow,
-//                             fontSize: 20,
+//                             fontSize: 12,
 //                           ),
 //                         ),
 //                       ],
@@ -561,7 +570,7 @@ class _DetailCarState extends State<DetailCar> {
 //               SizedBox(height: 1),
 //               // Select Location
 //               Padding(
-//                 padding: EdgeInsets.symmetric(vertical: 20),
+//                 padding: EdgeInsets.symmetric(vertical: 12),
 //                 child: Column(
 //                   mainAxisAlignment: MainAxisAlignment.start,
 //                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -585,7 +594,7 @@ class _DetailCarState extends State<DetailCar> {
 //                           ),
 //                         ),
 //                         child: Padding(
-//                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+//                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
 //                           child: Row(
 //                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //                             crossAxisAlignment: CrossAxisAlignment.center,
