@@ -7,19 +7,50 @@ class AnnouncementPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // ... other widgets ...
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(
+        // title: Text('Hành Trình Thuê Xe'),
+      ),
+      body: Stack(
         children: [
-          SizedBox(height: 150,),
-          Expanded(
-            child: _buildPromotionList(),
+          Column(
+            children: [
+              SizedBox(height: 150),
+              Expanded(
+                child: _buildPromotionList(),
+              ),
+            ],
+          ),
+          Positioned(
+            top: 110,
+            left: 10,
+            right: 10,
+            child: Container(
+              alignment: Alignment.centerRight,
+              // color: Colors.grey[200],
+              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 9),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      // Xử lý khi nhấn nút Xóa tất cả
+                      _showDeleteAllConfirmationDialog(context);
+                    },
+                    child: const Text(
+                      'Xóa tất cả',
+                      style: TextStyle(color: Colors.red),
+                      textAlign: TextAlign.end,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
     );
   }
-
   Widget _buildPromotionList() {
     return ListView.builder(
       itemCount: 5, // Số lượng promotion bạn muốn hiển thị
@@ -31,6 +62,7 @@ class AnnouncementPage extends StatelessWidget {
             // Xử lý khi phần tử bị Dismiss
             // Ở đây có thể là xóa phần tử khỏi danh sách hoặc thực hiện hành động khác
             // Ví dụ: _promotions.removeAt(index);
+            //code ở đây sau đó bỏ vào code show dialog
           },
           background: Container(
             alignment: Alignment.centerRight,
@@ -52,7 +84,35 @@ class AnnouncementPage extends StatelessWidget {
     );
   }
 
-
+  void _showDeleteAllConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Xác nhận"),
+          content: Text("Bạn có chắc chắn muốn xóa tất cả các mục không?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Không"),
+            ),
+            TextButton(
+              onPressed: () {
+                // setState(() {
+                //   _promotions.clear(); //code xoá tất cả
+                // });
+                Navigator.of(context).pop();
+              },
+              child: Text("Có"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
   Widget _buildPromotion() {
     return Container(
       height: 160,
@@ -156,7 +216,7 @@ class AnnouncementPage extends StatelessWidget {
       ),
     );
   }
-}
+
   Widget _buildCarList() {
     return ListView.builder(
       shrinkWrap: true,
