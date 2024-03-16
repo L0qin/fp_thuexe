@@ -109,4 +109,41 @@ class VehicleService {
       throw Exception('Failed to search vehicles');
     }
   }
+
+  // Method to post a new vehicle
+  static Future<bool> postVehicle(Vehicle vehicle) async {
+    final token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
+    final url = '$baseUrl/vehicles';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'ten_xe': vehicle.carName,
+        'trang_thai': vehicle.status,
+        'model': vehicle.model,
+        'hang_sx': vehicle.manufacturer,
+        'dia_chi': vehicle.address,
+        'mo_ta': vehicle.description,
+        'gia_thue': vehicle.rentalPrice,
+        'so_cho': vehicle.seating,
+        'chu_so_huu': vehicle.ownerName,
+        'ma_loai_xe': vehicle.categoryId,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      print('Vehicle posted successfully');
+      return true;
+    } else {
+      print('Failed to post vehicle');
+      return false;
+    }
+  }
 }

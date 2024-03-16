@@ -245,13 +245,14 @@ class _HomePageState extends State<HomePage> {
               child: Padding(
                 padding: EdgeInsets.fromLTRB(0, 0, 12, 0),
                 child: Text(
-                  'View All',
+                  'Xem tất cả',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                   ),
                 ),
               )),
+
         ],
       ),
     );
@@ -455,7 +456,8 @@ class _HomePageState extends State<HomePage> {
                               Navigator.pop(context); // Close the dialog
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => LoginPage()),
+                                MaterialPageRoute(
+                                    builder: (context) => LoginPage()),
                               );
                             },
                             child: Text("Đồng ý"),
@@ -491,7 +493,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
 
   Widget _buildRentButton(int price) {
     return MaterialButton(

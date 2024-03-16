@@ -30,6 +30,7 @@ class _PostTheCarState extends State<PostCar> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.teal,
+
       ),
       body: Container(
           child: Column(
@@ -42,169 +43,22 @@ class _PostTheCarState extends State<PostCar> {
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: Column(
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 80,
-                        child: Text('Tên Xe',
-                            style:
-                                TextStyle(fontSize: 14, color: Colors.green)),
-                      ),
-                      Expanded(
-                        child: Text("Nguyễn Văn A",
-                            style:
-                                TextStyle(fontSize: 15, color: Colors.black)),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8), // Add some vertical spacing
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 80,
-                        child: Text('Địa chỉ',
-                            style:
-                                TextStyle(fontSize: 14, color: Colors.green)),
-                      ),
-                      Expanded(
-                        child: Text("180 Cao Lỗ",
-                            style:
-                                TextStyle(fontSize: 15, color: Colors.black)),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 80,
-                        child: Text('Cho thuê xe',
-                            style:
-                                TextStyle(fontSize: 14, color: Colors.green)),
-                      ),
-                      Expanded(
-                        child: Column(children: [
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: true,
-                                // Set your boolean variable for the first checkbox here,
-                                onChanged: (value) {},
-                              ),
-                              Text('Ngày',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black)),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: true,
-                                // Set your boolean variable for the first checkbox here,
-                                onChanged: (value) {},
-                              ),
-                              Text('Tuần',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black)),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: true,
-                                // Set your boolean variable for the first checkbox here,
-                                onChanged: (value) {},
-                              ),
-                              Text('Tháng',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black)),
-                            ],
-                          ),
-                        ]),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8), // Add some vertical spacing
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 80,
-                        child: Text('Cho Thuê tối đa',
-                            style:
-                                TextStyle(fontSize: 14, color: Colors.green)),
-                      ),
-                      Expanded(
-                        child: TextField(
-                            controller: _soNgay,
-                            decoration: InputDecoration(hintText: "Ngày"),
-                            style:
-                                TextStyle(fontSize: 15, color: Colors.black)),
-                      ),
-                      Text("Ngày"),
-                    ],
-                  ),
-                  Divider(),
-                  SizedBox(height: 8), // Add some vertical spacing
-                  Row(
-                    children: [
-                      const SizedBox(
-                        width: 80,
-                        child: Text('Giá Thuê',
-                            style:
-                                TextStyle(fontSize: 14, color: Colors.green)),
-                      ),
-                      Expanded(
-                        child: TextField(
-                            controller: _soNgay,
-                            decoration: InputDecoration(hintText: "VNĐ"),
-                            style:
-                                TextStyle(fontSize: 10, color: Colors.black)),
-                      ),
-                      Text("Ngày"),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const SizedBox(
-                        width: 80,
-                        child: Text('Upload File',
-                            style:
-                                TextStyle(fontSize: 14, color: Colors.green)),
-                      ),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Show file picker dialog or implement your file uploading logic here
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text('File Picker'),
-                                  content: Text(
-                                      'Implement your file picker logic here'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('Close'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                          child: Text('Choose File'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ),
             ),
           ),
+          Container(
+            margin: EdgeInsets.all(12),
+            child: MaterialButton(
+              onPressed: () {},
+              height: 50,
+              minWidth: double.infinity,
+              color: Colors.teal,
+              child: Text(
+                "Đăng xe",
+                style: TextStyle(color: Colors.white, fontSize: 25),
+              ),
+            ),
+          )
         ],
       )),
     );
