@@ -68,4 +68,37 @@ class UserService {
       throw Exception('Failed to load users');
     }
   }
+
+  // Method to update an existing user
+  static Future<bool> updateUser(int userId, String fullName, String phoneNumber, String address) async {
+    final token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
+    final url = '$baseUrl/users/$userId';
+    final response = await http.put(
+      Uri.parse(url),
+      headers: {
+        'Authorization': ' $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'ho_ten': fullName,
+        'so_dien_thoai': phoneNumber,
+        'dia_chi_nguoi_dung': address,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('User updated successfully');
+      return true;
+    } else {
+      print('Failed to update user');
+      return false;
+    }
+  }
+
+
+
 }

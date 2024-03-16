@@ -9,6 +9,7 @@ import 'package:fp_thuexe/services/AuthService.dart';
 import 'package:fp_thuexe/services/UserService.dart';
 
 import '../models/User.dart';
+import 'PostCar.dart';
 
 class HomePage extends StatefulWidget {
   static const title = 'Thuê xe';
@@ -21,13 +22,11 @@ class _HomePageState extends State<HomePage> {
   bool _isLoggedIn = false;
   User? _user;
   late Timer _timer;
-  bool _isRenting= false;
-
+  bool _isRenting = false;
 
   void _startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
       setState(() {
-        // Update the UI here
         _checkLoginStatus();
       });
     });
@@ -57,6 +56,7 @@ class _HomePageState extends State<HomePage> {
         User? fetchedUser = await UserService.getUserById(userId);
         setState(() {
           _user = fetchedUser;
+          _timer.cancel();
         });
       }
     }
@@ -83,13 +83,15 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 10),
                 _searchWidget(),
                 const SizedBox(height: 15),
-                _buildHeader('Top Brands'),
+                _buildHeader('Các hãng & đối tác'),
                 _buildBrandList(context),
                 _buildViewAllButton(),
                 const SizedBox(height: 4),
-                _buildHeader('Most Rented'),
+                _buildHeader('Thuê nhiều'),
                 _buildCarList(),
                 const SizedBox(height: 10),
+                _buildHeaderNoExpand('Bạn có xe nhàn rỗi? Đăng ngay!'),
+                _buildPostCar(),
               ],
             ),
           ),
@@ -111,14 +113,14 @@ class _HomePageState extends State<HomePage> {
             height: 45,
             width: 45,
             child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(100)),
-                child: _user == null ? Image.asset(
-                    'assets/images/icons/user.png')
-                    : ClipRRect(
-                  clipBehavior: Clip.antiAlias,
-                  borderRadius: BorderRadius.circular(500),
-                  child: Image.network(_user!.profilePicture),
-                ),
+              borderRadius: const BorderRadius.all(Radius.circular(100)),
+              child: _user == null
+                  ? Image.asset('assets/images/icons/user.png')
+                  : ClipRRect(
+                      clipBehavior: Clip.antiAlias,
+                      borderRadius: BorderRadius.circular(500),
+                      child: Image.network(_user!.profilePicture),
+                    ),
             ),
           ),
           Column(
@@ -143,26 +145,26 @@ class _HomePageState extends State<HomePage> {
               if (_isLoggedIn) {
                 bool confirmLogout = await showDialog(
                   context: context,
-                  builder: (context) =>
-                      AlertDialog(
-                        title: Text('Xác nhận đăng xuất'),
-                        content: Text('Bạn có chắc chắn muốn đăng xuất?'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: Text('Không'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              AuthService.logout();
-                              _checkLoginStatus();
-                              _user = null;
-                            },
-                            child: Text('Có'),
-                          ),
-                        ],
+                  builder: (context) => AlertDialog(
+                    title: Text('Xác nhận đăng xuất'),
+                    content: Text('Bạn có chắc chắn muốn đăng xuất?'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: Text('Không'),
                       ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          AuthService.logout();
+                          _startTimer();
+                          _checkLoginStatus();
+                          _user = null;
+                        },
+                        child: Text('Có'),
+                      ),
+                    ],
+                  ),
                 );
               } else {
                 Navigator.push(
@@ -225,13 +227,12 @@ class _HomePageState extends State<HomePage> {
       width: double.infinity,
       margin: EdgeInsets.only(left: 12),
       child: Row(
-        // mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Text(
             title,
             style: TextStyle(
-              color: Colors.blue[700],
+              color: Colors.teal[700],
               fontSize: 20,
               fontWeight: FontWeight.w900,
             ),
@@ -240,15 +241,17 @@ class _HomePageState extends State<HomePage> {
             width: 200,
           ),
           GestureDetector(
-            onTap: () {},
-            child: Text(
-              'View All',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-              ),
-            ),
-          ),
+              onTap: () {},
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 12, 0),
+                child: Text(
+                  'View All',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              )),
         ],
       ),
     );
@@ -392,34 +395,131 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-Widget _buildRentButton(int price) {
-  return MaterialButton(
-    onPressed: () {
-      if (_isRenting) {
-        // Xử lý việc hủy thuê xe
-        setState(() {
-          _isRenting = false;
-        });
-      } else {
-        // Xử lý việc thuê xe
-        // Hiển thị thông tin chi tiết, xác nhận
-        setState(() {
-          _isRenting = true;
-        });
-      }
-    },
-    minWidth: 100,
-    height: 40,
-    splashColor: Colors.white12,
-    color: _isRenting ? Colors.grey : Colors.teal,
-    child: Text(
-      _isRenting ? "Đã Thuê" : "Thuê Xe",
-      style: const TextStyle(
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-        fontSize: 12,
+  Widget _buildHeaderNoExpand(String title) {
+    return Container(
+      height: 30,
+      width: double.infinity,
+      margin: EdgeInsets.only(left: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.teal[700],
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
       ),
-    ),
-  );
-}
+    );
+  }
+
+  Widget _buildPostCar() {
+    return Container(
+      margin: EdgeInsets.all(12.0),
+      width: double.infinity,
+      height: 200.0,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        image: DecorationImage(
+          image: AssetImage('assets/images/background2.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            bottom: 20.0,
+            right: 20.0,
+            child: ElevatedButton(
+              onPressed: () {
+                if (!_isLoggedIn) {
+                  // Show dialog if user is not logged in
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Bạn chưa đăng nhập"),
+                        content: Text("Bạn có muốn đăng nhập để tiếp tục?"),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context); // Close the dialog
+                            },
+                            child: Text("Hủy"),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context); // Close the dialog
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => LoginPage()),
+                              );
+                            },
+                            child: Text("Đồng ý"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } else {
+                  // User is logged in, navigate to PostCar screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PostCar()),
+                  );
+                }
+              },
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 17, vertical: 12),
+                child: Text(
+                  'Đăng xe ngay',
+                  style: TextStyle(fontSize: 20.0, color: Colors.white),
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal.withOpacity(0.95),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  Widget _buildRentButton(int price) {
+    return MaterialButton(
+      onPressed: () {
+        if (_isRenting) {
+          // Xử lý việc hủy thuê xe
+          setState(() {
+            _isRenting = false;
+          });
+        } else {
+          // Hiển thị thông tin chi tiết, xác nhận
+          setState(() {
+            _isRenting = true;
+          });
+        }
+      },
+      minWidth: 100,
+      height: 40,
+      splashColor: Colors.white12,
+      color: _isRenting ? Colors.grey : Colors.teal,
+      child: Text(
+        _isRenting ? "Đã Thuê" : "Thuê Xe",
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
 }
