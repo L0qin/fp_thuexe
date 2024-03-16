@@ -78,6 +78,7 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                const SizedBox(height: 30),
                 _headerWidget(),
                 const SizedBox(height: 10),
                 _searchWidget(),
@@ -236,7 +237,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           SizedBox(
-            width: 370,
+            width: 200,
           ),
           GestureDetector(
             onTap: () {},
