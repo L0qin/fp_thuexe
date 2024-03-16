@@ -1,30 +1,76 @@
+import 'dart:async';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fp_thuexe/services/ImageService.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+
+import '../models/Vehicle.dart';
+import '../services/VehicleService.dart';
 
 class DetailCar extends StatefulWidget {
   DetailCar(this.carId);
+
   int carId;
 
   @override
-  State<DetailCar> createState() => _DetailCarState();
+  State<DetailCar> createState() => _DetailCarState(carId);
 }
 
 class _DetailCarState extends State<DetailCar> {
+  int carId;
   TextEditingController _soNgay = TextEditingController();
   int _sliderIndex = 0;
+  Vehicle? _vehicle; // Initialize _vehicle to null
+  late List<String> _imageURLs = [];
+  late Timer _timer;
+
+  _DetailCarState(this.carId);
 
   @override
   void initState() {
     super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _checkVehicleStatus();
+    });
   }
 
   @override
   void dispose() {
-    // _controller.dispose();
-    // super.dispose();
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void _checkVehicleStatus() {
+    if (_vehicle == null || _imageURLs.isEmpty) {
+      _getVehicleInfo();
+      _getImageURLs();
+    } else {
+      _timer.cancel();
+    }
+  }
+
+  Future<void> _getVehicleInfo() async {
+    try {
+      Vehicle? vehicle = await VehicleService.getVehicleById(carId);
+      setState(() {
+        _vehicle = vehicle!;
+      });
+    } catch (e) {
+      print('Failed to retrieve vehicle: $e');
+    }
+  }
+
+  Future<void> _getImageURLs() async {
+    try {
+      List<String> imageURLs = await ImageService.getAllVehicleImageURLsById(carId);
+      setState(() {
+        _imageURLs = imageURLs;
+      });
+    } catch (e) {
+      print('Failed to retrieve image URLs: $e');
+    }
   }
 
   @override
@@ -32,9 +78,10 @@ class _DetailCarState extends State<DetailCar> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Land Rover",
-          style: TextStyle(color: Colors.teal),
+          _vehicle != null ? _vehicle!.carName : "...",
+          style: TextStyle(color: Colors.white),
         ),
+        backgroundColor: Colors.teal,
       ),
       body: ResponsiveBuilder(
         builder: (context, sizingInformation) {
@@ -42,11 +89,10 @@ class _DetailCarState extends State<DetailCar> {
             child: Column(
               children: [
                 _buildCarouselSlider(),
-                _buildTextWithIconRow("Sport", "5.0"),
-                _buildTextWithIconRow("Land Rover", "500VNĐ/Ngày"),
-                _buildDescription(),
-                _buildInfoCardsRow(),
-                _buildLocationSelection(),
+                _buildTextWithIconRow(_vehicle != null ? _vehicle!.model : "...", _vehicle != null ? "${_vehicle!.rentalPrice}VNĐ/Ngày" : "500VNĐ/Ngày"),
+                _buildDescription(_vehicle != null ? _vehicle!.description : "..."),
+                _buildInfoCardsRow("","",1),
+                _buildLocationSelection(_vehicle != null ? _vehicle!.address : "Katowice Airport"),
                 _buildElevatedButton(),
               ],
             ),
@@ -57,76 +103,74 @@ class _DetailCarState extends State<DetailCar> {
   }
 
   Widget _buildCarouselSlider() {
-    return Card(
-      margin: EdgeInsets.all(10),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Column(
-        children: [
-          Container(
-            height: 300, // Set height of the CarouselSlider
-            child: Stack(
-              children: [
-                CarouselSlider(
-                  options: CarouselOptions(
-                    height: 300,
-                    enableInfiniteScroll: true,
-                    autoPlay: true,
-                    autoPlayInterval: Duration(seconds: 3),
-                    autoPlayAnimationDuration: Duration(milliseconds: 800),
-                    autoPlayCurve: Curves.fastOutSlowIn,
-                    enlargeCenterPage: true,
-                    scrollDirection: Axis.horizontal,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _sliderIndex = index;
-                      });
-                    },
-                  ),
-                  items: [
-                    Image.asset(
-                      'assets/images/cars/land_rover_0.png',
-                      fit: BoxFit.cover,
+    if (_imageURLs.isNotEmpty) {
+      return Card(
+        margin: EdgeInsets.all(10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Column(
+          children: [
+            Container(
+              height: 300, // Set height of the CarouselSlider
+              child: Stack(
+                children: [
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      height: 300,
+                      enableInfiniteScroll: true,
+                      autoPlay: true,
+                      autoPlayInterval: Duration(seconds: 3),
+                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                      enlargeCenterPage: true,
+                      scrollDirection: Axis.horizontal,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _sliderIndex = index;
+                        });
+                      },
                     ),
-                    Image.asset(
-                      'assets/images/cars/land_rover_1.png',
-                      fit: BoxFit.cover,
-                    ),
-                    Image.asset(
-                      'assets/images/cars/land_rover_2.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ],
-                ),
-                Positioned(
-                  bottom: 16.0,
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(3, (index) {
-                      return Container(
-                        width: 8.0,
-                        height: 8.0,
-                        margin: EdgeInsets.symmetric(horizontal: 4.0),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _sliderIndex == index
-                              ? Colors.blue
-                              : Colors.grey, // Color of selected and unselected dots
-                        ),
+                    items: _imageURLs.map((imageUrl) {
+                      return Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
                       );
-                    }),
+                    }).toList(),
                   ),
-                ),
-              ],
+                  Positioned(
+                    bottom: 16.0,
+                    left: 0,
+                    right: 0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(_imageURLs.length, (index) {
+                        return Container(
+                          width: 8.0,
+                          height: 8.0,
+                          margin: EdgeInsets.symmetric(horizontal: 4.0),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _sliderIndex == index
+                                ? Colors.blue
+                                : Colors
+                                    .grey, // Color of selected and unselected dots
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          SizedBox(height: 10), // Spacing between elements
-        ],
-      ),
-    );
+            SizedBox(height: 10), // Spacing between elements
+          ],
+        ),
+      );
+    } else {
+      return SizedBox
+          .shrink(); // Return an empty SizedBox if _imageURLs is empty
+    }
   }
 
   Widget _buildTextWithIconRow(String text, String rating) {
@@ -166,7 +210,7 @@ class _DetailCarState extends State<DetailCar> {
     );
   }
 
-  Widget _buildDescription() {
+  Widget _buildDescription(String description) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -181,7 +225,7 @@ class _DetailCarState extends State<DetailCar> {
           ),
           SizedBox(height: 1),
           Text(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi.",
+            description,
             style: TextStyle(
               fontSize: 16,
               color: Colors.black,
@@ -193,13 +237,14 @@ class _DetailCarState extends State<DetailCar> {
     );
   }
 
-  Widget _buildInfoCardsRow() {
+  Widget _buildInfoCardsRow(String model, String rentalPrice, int seating) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildInfoCard(Icons.speed_sharp, "250 km/h", "Power"),
-        _buildInfoCard(Icons.build_circle_outlined, "2024 Model", "Year"),
-        _buildInfoCard(Icons.local_gas_station, "7.0 L", "Fuel Consumption"),
+        _buildInfoCard(Icons.build_circle_outlined, model, "Year"),
+        _buildInfoCard(
+            Icons.local_gas_station, rentalPrice, "Fuel Consumption"),
       ],
     );
   }
@@ -235,7 +280,7 @@ class _DetailCarState extends State<DetailCar> {
     );
   }
 
-  Widget _buildLocationSelection() {
+  Widget _buildLocationSelection(String address) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 20),
       child: Column(
@@ -254,8 +299,8 @@ class _DetailCarState extends State<DetailCar> {
           // Thêm khoảng cách giữa tiêu đề và phần chọn vị trí
           Center(
             child: Container(
-              // Widget giả lập
-            ),
+                // Widget giả lập
+                ),
           ),
         ],
       ),
@@ -281,9 +326,7 @@ class _DetailCarState extends State<DetailCar> {
       ),
     );
   }
-
 }
-
 
 // Code cũ-----------------------------------------------------------------------------------------
 // @override

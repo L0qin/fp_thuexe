@@ -26,10 +26,11 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Tìm kiếm xe',
-          style: TextStyle(color: Colors.teal),
+        title: Text(
+          "Tìm kiếm xe",
+          style: TextStyle(color: Colors.white),
         ),
+        backgroundColor: Colors.teal,
       ),
       body: ResponsiveBuilder(
         builder: (context, sizingInformation) {
@@ -63,7 +64,7 @@ class _SearchPageState extends State<SearchPage> {
                   carId: vehicle.carId,
                   carName: vehicle.carName,
                   shortAddress: vehicle.address,
-                  rentPrice: vehicle.rentalPrice,
+                  rentPrice: vehicle.rentalPrice.toDouble(),
                 );
               },
             );

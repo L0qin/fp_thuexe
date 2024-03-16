@@ -66,27 +66,6 @@ class _LoginPageState extends State<LoginPage> {
         },
       );
     }
-
-    User? user = await UserService.getUserById(1);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Token'),
-          content:  Text(user.toString()),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-
   }
 
 
