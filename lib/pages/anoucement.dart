@@ -12,18 +12,21 @@ class AnnouncementPage extends StatelessWidget {
       body: ListView(
         children: [
           const SizedBox(height: 150,),
-          _buildPromotion(),  // Add the promotion section
+          _buildPromotion(), // Add the promotion section
           //_buildHeader(),
           _buildPromotion(), // Use the updated _buildCarList function
           const SizedBox(height: 10,),
-         // _buildCarList(),
-          const SizedBox(height: 10,),
+          // _buildCarList(),
+          const SizedBox(height: 5,),
+          _buildHeader('News'),
           _buildNewCar(),
-          _buildCarVideo(),
+          //_buildCarVideo(),
+          _buildContent(),
         ],
       ),
     );
   }
+
   Widget _buildPromotion() {
     return Container(
       height: 160,
@@ -93,6 +96,41 @@ class AnnouncementPage extends StatelessWidget {
       ),
     );
   }
+  Widget _buildContent() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          // Hiển thị ảnh chính
+          Image.asset(
+            'assets/images/cars/land_rover_0.png',
+            width: 200,
+            height: 200,
+          ),
+          // Hiển thị ảnh nhỏ bên trong ảnh chính
+          Positioned(
+            top: 50,
+            left: 50,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.white,
+                  width: 2,
+                ),
+              ),
+              child: Image.asset(
+                'assets/images/icons/car.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
   Widget _buildCarList() {
     return ListView.builder(
       shrinkWrap: true,
@@ -174,8 +212,42 @@ class AnnouncementPage extends StatelessWidget {
 
 
 
-}
 
+//2021
+Widget _buildHeader(String title) {
+  return Container(
+    height: 30,
+    width: double.infinity,
+    margin: EdgeInsets.only(left: 20),
+    child: Row(
+      // mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          title,
+          style: TextStyle(
+            color: Colors.blue[700],
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        SizedBox(
+          width: 280,
+        ),
+        GestureDetector(
+          onTap: () {},
+          child: Text(
+            'More >',
+            style: TextStyle(
+              color: Colors.blue,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 Widget _buildNewCar() {
   return Container(
     padding: EdgeInsets.symmetric(horizontal: 20), // Adjust the horizontal padding as needed
@@ -242,48 +314,47 @@ Widget _buildNewCar() {
 
   ////
 
-  Widget buildAnnouncementCard({required String title, required String subtitle, required String imagePath}) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          children: <Widget>[
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage(imagePath),
-            ),
-            SizedBox(width: 30),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
+// Widget buildAnnouncementCard({required String title, required String subtitle, required String imagePath}) {
+//   return Card(
+//     shape: RoundedRectangleBorder(
+//       borderRadius: BorderRadius.circular(12.0),
+//     ),
+//     child: Padding(
+//       padding: const EdgeInsets.all(12.0),
+//       child: Row(
+//         children: <Widget>[
+//           CircleAvatar(
+//             radius: 50,
+//             backgroundImage: AssetImage(imagePath),
+//           ),
+//           SizedBox(width: 30),
+//           Expanded(
+//             child: Column(
+//               mainAxisSize: MainAxisSize.min,
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(
+//                   title,
+//                   style: TextStyle(
+//                     fontSize: 25,
+//                     fontWeight: FontWeight.normal,
+//                     color: Colors.blue,
+//                   ),
+//                 ),
+//                 SizedBox(height: 5),
+//                 Text(
+//                   subtitle,
+//                   style: TextStyle(
+//                     fontSize: 20,
+//                     fontWeight: FontWeight.bold,
+//                     color: Colors.black,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     ),
+//   );
+// }

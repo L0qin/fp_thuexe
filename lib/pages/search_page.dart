@@ -76,8 +76,9 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _searchBar() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 5),
-      child: TextField(
+      padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0).copyWith(bottom: 5.0),
+
+        child: TextField(
         onChanged: (value) {
           // Update searched vehicles based on search text
           if (value.isEmpty) {
