@@ -242,7 +242,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           SizedBox(
-            width: 200,
+            width: 100,
           ),
           GestureDetector(
               onTap: () {},
@@ -362,7 +362,7 @@ class _HomePageState extends State<HomePage> {
         final imageUrl = snapshot.data ?? defaultImage;
         return Container(
           width: 230,
-          margin: EdgeInsets.all(5),
+          margin: EdgeInsets.all(2.5),
           padding: EdgeInsets.all(5),
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey),

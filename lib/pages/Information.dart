@@ -1,9 +1,13 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fp_thuexe/models/User.dart';
 import 'package:fp_thuexe/services/AuthService.dart';
 import 'package:fp_thuexe/services/ImageService.dart';
 import 'package:fp_thuexe/services/UserService.dart';
+
 
 import '../shared/widgets/BottomBar.dart';
 
@@ -19,7 +23,8 @@ class _InformationState extends State<Information> {
   TextEditingController _DaddressController = TextEditingController();
   TextEditingController _phoneNumberController = TextEditingController();
   TextEditingController _profilePictureController = TextEditingController();
-
+  late File _profilePicture;
+  bool _imagePicked = false;
   @override
   void initState() {
     super.initState();
@@ -39,6 +44,25 @@ class _InformationState extends State<Information> {
     _phoneNumberController.text = user.phoneNumber?.toString() ?? '';
     _profilePictureController.text = user.profilePicture;
   }
+  void _pickImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: false,
+    );
+
+    if (result != null) {
+      PlatformFile file = result.files.first;
+      setState(() {
+        _profilePicture = File(file.path!);
+        _imagePicked = true;
+      });
+    } else {
+      // Người dùng không chọn ảnh
+    }
+  }
+
+
+
 
   @override
   void dispose() {
@@ -125,15 +149,17 @@ class _InformationState extends State<Information> {
                                       },
                                     );
                                   },
-                                  child: CircleAvatar(
-                                    radius: 50,
-                                    backgroundImage: AssetImage(
-                                        'assets/images/icons/user.png'),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(500),
-                                      child: Image.network(_profilePictureController.text),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _pickImage(); // Gọi hàm _pickImage khi người dùng nhấn vào CircleAvatar
+                                    },
+                                    child: CircleAvatar(
+                                      radius: 50,
+                                      backgroundImage: _imagePicked ? FileImage(_profilePicture) : null,
+                                      child: !_imagePicked ? Icon(Icons.add_a_photo, size: 50) : null,
                                     ),
                                   ),
+
                                 ),
                                 SizedBox(
                                   height: 5,
@@ -142,7 +168,7 @@ class _InformationState extends State<Information> {
                                 TextField(
                                   // controller: ,
                                   decoration: InputDecoration(
-                                      hintText: "name",
+                                      hintText: _UserNameController.text,
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(20))),
@@ -154,7 +180,7 @@ class _InformationState extends State<Information> {
                                 TextField(
                                   // controller: ,
                                   decoration: InputDecoration(
-                                      hintText: "Email",
+                                      hintText: _DaddressController.text,
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(20))),
@@ -165,7 +191,7 @@ class _InformationState extends State<Information> {
                                 TextField(
                                   // controller: ,
                                   decoration: InputDecoration(
-                                    hintText: "Phone",
+                                    hintText: _phoneNumberController.text,
                                     border: OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.circular(20)),
