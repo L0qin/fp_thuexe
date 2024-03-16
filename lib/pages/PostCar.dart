@@ -1,6 +1,4 @@
-import 'dart:html';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 
@@ -13,8 +11,7 @@ class PostCar extends StatefulWidget {
 
 class _PostTheCarState extends State<PostCar> {
   TextEditingController _soNgay = TextEditingController();
-  late File _profilePicture;
-  bool _imagePicked = false;
+
   @override
   void initState() {
     super.initState();
