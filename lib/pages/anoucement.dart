@@ -20,8 +20,10 @@ class AnnouncementPage extends StatelessWidget {
           const SizedBox(height: 5,),
           _buildHeader('News'),
           _buildNewCar(),
+          _buildHistoryItem(),
           //_buildCarVideo(),
-          _buildContent(),
+
+          //_buildContent(),
         ],
       ),
     );
@@ -298,6 +300,60 @@ Widget _buildNewCar() {
                   height: 120, // Adjust the height of the image as needed
                 ),
               ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+Widget _buildHistoryItem() {
+  return Container(
+    margin: EdgeInsets.all(13.0),
+    child: Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        side: BorderSide(color: Colors.grey.shade200, width: 1.0), // Border color and width
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Container(
+                  width: 100, // Width of the image container
+                  height: 80, // Height of the image container
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(9.0),
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/cars/land_rover_0.png'), // Image path
+                      fit: BoxFit.cover, // BoxFit property
+                    ),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing between the image and text
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Car Name',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Start Date - End Date',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Price VNĐ',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
