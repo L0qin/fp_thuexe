@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -5,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:fp_thuexe/pages/login_page.dart';
 import 'package:fp_thuexe/pages/search_page.dart';
 import 'package:fp_thuexe/services/AuthService.dart';
+import 'package:fp_thuexe/services/UserService.dart';
+
+import '../models/User.dart';
 
 class HomePage extends StatefulWidget {
   static const title = 'Thuê xe';
@@ -15,17 +19,47 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool _isLoggedIn = false;
-  bool _isRenting = false;
+  User? _user;
+  late Timer _timer;
+  bool _isRenting= false;
+
+
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      setState(() {
+        // Update the UI here
+        _checkLoginStatus();
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    // Check if token exists initially
-    AuthService.getToken().then((token) {
-      setState(() {
-        _isLoggedIn = token != null;
-      });
+    _checkLoginStatus();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void _checkLoginStatus() async {
+    bool loggedIn = await AuthService.getToken() != null;
+    setState(() {
+      _isLoggedIn = loggedIn;
     });
+    if (loggedIn) {
+      int? userId = await AuthService.getUserId();
+      if (userId != null) {
+        User? fetchedUser = await UserService.getUserById(userId);
+        setState(() {
+          _user = fetchedUser;
+        });
+      }
+    }
   }
 
   @override
@@ -44,7 +78,6 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const SizedBox(height: 30,),
                 _headerWidget(),
                 const SizedBox(height: 10),
                 _searchWidget(),
@@ -55,12 +88,7 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 4),
                 _buildHeader('Most Rented'),
                 _buildCarList(),
-                const SizedBox(height: 4),
-                _buildHeader('Most Popular'),
-                _buildMostPopularCars(),
-
-                // const SizedBox(height: 10), //Lịch sử thuê xe
-                // _buildRecentRentals(),
+                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -68,9 +96,10 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-//Login
+
   Widget _headerWidget() {
     String buttonText = _isLoggedIn ? "Đăng xuất" : "Đăng nhập";
+    String address = _user?.address ?? "Chưa đăng nhập";
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Row(
@@ -81,23 +110,29 @@ class _HomePageState extends State<HomePage> {
             height: 45,
             width: 45,
             child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(100)),
-              child: Image.asset('assets/images/icons/user.png'),
+                borderRadius: const BorderRadius.all(Radius.circular(100)),
+                child: _user == null ? Image.asset(
+                    'assets/images/icons/user.png')
+                    : ClipRRect(
+                  clipBehavior: Clip.antiAlias,
+                  borderRadius: BorderRadius.circular(500),
+                  child: Image.network(_user!.profilePicture),
+                ),
             ),
           ),
-          const Column(
+          Column(
             children: <Widget>[
-              Text(
+              const Text(
                 "Location",
                 style: TextStyle(fontSize: 18, color: Colors.black),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 2,
               ),
               Row(
                 children: <Widget>[
-                  Text("W4, D8, HCMC"),
-                  Icon(Icons.arrow_drop_down),
+                  Text(address),
+                  const Icon(Icons.arrow_drop_down),
                 ],
               )
             ],
@@ -105,16 +140,36 @@ class _HomePageState extends State<HomePage> {
           MaterialButton(
             onPressed: () async {
               if (_isLoggedIn) {
-                await AuthService.logout();
+                bool confirmLogout = await showDialog(
+                  context: context,
+                  builder: (context) =>
+                      AlertDialog(
+                        title: Text('Xác nhận đăng xuất'),
+                        content: Text('Bạn có chắc chắn muốn đăng xuất?'),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: Text('Không'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              AuthService.logout();
+                              _checkLoginStatus();
+                              _user = null;
+                            },
+                            child: Text('Có'),
+                          ),
+                        ],
+                      ),
+                );
               } else {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),
                 );
+                _checkLoginStatus();
               }
-              setState(() {
-                _isLoggedIn = !_isLoggedIn;
-              });
             },
             minWidth: 45,
             height: 50,
@@ -133,6 +188,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
 //Search
   Widget _searchWidget() {
     return Container(
@@ -160,6 +216,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
 //Brands
   Widget _buildHeader(String title) {
     return Container(
@@ -178,7 +235,9 @@ class _HomePageState extends State<HomePage> {
               fontWeight: FontWeight.w900,
             ),
           ),
-          SizedBox(width: 200,),
+          SizedBox(
+            width: 370,
+          ),
           GestureDetector(
             onTap: () {},
             child: Text(
@@ -193,6 +252,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
 //Brand
   Widget _buildLogoBrands(String brandName) {
     if (brandName == null) {
@@ -218,14 +278,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildBrandList(BuildContext context) {
-    List<String> brandNames = ['honda', 'bmw', 'huydai', 'landrover', 'cheverolet', 'bmw', 'bmw', 'audi','huydai','huydai']; // Sample brand names
+    List<String> brandNames = [
+      'honda',
+      'bmw',
+      'huydai',
+      'landrover',
+      'cheverolet',
+      'bmw',
+      'bmw',
+      'audi',
+      'huydai',
+      'huydai'
+    ]; // Sample brand names
 
-      return CarouselSlider(
+    return CarouselSlider(
       items: brandNames.map((name) => _buildLogoBrands(name ?? '')).toList(),
-    options: CarouselOptions(
-    height: 70, // Bạn có thể điều chỉnh chiều cao theo ý muốn
-    viewportFraction:1/5, // Hiển thị 50% tổng số item
-    enlargeCenterPage: true,
+      options: CarouselOptions(
+        height: 70,
+        // Bạn có thể điều chỉnh chiều cao theo ý muốn
+        viewportFraction: 1 / 5,
+        // Hiển thị 50% tổng số item
+        enlargeCenterPage: true,
         autoPlay: true,
         autoPlayInterval: Duration(seconds: 3),
         autoPlayAnimationDuration: Duration(milliseconds: 800),
@@ -234,18 +307,13 @@ class _HomePageState extends State<HomePage> {
         onPageChanged: (index, reason) {
           // Xử lý khi trang thay đổi (nếu cần)
         },
-
       ),
-
     );
   }
 
-
-
-
   Widget _buildViewAllButton() {
     return Padding(
-      padding: const EdgeInsets.only(top:1),
+      padding: const EdgeInsets.all(16.0),
       child: MaterialButton(
         onPressed: () {},
         child: Text('Xem tất cả'),
@@ -258,26 +326,25 @@ class _HomePageState extends State<HomePage> {
       items: [
         _buildCarItem('Sport', 'Hyundai i30 N 2021', 20),
         _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
-        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15), _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
+        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
+        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
         _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
 
         // Thêm các item khác cho các mẫu xe khác
       ],
       options: CarouselOptions(
-
-        height: 180, // Chiều cao của CarouselSlider
-        viewportFraction: 0.6, // Hiển thị 80% tổng số item
+        height: 175, // Chiều cao của CarouselSlider
+        viewportFraction: 2 / 4, // Hiển thị 80% tổng số item
         enableInfiniteScroll: true, // Bật cuộn vô hạn
       ),
     );
   }
 
-
   Widget _buildCarItem(String type, String name, int price) {
     return Container(
       width: 230,
-      margin: EdgeInsets.only(left: 1),
-       padding: EdgeInsets.all(7),
+      margin: EdgeInsets.all(5),
+      padding: EdgeInsets.all(5),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(10),
@@ -314,7 +381,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: 10),
-                _buildRentButton(price),
+                // _buildRentButton(price),
+                SizedBox(height: 10),
               ],
             ),
           ),
@@ -323,124 +391,34 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildRentButton(int price) {
-    return MaterialButton(
-      onPressed: () {
-        if (_isRenting) {
-          // Xử lý việc hủy thuê xe
-          setState(() {
-            _isRenting = false;
-          });
-        } else {
-          // Xử lý việc thuê xe
-          // Hiển thị thông tin chi tiết, xác nhận
-          setState(() {
-            _isRenting = true;
-          });
-        }
-      },
-      minWidth: 100,
-      height: 40,
-      splashColor: Colors.white12,
-      color: _isRenting ? Colors.grey : Colors.teal,
-      child: Text(
-        _isRenting ? "Đã Thuê" : "Thuê Xe",
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
-        ),
+Widget _buildRentButton(int price) {
+  return MaterialButton(
+    onPressed: () {
+      if (_isRenting) {
+        // Xử lý việc hủy thuê xe
+        setState(() {
+          _isRenting = false;
+        });
+      } else {
+        // Xử lý việc thuê xe
+        // Hiển thị thông tin chi tiết, xác nhận
+        setState(() {
+          _isRenting = true;
+        });
+      }
+    },
+    minWidth: 100,
+    height: 40,
+    splashColor: Colors.white12,
+    color: _isRenting ? Colors.grey : Colors.teal,
+    child: Text(
+      _isRenting ? "Đã Thuê" : "Thuê Xe",
+      style: const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        fontSize: 12,
       ),
-    );
-  }
-  Widget _buildMostPopularCars() {
-    return CarouselSlider(
-      items: [
-        _buildCarItem('Sport', 'Hyundai i30 N 2021', 20),
-        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
-        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
-        // ... Add more car items here
-      ],
-      options: CarouselOptions(
-        height: 180, // Adjust height as desired
-        viewportFraction: 0.6, // Display a portion of total items
-        enableInfiniteScroll: true, // Enable infinite scrolling (optional)
-      ),
-    );
-  }
-  Widget _buildRecentRentals() {
-    return Container(
-      height: 180,
-      margin: EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            'Lịch sử thuê xe gần đây',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Divider(color: Colors.grey),
-          Expanded(
-            child: ListView.builder(
-              itemCount: 3, // Adjust number of recent rentals to display
-              itemBuilder: (context, index) {
-                return _buildRecentRentalItem(index);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecentRentalItem(int index) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        children: <Widget>[
-          Image.asset(
-            'assets/images/cars/land_rover_0.png',
-            width: 80,
-          ),
-          SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Hyundai i30 N 2021',
-                  style: TextStyle(
-                    fontSize: 14,
-                  ),
-                ),
-                Text(
-                  '12/03/2024 - 15/03/2024',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-                Text(
-                  '\$80',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
+    ),
+  );
+}
 }

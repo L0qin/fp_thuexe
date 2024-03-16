@@ -23,6 +23,21 @@ class ImageService {
     }
   }
 
+  static Future<List<String>> getAllVehicleImageURLsById(int id) async {
+    final token = await AuthService.getToken();
+    final url = '$baseUrl/images/allimage/$id';
+    final response = await http.get(Uri.parse(url), headers: {'Authorization': token.toString()});
+    if (response.statusCode == 200) {
+      final List<dynamic> imagesData = json.decode(response.body);
+      List<String> imageUrls = imagesData.map((imageData) {
+        final imageName = imageData['hinh'];
+        return imageName.isEmpty ? "" : '$baseUrl/images/getimages/$imageName';
+      }).toList();
+      return imageUrls;
+    } else {
+      throw Exception('Failed to load images');
+    }
+  }
 
   // Create a new image
   static Future<String> createImage(

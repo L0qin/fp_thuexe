@@ -115,6 +115,6 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
 
-    return int.parse(userId != null ? userId :"-1") ;
+    return int.parse(userId ?? "-1") ;
   }
 }

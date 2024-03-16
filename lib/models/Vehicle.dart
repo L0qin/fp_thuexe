@@ -1,4 +1,4 @@
-class Car {
+class Vehicle {
   int carId;
   String carName;
   int status;
@@ -11,7 +11,7 @@ class Car {
   int ownerName;
   int categoryId;
 
-  Car(
+  Vehicle(
       this.carId,
       this.carName,
       this.status,
@@ -22,10 +22,27 @@ class Car {
       this.rentalPrice,
       this.seating,
       this.ownerName,
-      this.categoryId);
+      this.categoryId,
+      );
+
+  factory Vehicle.fromJson(Map<String, dynamic> json) {
+    return Vehicle(
+      json['ma_xe'],
+      json['ten_xe'],
+      json['trang_thai'],
+      json['model'],
+      json['hang_sx'],
+      json['dia_chi'],
+      json['mo_ta'],
+      json['gia_thue'].toDouble(),
+      json['so_cho'],
+      json['chu_so_huu'],
+      json['ma_loai_xe'],
+    );
+  }
 
   @override
   String toString() {
-    return 'Car{carId: $carId, carName: $carName, status: $status, model: $model, manufacturer: $manufacturer, address: $address, description: $description, rentalPrice: $rentalPrice, seatingCapacity: $seating, ownerName: $ownerName, categoryId: $categoryId}';
+    return 'Vehicle{carId: $carId, carName: $carName, status: $status, model: $model, manufacturer: $manufacturer, address: $address, description: $description, rentalPrice: $rentalPrice, seating: $seating, ownerName: $ownerName, categoryId: $categoryId}';
   }
 }
