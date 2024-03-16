@@ -64,7 +64,7 @@ class _SearchPageState extends State<SearchPage> {
                   carId: vehicle.carId,
                   carName: vehicle.carName,
                   shortAddress: vehicle.address,
-                  rentPrice: vehicle.rentalPrice.toDouble(),
+                  rentPrice: vehicle.rentalPrice,
                 );
               },
             );
@@ -106,6 +106,7 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
       ),
+
     );
   }
 
@@ -376,7 +377,7 @@ class VehicleItem extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    '${rentPrice.toStringAsFixed(0)}\n/Ngày',
+                    '${rentPrice.toDouble().toStringAsFixed(0)}\n/Ngày',
                     style: TextStyle(
                       color: Colors.teal,
                       fontSize: 18.0,
