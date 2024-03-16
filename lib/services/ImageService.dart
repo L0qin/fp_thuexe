@@ -7,10 +7,9 @@ class ImageService {
   static const String baseUrl = ServiceConstants.baseUrl;
 
   static Future<String> getVehicleImageURLById(int id) async {
-    final token = await AuthService.getToken();
     final url = '$baseUrl/images/$id';
     final response = await http
-        .get(Uri.parse(url), headers: {'Authorization': token.toString()});
+        .get(Uri.parse(url), );
     if (response.statusCode == 200) {
       final imageName = json.decode(response.body)["hinh"];
       if (imageName.toString().isEmpty) {
@@ -24,9 +23,8 @@ class ImageService {
   }
 
   static Future<List<String>> getAllVehicleImageURLsById(int id) async {
-    final token = await AuthService.getToken();
     final url = '$baseUrl/images/allimage/$id';
-    final response = await http.get(Uri.parse(url), headers: {'Authorization': token.toString()});
+    final response = await http.get(Uri.parse(url), );
     if (response.statusCode == 200) {
       final List<dynamic> imagesData = json.decode(response.body);
       List<String> imageUrls = imagesData.map((imageData) {

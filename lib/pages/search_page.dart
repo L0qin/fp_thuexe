@@ -37,7 +37,7 @@ class _SearchPageState extends State<SearchPage> {
           return Column(
             children: [
               _searchBar(),
-              _cardTimeWidget(sizingInformation),
+              // _cardTimeWidget(sizingInformation),
               _searchListWidget(),
             ],
           );
@@ -109,6 +109,7 @@ class _SearchPageState extends State<SearchPage> {
 
     );
   }
+
 
   Widget _cardTimeWidget(SizingInformation sizingInformation) {
     return Container(
