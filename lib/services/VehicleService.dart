@@ -78,6 +78,7 @@ class VehicleService {
   static Future<List<Vehicle>> searchVehicles(String keyword) async {
     final token = await AuthService.getToken();
     if (token == null) {
+
       throw Exception('Token not found');
     }
 

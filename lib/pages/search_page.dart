@@ -228,7 +228,7 @@ class VehicleItem extends StatelessWidget {
   final String shortAddress;
   final double rentPrice;
 
-  VehicleItem({
+  VehicleItem({super.key,
     required this.carId,
     required this.carName,
     required this.shortAddress,
