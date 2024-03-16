@@ -24,9 +24,29 @@ class AnnouncementPage extends StatelessWidget {
     return ListView.builder(
       itemCount: 5, // Số lượng promotion bạn muốn hiển thị
       itemBuilder: (BuildContext context, int index) {
-        return SizedBox(
-          height: 200, // Đặt kích thước cố định cho mỗi Widget promotion
-          child: _buildPromotion(),
+        return Dismissible(
+          key: UniqueKey(), // Key unique để xác định mỗi phần tử
+          direction: DismissDirection.endToStart,
+          onDismissed: (direction) {
+            // Xử lý khi phần tử bị Dismiss
+            // Ở đây có thể là xóa phần tử khỏi danh sách hoặc thực hiện hành động khác
+            // Ví dụ: _promotions.removeAt(index);
+          },
+          background: Container(
+            alignment: Alignment.centerRight,
+            color: Colors.red,
+            child: Padding(
+              padding: EdgeInsets.only(right: 20.0),
+              child: Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          child: SizedBox(
+            height: 200, // Đặt kích thước cố định cho mỗi Widget promotion
+            child: _buildPromotion(),
+          ),
         );
       },
     );
