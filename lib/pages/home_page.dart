@@ -3,13 +3,17 @@ import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:fp_thuexe/models/Vehicle.dart';
 import 'package:fp_thuexe/pages/login_page.dart';
 import 'package:fp_thuexe/pages/search_page.dart';
 import 'package:fp_thuexe/services/AuthService.dart';
 import 'package:fp_thuexe/services/UserService.dart';
+import 'package:fp_thuexe/services/VehicleService.dart';
 
 import '../models/User.dart';
+import '../services/ImageService.dart';
 import 'PostCar.dart';
+import 'detailCar.dart';
 
 class HomePage extends StatefulWidget {
   static const title = 'Thuê xe';
@@ -252,7 +256,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               )),
-
         ],
       ),
     );
@@ -285,14 +288,11 @@ class _HomePageState extends State<HomePage> {
   Widget _buildBrandList(BuildContext context) {
     List<String> brandNames = [
       'honda',
-      'bmw',
       'huydai',
       'landrover',
       'cheverolet',
       'bmw',
-      'bmw',
       'audi',
-      'huydai',
       'huydai'
     ]; // Sample brand names
 
@@ -309,9 +309,7 @@ class _HomePageState extends State<HomePage> {
         autoPlayAnimationDuration: Duration(milliseconds: 800),
         autoPlayCurve: Curves.fastOutSlowIn,
         pauseAutoPlayOnTouch: true,
-        onPageChanged: (index, reason) {
-          // Xử lý khi trang thay đổi (nếu cần)
-        },
+        onPageChanged: (index, reason) {},
       ),
     );
   }
@@ -327,74 +325,99 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildCarList() {
-    return CarouselSlider(
-      items: [
-        _buildCarItem('Sport', 'Hyundai i30 N 2021', 20),
-        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
-        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
-        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
-        _buildCarItem('Economy', 'Volkswagen Golf EVO 2022', 15),
-
-        // Thêm các item khác cho các mẫu xe khác
-      ],
-      options: CarouselOptions(
-        height: 175, // Chiều cao của CarouselSlider
-        viewportFraction: 2 / 4, // Hiển thị 80% tổng số item
-        enableInfiniteScroll: true, // Bật cuộn vô hạn
-      ),
-    );
-  }
-
-  Widget _buildCarItem(String type, String name, int price) {
-    return Container(
-      width: 230,
-      margin: EdgeInsets.all(5),
-      padding: EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: <Widget>[
-          Image.asset(
-            'assets/images/cars/land_rover_0.png',
-            width: 100,
-          ),
-          SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  type,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  name,
-                  style: TextStyle(
-                    fontSize: 14,
-                  ),
-                ),
-                Text(
-                  '\$$price/per day',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 10),
-                // _buildRentButton(price),
-                SizedBox(height: 10),
-              ],
+    return FutureBuilder<List<Vehicle>>(
+      future: VehicleService.getAllVehicles(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // Show a loading indicator while fetching data
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          final List<Vehicle> vehicles = snapshot.data ?? [];
+          return CarouselSlider(
+            items: vehicles.map((vehicle) {
+              return _buildCarItem(
+                vehicle.carId,
+                vehicle.model,
+                vehicle.carName,
+                vehicle.rentalPrice,
+              );
+            }).toList(),
+            options: CarouselOptions(
+              height: 175, // Chiều cao của CarouselSlider
+              viewportFraction: 2 / 4, // Hiển thị 80% tổng số item
+              enableInfiniteScroll: true, // Bật cuộn vô hạn
             ),
-          ),
-        ],
-      ),
+          );
+        }
+      },
     );
   }
+
+  Widget _buildCarItem(int carId, String type, String name, double price) {
+    return FutureBuilder<String>(
+      future: ImageService.getVehicleImageURLById(carId),
+      builder: (context, snapshot) {
+        final defaultImage = 'assets/images/cars/land_rover_0.png';
+        final imageUrl = snapshot.data ?? defaultImage;
+        return Container(
+          width: 230,
+          margin: EdgeInsets.all(5),
+          padding: EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: <Widget>[
+              Image.network(
+                imageUrl,
+                width: 100,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    defaultImage,
+                    width: 100,
+                  );
+                },
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      type,
+                      style: TextStyle(
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      '\$$price/per day',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    _buildRentButton(carId),
+                    SizedBox(height: 10),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 
   Widget _buildHeaderNoExpand(String title) {
     return Container(
@@ -494,28 +517,23 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildRentButton(int price) {
+  Widget _buildRentButton(int carId) {
     return MaterialButton(
       onPressed: () {
-        if (_isRenting) {
-          // Xử lý việc hủy thuê xe
-          setState(() {
-            _isRenting = false;
-          });
-        } else {
-          // Hiển thị thông tin chi tiết, xác nhận
-          setState(() {
-            _isRenting = true;
-          });
-        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailCar(carId),
+          ),
+        );
       },
       minWidth: 100,
       height: 40,
       splashColor: Colors.white12,
-      color: _isRenting ? Colors.grey : Colors.teal,
-      child: Text(
-        _isRenting ? "Đã Thuê" : "Thuê Xe",
-        style: const TextStyle(
+      color: Colors.teal,
+      child: const Text(
+        "Thuê Ngay",
+        style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
           fontSize: 12,
