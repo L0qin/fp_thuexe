@@ -110,7 +110,6 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-
   Widget _cardTimeWidget(SizingInformation sizingInformation) {
     return Container(
       height: 101,

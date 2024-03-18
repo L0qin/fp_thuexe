@@ -97,7 +97,7 @@ class VehicleService {
   }
 
   // Method to post a new vehicle
-  static Future<bool> postVehicle(Vehicle vehicle) async {
+  static Future<int?> postVehicle(Vehicle vehicle) async {
     final token = await AuthService.getToken();
     if (token == null) {
       throw Exception('Token not found');
@@ -125,11 +125,13 @@ class VehicleService {
     );
 
     if (response.statusCode == 201) {
-      print('Vehicle posted successfully');
-      return true;
+      final dynamic responseData = json.decode(response.body);
+      final int? insertId = responseData['id']; // Assuming 'id' is the key for insertId
+      print('Vehicle posted successfully with ID: $insertId');
+      return insertId;
     } else {
       print('Failed to post vehicle');
-      return false;
+      return null;
     }
   }
 }

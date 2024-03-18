@@ -70,7 +70,8 @@ class UserService {
   }
 
   // Method to update an existing user
-  static Future<bool> updateUser(int userId, String fullName, String phoneNumber, String address) async {
+  static Future<bool> updateUser(
+      int userId, String fullName, String phoneNumber, String address) async {
     final token = await AuthService.getToken();
     if (token == null) {
       throw Exception('Token not found');
@@ -98,7 +99,4 @@ class UserService {
       return false;
     }
   }
-
-
-
 }

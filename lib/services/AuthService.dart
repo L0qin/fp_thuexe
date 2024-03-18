@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:fp_thuexe/models/User.dart';
 import 'package:fp_thuexe/services/ServiceConstants.dart';
+import 'package:fp_thuexe/services/UserService.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,8 +25,16 @@ class AuthService {
       if (response.statusCode == 200) {
         final token = jsonDecode(response.body)['token'];
         final userId = jsonDecode(response.body)['userId'];
-        await _saveInfo(token,userId.toString());
-        return token;
+        await _saveInfo(token, userId.toString());
+        final User? user = await UserService.getUserById(userId);
+
+        if (user != null) {
+          _saveUser(user);
+          return token;
+        } else {
+          // Handle case where user is null
+          return null;
+        }
       } else {
         return null;
       }
@@ -33,6 +43,7 @@ class AuthService {
       throw 'Network error: $e';
     }
   }
+
 
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
@@ -72,10 +83,15 @@ class AuthService {
     }
   }
 
-  static Future<void> _saveInfo(String token,String userId) async {
+  static Future<void> _saveInfo(String token, String userId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
     await prefs.setString('userId', userId);
+
+  }
+  static Future<void> _saveUser(User user) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user', User.toJsonString(user));
   }
 
   static Future<String?> getToken() async {
@@ -107,7 +123,6 @@ class AuthService {
       return null;
     }
 
-    // Token is valid
     return token;
   }
 
@@ -115,6 +130,13 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
 
-    return int.parse(userId ?? "-1") ;
+    return int.parse(userId ?? "-1");
+  }
+
+  static Future<User?> getUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user');
+
+    return User.fromJsonToUser(userJson!);
   }
 }
