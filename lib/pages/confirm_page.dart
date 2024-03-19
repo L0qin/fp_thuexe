@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -407,6 +408,20 @@ class _ConfirmPageState extends State<ConfirmPage> {
   }
 
   Widget _buildPaymentInfoCard() {
+    if (_selectedDateTime1 == null ||
+        _selectedDateTime2 == null ||
+        _vehicle == null) {
+      return Container(); // Return an empty container if dates or vehicle are not selected
+    }
+
+    // Calculate the number of days between selected dates
+    int numberOfDays =
+        _selectedDateTime2!.difference(_selectedDateTime1!).inDays;
+    numberOfDays = max(1, numberOfDays); // Ensure minimum of 1 day
+
+    // Calculate total price
+    double totalPrice = _vehicle.rentalPrice * numberOfDays;
+
     return Container(
       width: double.infinity,
       child: Card(
@@ -420,11 +435,43 @@ class _ConfirmPageState extends State<ConfirmPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Thông tin thanh toán", // Car details
+                "Thông tin thanh toán", // Payment information
                 style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.teal),
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.teal,
+                ),
+              ),
+              SizedBox(height: 10),
+              ListTile(
+                title: Text(
+                  "Giá thuê mỗi ngày",
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                trailing: Text(
+                  "${_vehicle.rentalPrice} đ",
+                  style: TextStyle(fontSize: 16.0),
+                ),
+              ),
+              ListTile(
+                title: Text(
+                  "Số ngày thuê",
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                trailing: Text(
+                  "$numberOfDays ngày",
+                  style: TextStyle(fontSize: 16.0),
+                ),
+              ),
+              ListTile(
+                title: Text(
+                  "Tổng giá",
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                trailing: Text(
+                  "$totalPrice đ",
+                  style: TextStyle(fontSize: 16.0),
+                ),
               ),
             ],
           ),
