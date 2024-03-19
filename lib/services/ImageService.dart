@@ -26,6 +26,11 @@ class ImageService {
     }
   }
 
+  static String getImageByName(String imageName) {
+    final imageURL = '$baseUrl/images/getimages/$imageName';
+    return imageURL;
+  }
+
   static Future<List<String>> getAllVehicleImageURLsById(int id) async {
     final url = '$baseUrl/images/allimage/$id';
     final response = await http.get(
@@ -43,7 +48,8 @@ class ImageService {
     }
   }
 
-  static Future<String> postImage(String loaiHinh, String maXe, File imageFile) async {
+  static Future<String> postImage(
+      String loaiHinh, String maXe, File imageFile) async {
     final url = '$baseUrl/images';
     final token = await AuthService.getToken();
     if (token == null) {
@@ -63,7 +69,8 @@ class ImageService {
     // Add image file to the request
     var imageStream = http.ByteStream(imageFile.openRead());
     var length = await imageFile.length();
-    var multipartFile = http.MultipartFile('image', imageStream, length, filename: imageFile.path.split('/').last);
+    var multipartFile = http.MultipartFile('image', imageStream, length,
+        filename: imageFile.path.split('/').last);
     request.files.add(multipartFile);
 
     // Send the request
@@ -71,8 +78,10 @@ class ImageService {
 
     // Check the response status code
     if (response.statusCode == 201) {
-      final dynamic responseData = json.decode(await response.stream.bytesToString());
-      final String imageUrl = '$baseUrl/images/getimages/${responseData["hinh"]}';
+      final dynamic responseData =
+          json.decode(await response.stream.bytesToString());
+      final String imageUrl =
+          '$baseUrl/images/getimages/${responseData["hinh"]}';
       return imageUrl;
     } else {
       throw Exception('Failed to post image');

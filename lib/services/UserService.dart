@@ -27,7 +27,7 @@ class UserService {
         jsonData['ten_nguoi_dung'],
         jsonData['mat_khau_hash'],
         jsonData['ho_ten'],
-        '$baseUrl/images/getimages/hinh1.jpg',
+        '$baseUrl/images/getimages/'+jsonData['hinh_dai_dien'],
         DateTime.parse(jsonData['ngay_dang_ky']),
         jsonData['so_dien_thoai'],
         jsonData['dia_chi_nguoi_dung'],
@@ -36,6 +36,7 @@ class UserService {
       throw Exception('Failed to load user data');
     }
   }
+  
 
   // Method to retrieve all users
   static Future<List<User>> getAllUsers() async {
