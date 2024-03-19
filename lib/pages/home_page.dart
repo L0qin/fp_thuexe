@@ -12,8 +12,8 @@ import 'package:fp_thuexe/services/VehicleService.dart';
 
 import '../models/User.dart';
 import '../services/ImageService.dart';
-import 'PostCar.dart';
-import 'detailCar.dart';
+import 'post_car_page.dart';
+import 'car_detail_page.dart';
 
 class HomePage extends StatefulWidget {
   static const title = 'Thuê xe';

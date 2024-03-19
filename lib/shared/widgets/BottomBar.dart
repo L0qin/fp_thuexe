@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fp_thuexe/pages/JourneyHistory.dart';
-import 'package:fp_thuexe/pages/anoucement.dart';
+import 'package:fp_thuexe/pages/journey_history_page.dart';
+import 'package:fp_thuexe/pages/anoucement_page.dart';
 import 'package:fp_thuexe/pages/home_page.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
-import '../../pages/Information.dart';
+import '../../pages/info_page.dart';
 
 class BottomBar extends StatefulWidget {
   const BottomBar({super.key});

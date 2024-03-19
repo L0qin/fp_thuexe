@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fp_thuexe/pages/detailCar.dart';
+import 'package:fp_thuexe/pages/car_detail_page.dart';
 import 'package:fp_thuexe/services/ImageService.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
