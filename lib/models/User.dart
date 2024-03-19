@@ -6,14 +6,23 @@ class User {
   String passwordHash;
   String fullName;
   String profilePicture;
-  DateTime birthDate;
+  DateTime? birthDate;
   String phoneNumber;
   String address;
 
   User(this.userId, this.username, this.passwordHash, this.fullName,
       this.profilePicture, this.birthDate, this.phoneNumber, this.address);
 
-  // Convert User object to a Map for serialization
+  User.unLoadedUser(
+      {this.userId = -1,
+      this.username = "...",
+      this.passwordHash = "...",
+      this.fullName = "...",
+      this.profilePicture = "...",
+      this.birthDate ,
+      this.phoneNumber = "",
+      this.address = "..."});
+
   Map<String, dynamic> toJson() {
     return {
       'userId': userId,
@@ -21,7 +30,7 @@ class User {
       'passwordHash': passwordHash,
       'fullName': fullName,
       'profilePicture': profilePicture,
-      'birthDate': birthDate.toIso8601String(),
+      'birthDate': birthDate!.toIso8601String(),
       'phoneNumber': phoneNumber,
       'address': address,
     };
