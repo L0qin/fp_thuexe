@@ -359,7 +359,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildCarItem(int carId, String type, String name, double price) {
     return FutureBuilder<String>(
-      future: ImageService.getVehicleImageURLById(carId),
+      future: ImageService.getVehicleMainImageURLById(carId),
       builder: (context, snapshot) {
         final defaultImage = 'assets/images/cars/land_rover_0.png';
         final imageUrl = snapshot.data ?? defaultImage;

@@ -132,7 +132,6 @@ class _PostTheCarState extends State<PostCar> {
     }
   }
 
-
   Future<void> getImage(bool isMainImage) async {
     final pickedFiles = await _picker
         .getMultiImage(); // Use getMultiImage to select multiple images
@@ -537,7 +536,7 @@ class _PostTheCarState extends State<PostCar> {
                 ...images.asMap().entries.map((entry) {
                   int index = entry.key;
                   File image = entry.value;
-                  return index < images.length - 1
+                  return index < images.length
                       ? Stack(
                           children: [
                             Padding(
@@ -584,6 +583,15 @@ class _PostTheCarState extends State<PostCar> {
                           ),
                         );
                 }).toList(),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.2,
+                  height: MediaQuery.of(context).size.width * 0.2,
+                  child: Container(
+                    color: Colors.grey[300],
+                    child: Icon(Icons.add_a_photo,
+                        size: 50, color: Colors.grey[600]),
+                  ),
+                )
               ],
             ),
           ],

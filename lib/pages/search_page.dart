@@ -238,7 +238,7 @@ class VehicleItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
-      future: ImageService.getVehicleImageURLById(carId),
+      future: ImageService.getVehicleMainImageURLById(carId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();

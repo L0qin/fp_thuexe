@@ -7,13 +7,15 @@ import 'ServiceConstants.dart';
 class ImageService {
   static const String baseUrl = ServiceConstants.baseUrl;
 
-  static Future<String> getVehicleImageURLById(int id) async {
-    final url = '$baseUrl/images/$id';
+  static Future<String> getVehicleMainImageURLById(int id) async {
+    final url = '$baseUrl/images/mainimage/$id';
     final response = await http.get(
       Uri.parse(url),
     );
+
     if (response.statusCode == 200) {
       final imageName = json.decode(response.body)["hinh"];
+
       if (imageName.toString().isEmpty) {
         return "";
       }
