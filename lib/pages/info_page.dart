@@ -6,8 +6,6 @@ import 'package:flutter/rendering.dart';
 import 'package:fp_thuexe/models/User.dart';
 import 'package:fp_thuexe/services/UserService.dart';
 
-
-
 class Information extends StatefulWidget {
   const Information({super.key});
 
