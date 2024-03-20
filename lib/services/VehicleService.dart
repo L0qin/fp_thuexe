@@ -119,7 +119,7 @@ class VehicleService {
         'mo_ta': vehicle.description,
         'gia_thue': vehicle.rentalPrice,
         'so_cho': vehicle.seating,
-        'chu_so_huu': vehicle.ownerName,
+        'chu_so_huu': vehicle.ownerId,
         'ma_loai_xe': vehicle.categoryId,
       }),
     );

@@ -40,7 +40,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _checkLoginStatus();
-    _startTimer();
   }
 
   @override
@@ -110,87 +109,88 @@ class _HomePageState extends State<HomePage> {
   Widget _headerWidget() {
     String buttonText = _isLoggedIn ? "Đăng xuất" : "Đăng nhập";
     String address = _user?.address ?? "Chưa đăng nhập";
+
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          SizedBox(
-            height: 45,
-            width: 45,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(100)),
-              child: _user == null
-                  ? Image.asset('assets/images/icons/user.png')
-                  : ClipRRect(
-                      clipBehavior: Clip.antiAlias,
-                      borderRadius: BorderRadius.circular(500),
-                      child: Image.network(_user!.profilePicture),
-                    ),
+          CircleAvatar(
+            radius: 22.5, // Adjusted for symmetry
+            backgroundImage: _user == null
+                ? AssetImage('assets/images/icons/user.png') as ImageProvider // Cast as ImageProvider
+                : NetworkImage(_user!.profilePicture) as ImageProvider, // Cast as ImageProvider
+            backgroundColor: Colors.grey[300],
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    "Location",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center, // Centers the children horizontally
+                    children: <Widget>[
+                      Text(
+                        address,
+                        style: TextStyle(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Icon(Icons.arrow_drop_down, color: Colors.teal),
+                    ],
+                  )
+                ],
+              ),
             ),
           ),
-          Column(
-            children: <Widget>[
-              const Text(
-                "Location",
-                style: TextStyle(fontSize: 18, color: Colors.black),
-              ),
-              const SizedBox(
-                height: 2,
-              ),
-              Row(
-                children: <Widget>[
-                  Text(address),
-                  const Icon(Icons.arrow_drop_down),
-                ],
-              )
-            ],
-          ),
-          MaterialButton(
-            onPressed: () async {
-              if (_isLoggedIn) {
-                bool confirmLogout = await showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('Xác nhận đăng xuất'),
-                    content: Text('Bạn có chắc chắn muốn đăng xuất?'),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: Text('Không'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          AuthService.logout();
-                          _startTimer();
-                          _checkLoginStatus();
-                          _user = null;
-                        },
-                        child: Text('Có'),
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                );
-                _checkLoginStatus();
-              }
-            },
-            minWidth: 45,
-            height: 50,
-            splashColor: Colors.white12,
-            color: Colors.teal,
-            child: Text(
-              buttonText,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
+          ButtonTheme(
+            minWidth: 80, // Adjusted for visual balance
+            height: 36, // Reduced for aesthetic alignment
+            child: MaterialButton(
+              onPressed: () async {
+                if (_isLoggedIn) {
+                  bool confirmLogout = await showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Xác nhận đăng xuất'),
+                      content: Text('Bạn có chắc chắn muốn đăng xuất?'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: Text('Không'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            AuthService.logout();
+                            _checkLoginStatus();
+                            _user = null;
+                          },
+                          child: Text('Có'),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  _startTimer();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                  _checkLoginStatus();
+                }
+              },
+              color: Colors.teal,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+              child: Text(
+                buttonText,
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
               ),
             ),
           ),
@@ -198,6 +198,8 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+
 
 //Search
   Widget _searchWidget() {
@@ -340,10 +342,7 @@ class _HomePageState extends State<HomePage> {
           return CarouselSlider(
             items: vehicles.map((vehicle) {
               return _buildCarItem(
-                vehicle.carId,
-                vehicle.model,
-                vehicle.carName,
-                vehicle.rentalPrice,
+                  vehicle
               );
             }).toList(),
             options: CarouselOptions(
@@ -357,9 +356,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildCarItem(int carId, String type, String name, double price) {
+  Widget _buildCarItem(Vehicle vehicle) {
     return FutureBuilder<String>(
-      future: ImageService.getVehicleMainImageURLById(carId),
+      future: ImageService.getVehicleMainImageURLById(vehicle.carId),
       builder: (context, snapshot) {
         final defaultImage = 'assets/images/cars/land_rover_0.png';
         final imageUrl = snapshot.data ?? defaultImage;
@@ -389,27 +388,27 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      name,
+                      vehicle.carName,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      type,
+                      vehicle.model,
                       style: TextStyle(
                         fontSize: 14,
                       ),
                     ),
                     Text(
-                      '\$$price/per day',
+                      '${vehicle.rentalPrice}d/Ngày',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     SizedBox(height: 10),
-                    _buildRentButton(carId),
+                    _buildRentButton(vehicle),
                     SizedBox(height: 10),
                   ],
                 ),
@@ -576,13 +575,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildRentButton(int carId) {
+  Widget _buildRentButton(Vehicle vehicle) {
     return MaterialButton(
       onPressed: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DetailCar(carId),
+            builder: (context) => DetailCar(vehicle),
           ),
         );
       },

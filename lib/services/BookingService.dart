@@ -1,76 +1,110 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
 import 'ServiceConstants.dart';
+import 'AuthService.dart'; // Ensure AuthService provides a method to get a token
 
 class BookingService {
-  final String baseUrl =ServiceConstants.baseUrl;
+  static final String baseUrl = ServiceConstants.baseUrl;
 
-  Future<List<Map<String, dynamic>>?> getAllDatXe() async {
-    final url = '$baseUrl/datxe';
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.cast<Map<String, dynamic>>();
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print('Error while getting all datxe: $e');
-      return null;
+  // Get all bookings
+  static Future<List<dynamic>> getAllBookings() async {
+    final token = await AuthService.getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/datxe'),
+      headers: {'Authorization': ' $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to load bookings');
     }
   }
 
-  Future<Map<String, dynamic>?> getDatXeById(String id) async {
-    final url = '$baseUrl/datxe/$id';
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print('Error while getting datxe by ID: $e');
-      return null;
+  // Get a specific booking by ID
+  static Future<dynamic> getBookingById(int bookingId) async {
+    final token = await AuthService.getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/datxe/$bookingId'),
+      headers: {'Authorization': ' $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to load booking');
     }
   }
 
-  Future<bool> createDatXe(Map<String, dynamic> data) async {
-    final url = '$baseUrl/datxe';
-    try {
-      final response = await http.post(Uri.parse(url), headers: {
+  // Create a new booking entry
+  static Future<void> createBooking(Map<String, dynamic> bookingData) async {
+    final token = await AuthService.getToken();
+    final response = await http.post(
+      Uri.parse('$baseUrl/datxe'),
+      headers: {
+        'Authorization': ' $token',
         'Content-Type': 'application/json',
-      }, body: jsonEncode(data));
-      return response.statusCode == 201;
-    } catch (e) {
-      print('Error while creating datxe: $e');
-      return false;
+      },
+      body: jsonEncode(bookingData),
+    );
+
+    if (response.statusCode == 201) {
+      print('Booking created successfully');
+    } else {
+      throw Exception('Failed to create booking');
     }
   }
 
-  Future<bool> updateDatXe(String id, Map<String, dynamic> data) async {
-    final url = '$baseUrl/datxe/$id';
-    try {
-      final response = await http.put(Uri.parse(url), headers: {
+  // Update an existing booking entry
+  static Future<void> updateBooking(int bookingId, Map<String, dynamic> bookingData) async {
+    final token = await AuthService.getToken();
+    final response = await http.put(
+      Uri.parse('$baseUrl/datxe/$bookingId'),
+      headers: {
+        'Authorization': ' $token',
         'Content-Type': 'application/json',
-      }, body: jsonEncode(data));
-      return response.statusCode == 200;
-    } catch (e) {
-      print('Error while updating datxe: $e');
-      return false;
+      },
+      body: jsonEncode(bookingData),
+    );
+
+    if (response.statusCode == 200) {
+      print('Booking updated successfully');
+    } else {
+      throw Exception('Failed to update booking');
     }
   }
 
-  Future<bool> deleteDatXe(String id) async {
-    final url = '$baseUrl/datxe/$id';
-    try {
-      final response = await http.delete(Uri.parse(url));
-      return response.statusCode == 200;
-    } catch (e) {
-      print('Error while deleting datxe: $e');
-      return false;
+  // Delete an existing booking entry
+  static Future<void> deleteBooking(int bookingId) async {
+    final token = await AuthService.getToken();
+    final response = await http.delete(
+      Uri.parse('$baseUrl/datxe/$bookingId'),
+      headers: {'Authorization': ' $token'},
+    );
+
+    if (response.statusCode == 200) {
+      print('Booking deleted successfully');
+    } else {
+      throw Exception('Failed to delete booking');
+    }
+  }
+
+  // Method to close a booking
+  static Future<void> closeBooking(int bookingId, int vehicleId) async {
+    final token = await AuthService.getToken();
+    final response = await http.put(
+      Uri.parse('$baseUrl/datxe/close/$bookingId'),
+      headers: {
+        'Authorization': ' $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'ma_xe': vehicleId}),
+    );
+
+    if (response.statusCode == 200) {
+      print('Booking closed successfully');
+    } else {
+      throw Exception('Failed to close booking');
     }
   }
 }

@@ -78,7 +78,7 @@ class _PostTheCarState extends State<PostCar> {
     if (_vehicle!.description.isEmpty) _vehicle!.description = "";
     if (_vehicle!.carId == null) _vehicle!.carId = -1;
     if (_vehicle!.status == null) _vehicle!.status = -1;
-    if (_vehicle!.ownerName == null) _vehicle!.ownerName = -1;
+    if (_vehicle!.ownerId == null) _vehicle!.ownerId = -1;
     if (_vehicle!.categoryId == null) _vehicle!.categoryId = -1;
 
     // Post the vehicle to the server

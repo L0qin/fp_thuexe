@@ -8,7 +8,7 @@ class Vehicle {
   String description;
   double rentalPrice;
   int seating;
-  int ownerName;
+  int ownerId;
   int categoryId;
 
   Vehicle(
@@ -21,7 +21,7 @@ class Vehicle {
       this.description,
       this.rentalPrice,
       this.seating,
-      this.ownerName,
+      this.ownerId,
       this.categoryId,
       );
 
@@ -43,6 +43,6 @@ class Vehicle {
 
   @override
   String toString() {
-    return 'Vehicle{carId: $carId, carName: $carName, status: $status, model: $model, manufacturer: $manufacturer, address: $address, description: $description, rentalPrice: $rentalPrice, seating: $seating, ownerName: $ownerName, categoryId: $categoryId}';
+    return 'Vehicle{carId: $carId, carName: $carName, status: $status, model: $model, manufacturer: $manufacturer, address: $address, description: $description, rentalPrice: $rentalPrice, seating: $seating, ownerName: $ownerId, categoryId: $categoryId}';
   }
 }

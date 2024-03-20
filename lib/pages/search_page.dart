@@ -61,10 +61,7 @@ class _SearchPageState extends State<SearchPage> {
               itemBuilder: (context, index) {
                 Vehicle vehicle = snapshot.data![index];
                 return VehicleItem(
-                  carId: vehicle.carId,
-                  carName: vehicle.carName,
-                  shortAddress: vehicle.address,
-                  rentPrice: vehicle.rentalPrice,
+                 vehicle
                 );
               },
             );
@@ -223,22 +220,14 @@ class _SearchPageState extends State<SearchPage> {
 }
 
 class VehicleItem extends StatelessWidget {
-  final int carId;
-  final String carName;
-  final String shortAddress;
-  final double rentPrice;
+  final Vehicle vehicle;
 
-  VehicleItem({super.key,
-    required this.carId,
-    required this.carName,
-    required this.shortAddress,
-    required this.rentPrice,
-  });
+  VehicleItem(this.vehicle);
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
-      future: ImageService.getVehicleMainImageURLById(carId),
+      future: ImageService.getVehicleMainImageURLById(vehicle.carId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
@@ -271,7 +260,7 @@ class VehicleItem extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DetailCar(carId),
+                          builder: (context) => DetailCar(vehicle),
                         ),
                       );
                     },
@@ -332,7 +321,7 @@ class VehicleItem extends StatelessWidget {
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
                                   child: Text(
-                                    carName,
+                                    vehicle.carName,
                                     style: TextStyle(
                                       fontSize: 22.0,
                                       fontWeight: FontWeight.bold,
@@ -347,7 +336,7 @@ class VehicleItem extends StatelessWidget {
                                     // Map pin icon
                                     SizedBox(width: 4.0),
                                     Text(
-                                      shortAddress,
+                                      vehicle.address,
                                       style: TextStyle(
                                         decoration: TextDecoration.underline,
                                         fontSize: 16.0,
@@ -377,7 +366,7 @@ class VehicleItem extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    '$rentPrice\n/Ngày',
+                    '${vehicle.rentalPrice}\n/Ngày',
                     style: TextStyle(
                       color: Colors.teal,
                       fontSize: 18.0,

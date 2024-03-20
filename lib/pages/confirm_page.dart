@@ -1,15 +1,17 @@
 import 'dart:async';
 import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_zalopay_sdk/flutter_zalopay_sdk.dart';
 import 'package:fp_thuexe/models/Vehicle.dart';
+import 'package:fp_thuexe/pages/success_page.dart';
 import 'package:fp_thuexe/services/ImageService.dart';
 import 'package:fp_thuexe/services/UserService.dart';
 import 'package:intl/intl.dart';
 
 import '../models/User.dart';
 import '../services/AuthService.dart';
+import '../services/BookingService.dart';
 
 class ConfirmPage extends StatefulWidget {
   Vehicle vehicle;
@@ -26,14 +28,26 @@ class _ConfirmPageState extends State<ConfirmPage> {
   late User _userOwner;
   Vehicle _vehicle;
   late String imgURL;
-  DateTime? _selectedDateTime1;
-  DateTime? _selectedDateTime2;
+
+  // Initialize _selectedDateTime1 to tomorrow
+  DateTime _selectedDateTime1 = DateTime.now().add(Duration(days: 1));
+
+  // Initialize _selectedDateTime2 to the day after tomorrow
+  DateTime _selectedDateTime2 = DateTime.now().add(Duration(days: 2));
+  String? _selectedPaymentMethod = 'Tiền mặt';
+
+  final List<String> _paymentMethods = [
+    'ZaloPay',
+    'Tiền mặt',
+  ];
 
   _ConfirmPageState(this._vehicle);
 
   @override
   void initState() {
     super.initState();
+    _user = User.unLoadedUser();
+    _userOwner = User.unLoadedUser();
     _startTimer();
   }
 
@@ -44,27 +58,162 @@ class _ConfirmPageState extends State<ConfirmPage> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      AuthService.getUser().then((user) {
-        if (user != null) {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) async {
+      var user = await AuthService.getUser();
+      if (user != null && mounted) {
+        setState(() {
+          _user = user;
+        });
+        var userOwner = await UserService.getUserById(_vehicle.ownerId);
+        if (userOwner != null && mounted) {
           setState(() {
-            _user = user;
+            _userOwner = userOwner;
           });
-          UserService.getUserById(_vehicle.carId).then((userOwner) {
-            if (userOwner != null) {
-              setState(() {
-                _userOwner = userOwner;
-              });
-              _stopTimer();
-            }
-          });
+          _stopTimer();
         }
-      });
+      }
     });
   }
 
   void _stopTimer() {
-    _timer?.cancel();
+    if (_timer.isActive) {
+      _timer.cancel();
+    }
+  }
+
+  void _createBooking() async {
+    int status = 0;
+    String receivingAddress = _user.address;
+    int customerId = _user.userId;
+
+    // Calculate the rental cost
+    int rentalDays = _selectedDateTime2.difference(_selectedDateTime1).inDays;
+    int totalRentalCost = (rentalDays * _vehicle.rentalPrice).toInt();
+
+    // Prevent users from renting their own vehicle
+    if (customerId == _userOwner.userId) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Lỗi"),
+            content: Text(
+                "Bạn không thể thuê xe của chính mình,\n vui lòng chọn xe khác"),
+            actions: <Widget>[
+              TextButton(
+                child: Text("Ok"),
+                onPressed: () {
+                  Navigator.popUntil(context, ModalRoute.withName('/'));
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    // Check if the selected payment method is ZaloPay
+    if (_selectedPaymentMethod == 'ZaloPay') {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(child: CircularProgressIndicator());
+        },
+      );
+
+      var result = await FlutterZaloPaySdk.payOrder(
+          zpToken: 'uUfsWgfLkRLzq6W2uNXTCxrfxs51auny');
+      Navigator.pop(context);
+      if (result != null) {
+        var paymentResult = await FlutterZaloPaySdk.payOrder(
+            zpToken: "uUfsWgfLkRLzq6W2uNXTCxrfxs51auny");
+        if (paymentResult == FlutterZaloPayStatus.success) {
+        } else {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Payment Error"),
+                content: Text("Failed to process payment. Please try again."),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text("Close"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+          return;
+        }
+      } else {
+        // Payment initiation failed
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Payment Error"),
+              content: Text("Failed to initiate payment. Please try again."),
+              actions: <Widget>[
+                TextButton(
+                  child: Text("Close"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        return; // Exit the function if unable to initiate payment
+      }
+    }
+
+    Map<String, dynamic> bookingData = {
+      'ngay_bat_dau': _selectedDateTime1.toIso8601String(),
+      'ngay_ket_thuc': _selectedDateTime2.toIso8601String(),
+      'trang_thai_dat_xe': status,
+      'dia_chi_nhan_xe': receivingAddress,
+      'so_ngay_thue': rentalDays,
+      'tong_tien_thue': totalRentalCost,
+      'ma_xe': _vehicle.carId,
+      'ma_nguoi_dat_xe': customerId,
+    };
+
+    try {
+      await BookingService.createBooking(bookingData);
+      // Navigate to the SuccessPage on successful booking
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                SuccessPage()), // Replace SuccessPage() with the actual success page widget
+      );
+    } catch (e) {
+      // Show a dialog on failure
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text("Failed to create booking. Please try again."),
+            actions: <Widget>[
+              TextButton(
+                child: Text("Close"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -414,64 +563,65 @@ class _ConfirmPageState extends State<ConfirmPage> {
       return Container(); // Return an empty container if dates or vehicle are not selected
     }
 
-    // Calculate the number of days between selected dates
     int numberOfDays =
         _selectedDateTime2!.difference(_selectedDateTime1!).inDays;
-    numberOfDays = max(1, numberOfDays); // Ensure minimum of 1 day
+    numberOfDays = max(1, numberOfDays); // Ensure a minimum of 1 day
 
-    // Calculate total price
     double totalPrice = _vehicle.rentalPrice * numberOfDays;
 
     return Container(
       width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       child: Card(
-        margin: EdgeInsets.all(5),
+        elevation: 4,
+        margin: EdgeInsets.all(10),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
+          borderRadius: BorderRadius.circular(16.0),
         ),
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 "Thông tin thanh toán", // Payment information
                 style: TextStyle(
-                  fontSize: 18.0,
+                  fontSize: 20.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.teal,
                 ),
               ),
-              SizedBox(height: 10),
-              ListTile(
-                title: Text(
-                  "Giá thuê mỗi ngày",
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                trailing: Text(
-                  "${_vehicle.rentalPrice} đ",
-                  style: TextStyle(fontSize: 16.0),
-                ),
-              ),
-              ListTile(
-                title: Text(
-                  "Số ngày thuê",
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                trailing: Text(
-                  "$numberOfDays ngày",
-                  style: TextStyle(fontSize: 16.0),
+              SizedBox(height: 20),
+              _buildInfoTile("Giá thuê mỗi ngày", "${_vehicle.rentalPrice} đ"),
+              _buildInfoTile("Số ngày thuê", "$numberOfDays ngày"),
+              _buildInfoTile("Tổng giá", "$totalPrice đ"),
+              SizedBox(height: 30),
+              Text(
+                "Chọn phương thức thanh toán",
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              ListTile(
-                title: Text(
-                  "Tổng giá",
-                  style: TextStyle(fontSize: 16.0),
+              DropdownButtonFormField(
+                decoration: InputDecoration(
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.teal),
+                  ),
                 ),
-                trailing: Text(
-                  "$totalPrice đ",
-                  style: TextStyle(fontSize: 16.0),
-                ),
+                value: _selectedPaymentMethod,
+                items: _paymentMethods
+                    .map((method) => DropdownMenuItem(
+                          value: method,
+                          child: Text(method),
+                        ))
+                    .toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedPaymentMethod = newValue;
+                  });
+                },
+                hint: Text("Select a payment method"),
               ),
             ],
           ),
@@ -480,11 +630,26 @@ class _ConfirmPageState extends State<ConfirmPage> {
     );
   }
 
+  ListTile _buildInfoTile(String title, String trailing) {
+    return ListTile(
+      title: Text(
+        title,
+        style: TextStyle(fontSize: 16.0),
+      ),
+      trailing: Text(
+        trailing,
+        style: TextStyle(fontSize: 16.0),
+      ),
+    );
+  }
+
   Widget _buildButton() {
     return Container(
       margin: EdgeInsets.all(12),
       child: MaterialButton(
-        onPressed: () {},
+        onPressed: () {
+          _createBooking();
+        },
         height: 50,
         minWidth: double.infinity,
         color: Colors.teal,
