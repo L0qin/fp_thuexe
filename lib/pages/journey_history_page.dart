@@ -1,46 +1,91 @@
 import 'package:flutter/material.dart';
 
-class JourneyHistoryPage extends StatelessWidget {
+import 'package:flutter/material.dart';
+
+// Ensure you have these imports
+import '../models/VehicleBooking.dart';
+import '../services/AuthService.dart';
+import '../services/BookingService.dart';
+
+class JourneyHistoryPage extends StatefulWidget {
+  @override
+  _JourneyHistoryPageState createState() => _JourneyHistoryPageState();
+}
+
+class _JourneyHistoryPageState extends State<JourneyHistoryPage> {
+  Future<List<Booking?>?>? futureBookings;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBookings();
+  }
+
+  void _fetchBookings() async {
+    try {
+      final userId = await AuthService.getUserId(); // Wait for the userId
+      final bookings = await BookingService.getBookingsByUserId(userId!);
+      setState(() {
+        futureBookings = Future.value(
+            bookings); // Set the futureBookings with the resolved future
+      });
+    } catch (error) {
+      print("Error fetching bookings: $error");
+      setState(() {
+        futureBookings = Future.value(
+            []); // In case of error, set futureBookings to an empty list
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // title: Text('Hành Trình Thuê Xe'),
+        title: Text('Hành Trình Thuê Xe'),
+        backgroundColor: Colors.teal.shade700,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 10,),
-            JourneyHistoryItem(
-              carType: "Kia",
-              renterName: "Phạm Trường",
-              location: "Cao Lỗ",
-              rentalDuration: "3 ngày",
-              cost: "750,000 VNĐ",
-              tripStart: "8:00 AM, 15/03/2024",
-              tripEnd: "11:00 AM, 18/03/2024",
-              paymentMethod: "Thanh toán tiền mặt",
-              contactSupport: "support@example.com",
-            ),
-            SizedBox(height: 16.0),
-            JourneyHistoryItem(
-              carType: "Toyota",
-              renterName: "Nguyễn Thị An",
-              location: "Đống Đa",
-              rentalDuration: "2 ngày",
-              cost: "500,000 VNĐ",
-              tripStart: "10:00 AM, 17/03/2024",
-              tripEnd: "12:00 PM, 19/03/2024",
-              paymentMethod: "Thanh toán thẻ tín dụng",
-              contactSupport: "support@example.com",
-            ),
-            // Add more items to the Column as needed
-          ],
-        ),
+      body: FutureBuilder<List<Booking?>?>(
+        future: futureBookings,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError ||
+              snapshot.data == null ||
+              snapshot.data!.isEmpty) {
+            // Show dummy data if real data fails to load
+            return _buildDummyContent();
+          } else {
+            // Map through the bookings and create a list of widgets to display
+            List<Widget> bookingWidgets = snapshot.data!
+                .map((booking) => JourneyHistoryItem(
+                      carType: "Giao dịch Id: #${booking!.bookingId}",
+                      renterName: booking!.customerId.toString(),
+                      location: booking.receivingAddress,
+                      rentalDuration: "${booking.rentalDays} ngày",
+                      cost: "${booking.totalRentalCost} VNĐ",
+                      tripStart: booking.startDate.toString(),
+                      tripEnd: booking.endDate.toString(),
+                      paymentMethod: "Tiền mặt",
+                      contactSupport: "support@example.com",
+                    ))
+                .toList();
+
+            return SingleChildScrollView(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: bookingWidgets,
+              ),
+            );
+          }
+        },
       ),
     );
+  }
+
+  Widget _buildDummyContent() {
+    return Container();
   }
 }
 
@@ -82,7 +127,8 @@ class JourneyHistoryItem extends StatelessWidget {
               right: 0,
               child: CircleAvatar(
                 radius: 60,
-                backgroundImage: AssetImage('assets/images/cars/land_rover_0.png'),
+                backgroundImage:
+                    AssetImage('assets/images/cars/land_rover_0.png'),
               ),
             ),
             Column(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/VehicleBooking.dart';
 import 'ServiceConstants.dart';
 import 'AuthService.dart'; // Ensure AuthService provides a method to get a token
 
@@ -33,6 +34,24 @@ class BookingService {
       return jsonDecode(response.body);
     } else {
       throw Exception('Failed to load booking');
+    }
+  }
+
+  // Get all bookings for a specific user by ma_nguoi_dat_xe
+  static Future<List<Booking?>?> getBookingsByUserId(int userId) async {
+    final token = await AuthService.getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/datxe/user/$userId'),
+      headers: {'Authorization': ' $token'},
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonList = jsonDecode(response.body);
+      print((jsonList.map((json) => Booking.fromJson(json)).toList()).toString());
+      return jsonList.map((json) => Booking.fromJson(json)).toList();
+    } else {
+      // Resolve to an empty list in case of error.
+      return [];
     }
   }
 
