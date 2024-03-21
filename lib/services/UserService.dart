@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../models/User.dart';
 import 'AuthService.dart';
@@ -34,6 +35,42 @@ class UserService {
       );
     } else {
       throw Exception('Failed to load user data');
+    }
+  }
+
+  static Future<bool> updateUserProfilePicture(
+      int userId, File imageFile) async {
+    final token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
+    final url = '$baseUrl/userimages';
+    var request = http.MultipartRequest('POST', Uri.parse(url))
+      ..headers['Authorization'] =
+          ' $token';
+
+    request.fields['ma_nguoi_dung'] = userId.toString();
+
+    // Handle file upload
+    var imageStream = http.ByteStream(imageFile.openRead());
+    var length = await imageFile.length();
+    var multipartFile = http.MultipartFile(
+      'image',
+      imageStream,
+      length,
+      filename: imageFile.path.split('/').last,
+    );
+    request.files.add(multipartFile);
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      print(
+          'Failed to update profile picture with status code: ${response.statusCode}');
+      return false;
     }
   }
 
@@ -92,11 +129,11 @@ class UserService {
           userJson['ma_nguoi_dung'],
           userJson['ten_nguoi_dung'],
           userJson['mat_khau_hash'],
-          userJson['ho_ten'],
-          userJson['hinh_dai_dien'],
+          userJson['ho_ten'] ?? "",
+          userJson['hinh_dai_dien'] ?? "",
           DateTime.parse(userJson['ngay_dang_ky']),
-          userJson['so_dien_thoai'],
-          userJson['dia_chi_nguoi_dung'],
+          userJson['so_dien_thoai'] ?? "",
+          userJson['dia_chi_nguoi_dung'] ?? "",
         );
       }).toList();
     } else {

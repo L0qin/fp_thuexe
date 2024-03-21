@@ -22,7 +22,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _isLoggedIn = false;
   User? _user;
   late Timer _timer;
@@ -37,14 +37,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // Check login status when the app is resumed
+      _checkLoginStatus();
+    }
+  }
+
+  @override
   void initState() {
-    _vehiclesFuture = VehicleService.getAllVehicles();
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _vehiclesFuture = VehicleService.getAllVehicles();
     _checkLoginStatus();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer.cancel();
     super.dispose();
   }
@@ -109,7 +120,6 @@ class _HomePageState extends State<HomePage> {
 
   Widget _headerWidget() {
     String buttonText = _isLoggedIn ? "Đăng xuất" : "Đăng nhập";
-    String address = _user?.address ?? "Chưa đăng nhập";
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -117,13 +127,38 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          CircleAvatar(
-            radius: 22.5, // Adjusted for symmetry
-            backgroundImage: _user == null
-                ? AssetImage('assets/images/icons/user.png') as ImageProvider // Cast as ImageProvider
-                : NetworkImage(_user!.profilePicture) as ImageProvider, // Cast as ImageProvider
-            backgroundColor: Colors.grey[300],
-          ),
+          if (_isLoggedIn)
+            FutureBuilder<User?>(
+              future: _getUserFuture(), // Adjust this method to fetch the user
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircleAvatar(
+                    radius: 22.5,
+                    backgroundColor: Colors.grey[300],
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasData) {
+                  return CircleAvatar(
+                    radius: 22.5,
+                    backgroundImage:
+                        NetworkImage(snapshot.data!.profilePicture),
+                    backgroundColor: Colors.grey[300],
+                  );
+                } else {
+                  return CircleAvatar(
+                    radius: 22.5,
+                    backgroundImage: AssetImage('assets/images/icons/user.png'),
+                    backgroundColor: Colors.grey[300],
+                  );
+                }
+              },
+            )
+          else
+            CircleAvatar(
+              radius: 22.5,
+              backgroundImage: AssetImage('assets/images/icons/user.png'),
+              backgroundColor: Colors.grey[300],
+            ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -132,75 +167,115 @@ class _HomePageState extends State<HomePage> {
                 children: <Widget>[
                   Text(
                     "Location",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
                   ),
                   SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center, // Centers the children horizontally
-                    children: <Widget>[
-                      Text(
-                        address,
-                        style: TextStyle(fontSize: 14),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Icon(Icons.arrow_drop_down, color: Colors.teal),
-                    ],
-                  )
+                  if (_isLoggedIn)
+                    FutureBuilder<User?>(
+                      future: _getUserFuture(),
+                      // Adjust this method to fetch the user
+                      builder: (context, snapshot) {
+                        String address = snapshot.hasData &&
+                                snapshot.data!.address.isNotEmpty
+                            ? snapshot.data!.address
+                            : "Chưa đăng nhập";
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              address,
+                              style: TextStyle(fontSize: 14),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Icon(Icons.arrow_drop_down, color: Colors.teal),
+                          ],
+                        );
+                      },
+                    )
+                  else
+                    Text(
+                      "Chưa đăng nhập",
+                      style: TextStyle(fontSize: 14),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                 ],
               ),
             ),
           ),
-          ButtonTheme(
-            minWidth: 80, // Adjusted for visual balance
-            height: 36, // Reduced for aesthetic alignment
-            child: MaterialButton(
-              onPressed: () async {
-                if (_isLoggedIn) {
-                  bool confirmLogout = await showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text('Xác nhận đăng xuất'),
-                      content: Text('Bạn có chắc chắn muốn đăng xuất?'),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(false),
-                          child: Text('Không'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            AuthService.logout();
-                            _checkLoginStatus();
-                            _user = null;
-                          },
-                          child: Text('Có'),
-                        ),
-                      ],
-                    ),
-                  );
-                } else {
-                  _startTimer();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
-                  _checkLoginStatus();
-                }
-              },
-              color: Colors.teal,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-              child: Text(
-                buttonText,
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-            ),
-          ),
+          _buildLoginLogoutButton(buttonText),
         ],
       ),
     );
   }
 
+  Future<User?> _getUserFuture() async {
+    int? userId = await AuthService.getUserId();
+    if (userId != null) {
+      return UserService.getUserById(userId);
+    }
+    return null; // Or handle this case as needed
+  }
 
+  Widget _buildLoginLogoutButton(String buttonText) {
+    return ButtonTheme(
+      minWidth: 80,
+      height: 36,
+      child: MaterialButton(
+        onPressed: () async {
+          if (_isLoggedIn) {
+            // Confirm log out dialog
+            bool confirmLogout = await showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Xác nhận đăng xuất'),
+                    content: Text('Bạn có chắc chắn muốn đăng xuất?'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: Text('Không'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(true);
+                        },
+                        child: Text('Có'),
+                      ),
+                    ],
+                  ),
+                ) ??
+                false;
+
+            if (confirmLogout) {
+              await AuthService
+                  .logout(); // Assumes logout method sets internal state and clears any auth tokens
+              setState(() {
+                _isLoggedIn = false;
+                _user = null; // Ensure user info is cleared on logout
+              });
+            }
+          } else {
+            // Navigate to the login page and then check login status again
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      LoginPage()), // LoginPage() must be defined in your app
+            ).then((_) => _checkLoginStatus());
+          }
+        },
+        color: Colors.teal,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: Text(
+          buttonText,
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+        ),
+      ),
+    );
+  }
 
 //Search
   Widget _searchWidget() {
@@ -421,13 +496,15 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildNewCar() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10), // Adjust the horizontal padding as needed
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      // Adjust the horizontal padding as needed
       child: Center(
         child: Container(
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Colors.white10, // Background color for the main container
-            borderRadius: BorderRadius.circular(10), // Border radius for the main container
+            borderRadius: BorderRadius.circular(
+                10), // Border radius for the main container
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -439,7 +516,10 @@ class _HomePageState extends State<HomePage> {
                   children: <Widget>[
                     Text(
                       '2021 Mazda 6 sedan adds standard Apple CarPlay',
-                      style: TextStyle(fontSize: 18,color: Colors.black,fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500),
                     ),
                     SizedBox(height: 5),
                     Text(
@@ -454,15 +534,18 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              SizedBox(width: 10), // Adjust the spacing between the text content and image
+              SizedBox(width: 10),
+              // Adjust the spacing between the text content and image
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black), // Border color for the image frame
+                  border: Border.all(color: Colors.black),
+                  // Border color for the image frame
                   borderRadius: BorderRadius.circular(10),
                   // Border radius for the image frame
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10), // Clip the image with border radius
+                  borderRadius: BorderRadius.circular(10),
+                  // Clip the image with border radius
                   child: Image.asset(
                     'assets/images/cars/land_rover_0.png',
                     width: 120, // Adjust the width of the image as needed

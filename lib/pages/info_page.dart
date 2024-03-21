@@ -5,7 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fp_thuexe/models/User.dart';
+import 'package:fp_thuexe/pages/history_page.dart';
 import 'package:fp_thuexe/services/UserService.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../services/ImageService.dart';
 
@@ -35,6 +37,9 @@ class _InformationState extends State<Information> {
     user = await UserService.getUserById(1);
     setState(() {
       loadFetchedData(user!);
+      _fullNameController.text = user?.fullName ?? "";
+      _phoneNumberController.text = user?.phoneNumber ?? "";
+      _addressController.text = user?.address ?? "";
     });
   }
 
@@ -50,7 +55,7 @@ class _InformationState extends State<Information> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Edit User'),
+          title: Text('Sửa thông tin người dùng'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -71,13 +76,13 @@ class _InformationState extends State<Information> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: Text('Huỷ'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Update'),
+              child: Text('Cập nhật'),
               onPressed: () {
                 _updateUser(context);
               },
@@ -98,39 +103,50 @@ class _InformationState extends State<Information> {
       );
 
       if (success) {
+        // Assuming you have a method to fetch the updated user details
+        User? updatedUser = await UserService.getUserById(user!.userId);
+        if (updatedUser != null) {
+          setState(() {
+            user = updatedUser; // Update the user data in the state
+          });
+        }
+
         Navigator.of(context).pop(); // Close the dialog
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Success'),
-            content: Text('User updated successfully.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+          builder: (context) =>
+              AlertDialog(
+                title: Text('Thành công'),
+                content: Text('Cập nhật thông tin người dùng thành công.'),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // Optionally, if you're navigating or need to refresh the page, do it here
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
         );
       }
     } catch (e) {
       Navigator.of(context).pop(); // Close the dialog
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Error'),
-          content: Text(e.toString()),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+        builder: (context) =>
+            AlertDialog(
+              title: Text('Lỗi'),
+              content: const Text("Có lỗi khi cập nhật htông tin người dùng"),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
       );
     }
   }
@@ -170,20 +186,37 @@ class _InformationState extends State<Information> {
                       _buildProfilePicture(),
                       _buildUserInfo(),
                       GestureDetector(
-                        onTap: () {showEditUserForm(context);},
+                        onTap: () {
+                          showEditUserForm(context);
+                        },
                         child: Text(
                           'Chỉnh Sửa',
                           style:
-                              TextStyle(decoration: TextDecoration.underline),
+                          TextStyle(decoration: TextDecoration.underline),
                         ),
                       ),
                       _buildDivider(),
-                      _buildMenuRow(
-                          Icons.history, "Đặt xe", "Chuyến đi và lịch sử"),
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HistoryPage()),
+                          );
+                        },
+                        child: _buildMenuRow(
+                            Icons.history, "Đặt xe", "Chuyến đi và lịch sử"),
+                      ),
                       _buildDivider(),
-                      _buildMenuRow(Icons.payment, "Phương thức thanh toán"),
+                      InkWell(
+                          onTap: () {},
+                          child: _buildMenuRow(
+                              Icons.payment, "Phương thức thanh toán")),
                       _buildDivider(),
-                      _buildMenuRow(Icons.help, "Trợ giúp & yêu cầu hỗ trợ"),
+                      InkWell(
+                          onTap: () {},
+                          child: _buildMenuRow(
+                              Icons.help, "Trợ giúp & yêu cầu hỗ trợ")),
                       _buildDivider(),
                       _buildMenuRow(Icons.language, "Thay đổi ngôn ngữ"),
                       _buildDivider(),
@@ -209,11 +242,141 @@ class _InformationState extends State<Information> {
 
   Widget _buildProfilePicture() {
     final String imageUrl = user!.profilePicture ?? "";
-    return CircleAvatar(
-      radius: 50,
-      backgroundImage: imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
-      child: imageUrl.isEmpty ? Icon(Icons.person, size: 50) : null,
-      onBackgroundImageError: (exception, stackTrace) {},
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(50), // Clip to circle
+      child: Material( // Use Material widget to enable splash effect
+        color: Colors.transparent, // Make Material widget transparent
+        child: InkWell(
+          splashColor: Colors.teal.withOpacity(0.5),
+          onTap: () {
+            _editProfilePicture();
+          },
+          child: CircleAvatar(
+            radius: 50,
+            backgroundImage: imageUrl.isNotEmpty
+                ? NetworkImage(imageUrl)
+                : null,
+            child: imageUrl.isEmpty ? Icon(Icons.person, size: 50) : null,
+            onBackgroundImageError: (exception, stackTrace) {},
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _editProfilePicture() async {
+    final ImagePicker _picker = ImagePicker();
+    void _pickImage(ImageSource source) async {
+      try {
+        final XFile? pickedFile = await _picker.pickImage(source: source);
+        if (pickedFile != null) {
+          // Show the image in a dialog and ask for confirmation
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Save this picture as your profile picture?"),
+                content: Image.file(File(pickedFile.path)),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text("Cancel"),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                  ),
+                  TextButton(
+                    child: Text("Lưu"),
+                    onPressed: () async {
+                      Navigator.of(context).pop(); // Close the dialog
+                      bool success = await UserService.updateUserProfilePicture(
+                          user!.userId, File(pickedFile.path));
+                      if (success) {
+                        // Fetch the updated user details from the backend
+                        User? updatedUser =
+                        await UserService.getUserById(user!.userId);
+                        if (updatedUser != null) {
+                          setState(() {
+                            user = updatedUser;
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Thông báo"),
+                                  content:
+                                  Text("Cập nhật ảnh đại diện thành công."),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: Text("OK"),
+                                      onPressed: () {
+                                        Navigator.of(context)
+                                            .pop(); // Close the dialog
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          });
+                        }
+                      } else {
+                        // Show a failure dialog
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Lỗi"),
+                              content: Text("Cập nhật ảnh đại diện thất bại."),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text("OK"),
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pop(); // Close the dialog
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } catch (e) {
+        print('Error picking image: $e');
+      }
+    }
+
+    // Show the bottom sheet/dialog for image source selection
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                  leading: Icon(Icons.photo_library),
+                  title: Text('Gallery'),
+                  onTap: () {
+                    _pickImage(ImageSource.gallery);
+                    Navigator.of(context).pop();
+                  }),
+              ListTile(
+                leading: Icon(Icons.photo_camera),
+                title: Text('Camera'),
+                onTap: () {
+                  _pickImage(ImageSource.camera);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -257,41 +420,38 @@ class _InformationState extends State<Information> {
   }
 
   Widget _buildMenuRow(IconData icon, String label1, [String? label2]) {
-    return InkWell(
-      onTap: () {}, // Placeholder function for onTap action
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          // Align items to the start of the row
-          children: [
-            Icon(icon, size: 30, color: Colors.teal),
-            // Icon with teal color
-            SizedBox(width: 10),
-            // Positive width for spacing
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        // Align items to the start of the row
+        children: [
+          Icon(icon, size: 30, color: Colors.teal),
+          // Icon with teal color
+          SizedBox(width: 10),
+          // Positive width for spacing
+          Expanded(
+            // Wrap Text with Expanded to prevent overflow
+            child: Text(
+              label1,
+              style: TextStyle(fontSize: 16),
+              overflow: TextOverflow.ellipsis, // Prevent text overflow
+            ),
+          ),
+          if (label2 != null) ...[
             Expanded(
-              // Wrap Text with Expanded to prevent overflow
+              // Also wrap the optional text with Expanded
               child: Text(
-                label1,
-                style: TextStyle(fontSize: 16),
-                overflow: TextOverflow.ellipsis, // Prevent text overflow
+                label2,
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+                overflow:
+                TextOverflow.ellipsis, // Handle overflow for second label
               ),
             ),
-            if (label2 != null) ...[
-              Expanded(
-                // Also wrap the optional text with Expanded
-                child: Text(
-                  label2,
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                  overflow:
-                      TextOverflow.ellipsis, // Handle overflow for second label
-                ),
-              ),
-            ],
-            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.teal),
-            // Forward icon
           ],
-        ),
+          Icon(Icons.arrow_forward_ios, size: 16, color: Colors.teal),
+          // Forward icon
+        ],
       ),
     );
   }

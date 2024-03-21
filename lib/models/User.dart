@@ -42,11 +42,11 @@ class User {
       json['userId'],
       json['username'],
       json['passwordHash'],
-      json['fullName'],
+      json['fullName']?? "",
       json['profilePicture'],
       DateTime.parse(json['birthDate']),
-      json['phoneNumber'],
-      json['address'],
+      json['phoneNumber']?? "",
+      json['address']?? "",
     );
   }
 

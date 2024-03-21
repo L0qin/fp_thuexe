@@ -123,7 +123,6 @@ class _ConfirmPageState extends State<ConfirmPage> {
           return Center(child: CircularProgressIndicator());
         },
       );
-
       var result = await FlutterZaloPaySdk.payOrder(
           zpToken: 'uUfsWgfLkRLzq6W2uNXTCxrfxs51auny');
       Navigator.pop(context);
