@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   bool _isLoggedIn = false;
   User? _user;
   late Timer _timer;
-  bool _isRenting = false;
+  late Future<List<Vehicle>> _vehiclesFuture;
 
   void _startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
@@ -38,6 +38,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    _vehiclesFuture = VehicleService.getAllVehicles();
     super.initState();
     _checkLoginStatus();
   }
@@ -331,24 +332,22 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildCarList() {
     return FutureBuilder<List<Vehicle>>(
-      future: VehicleService.getAllVehicles(),
+      future: _vehiclesFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Show a loading indicator while fetching data
+          return CircularProgressIndicator();
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
           final List<Vehicle> vehicles = snapshot.data ?? [];
           return CarouselSlider(
             items: vehicles.map((vehicle) {
-              return _buildCarItem(
-                  vehicle
-              );
+              return _buildCarItem(vehicle);
             }).toList(),
             options: CarouselOptions(
-              height: 175, // Chiều cao của CarouselSlider
-              viewportFraction: 2 / 4, // Hiển thị 80% tổng số item
-              enableInfiniteScroll: true, // Bật cuộn vô hạn
+              height: 175,
+              viewportFraction: 2 / 4,
+              enableInfiniteScroll: true,
             ),
           );
         }
@@ -419,6 +418,7 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+
   Widget _buildNewCar() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10), // Adjust the horizontal padding as needed

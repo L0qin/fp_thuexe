@@ -27,7 +27,7 @@ class UserService {
         jsonData['ten_nguoi_dung'],
         jsonData['mat_khau_hash'],
         jsonData['ho_ten'],
-        '$baseUrl/images/getimages/'+jsonData['hinh_dai_dien'],
+        '$baseUrl/images/getimages/' + jsonData['hinh_dai_dien'],
         DateTime.parse(jsonData['ngay_dang_ky']),
         jsonData['so_dien_thoai'],
         jsonData['dia_chi_nguoi_dung'],
@@ -36,7 +36,41 @@ class UserService {
       throw Exception('Failed to load user data');
     }
   }
-  
+
+  static Future<bool> registerUser({
+    required String username,
+    required String password,
+    required String fullName,
+    required String phoneNumber,
+    required String address,
+  }) async {
+    final url = '$baseUrl/register';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'username': username,
+        'password': password,
+        'fullName': fullName,
+        'phoneNumber': phoneNumber,
+        'address': address,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      print('User registered successfully');
+      return true;
+    } else if (response.statusCode == 400) {
+      final responseData = jsonDecode(response.body);
+      throw Exception(responseData['message']);
+    } else if (response.statusCode == 409) {
+      throw Exception('Username already exists');
+    } else {
+      throw Exception('Failed to register user');
+    }
+  }
 
   // Method to retrieve all users
   static Future<List<User>> getAllUsers() async {
