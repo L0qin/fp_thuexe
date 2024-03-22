@@ -43,6 +43,7 @@ class _JourneyHistoryPageState extends State<JourneyHistoryPage> {
       appBar: AppBar(
         title: Text('Hành Trình Thuê Xe'),
         backgroundColor: Colors.teal.shade700,
+
       ),
       body: FutureBuilder<List<Booking?>?>(
         future: futureBookings,
@@ -113,85 +114,95 @@ class JourneyHistoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.topRight,
+          colors: [Colors.teal.shade600, Colors.teal.shade200],
+        ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 0,
-              right: 0,
-              child: CircleAvatar(
-                radius: 60,
-                backgroundImage:
-                    AssetImage('assets/images/cars/land_rover_0.png'),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Stack(
+
+            children: [
+              Positioned(
+                top: 0,
+                right: 0,
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundImage:
+                  AssetImage('assets/images/cars/land_rover_0.png'),
+                ),
               ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  carType,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    carType,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  "Người Thuê: $renterName",
-                  style: TextStyle(fontSize: 16),
-                ),
-                Text(
-                  "Địa Điểm: $location",
-                  style: TextStyle(fontSize: 16),
-                ),
-                Text(
-                  "Thời Gian Thuê: $rentalDuration",
-                  style: TextStyle(fontSize: 16),
-                ),
-                Text(
-                  "Chi Phí: $cost",
-                  style: TextStyle(fontSize: 16),
-                ),
-                Divider(),
-                Text(
-                  "Thời Gian Bắt Đầu: $tripStart",
-                  style: TextStyle(fontSize: 16),
-                ),
-                Text(
-                  "Thời Gian Kết Thúc: $tripEnd",
-                  style: TextStyle(fontSize: 16),
-                ),
-                Divider(),
-                Text(
-                  "Phương Thức Thanh Toán: $paymentMethod",
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        // Điều hướng đến trang hỗ trợ khi nhấn vào nút
-                      },
-                      child: Text(
-                        "Liên Hệ Hỗ Trợ",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.blue,
+                  SizedBox(height: 8),
+                  Text(
+                    "Người Thuê: $renterName",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Text(
+                    "Địa Điểm: $location",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Text(
+                    "Thời Gian Thuê: $rentalDuration",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Text(
+                    "Chi Phí: $cost",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Divider(),
+                  Text(
+                    "Thời Gian Bắt Đầu: $tripStart",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Text(
+                    "Thời Gian Kết Thúc: $tripEnd",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Divider(),
+                  Text(
+                    "Phương Thức Thanh Toán: $paymentMethod",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          // Điều hướng đến trang hỗ trợ khi nhấn vào nút
+                        },
+                        child: Text(
+                          "Liên Hệ Hỗ Trợ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.blue,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

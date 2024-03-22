@@ -55,6 +55,17 @@ class _PostTheCarState extends State<PostCar> {
     }
   }
 
+  void fillFormWithDummyData() {
+    _controllerCarTitle.text = "TEST CAR 3123123";
+    _controllerModel.text = "T2024";
+    _selectedCarBrand = "Brand X";
+    _controllerAddress.text = "123 Test Street, Test City";
+    _controllerDescription.text =
+        "This is a dummy description for testing purposes.This is a dummy description for testing purposes.This is a dummy description for testing purposes.";
+    _controllerRentalPrice.text = "5000000";
+    _controllerSeating.text = "5";
+  }
+
   void _submitForm() async {
     _vehicle = Vehicle(
       -1,
@@ -94,7 +105,7 @@ class _PostTheCarState extends State<PostCar> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('Success'),
-              content: Text('Vehicle posted successfully with ID: $insertId'),
+              content: Text('Đăng xe thành công Id: $insertId'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -107,13 +118,12 @@ class _PostTheCarState extends State<PostCar> {
           },
         );
       } else {
-        // Show failure dialog
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('Error'),
-              content: Text('Failed to post vehicle'),
+              content: Text('Đăng xe thất bại'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -207,6 +217,8 @@ class _PostTheCarState extends State<PostCar> {
             _buildCarDetailsCard(),
             SizedBox(height: 10.0),
             _buildRentingInfoCard(),
+            SizedBox(height: 10.0),
+            _buildSmallButton(),
             SizedBox(height: 10.0),
             _buildImageUploadCard(),
             SizedBox(height: 10.0),
@@ -435,6 +447,25 @@ class _PostTheCarState extends State<PostCar> {
             SizedBox(height: 10.0),
           ],
         ),
+      ),
+    );
+  }
+
+  // Widget method to build a small button
+  Widget _buildSmallButton() {
+    return TextButton(
+      onPressed: () {
+        fillFormWithDummyData();
+      },
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+      child: Text(
+        "Fill data",
+        style: TextStyle(fontSize: 14, decoration: TextDecoration.underline),
       ),
     );
   }

@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 const SizedBox(height: 4),
                 _buildHeader('Thuê nhiều'),
                 _buildCarList(),
-                const SizedBox(height: 4),
+                const SizedBox(height: 10),
                 _buildHeader('News'),
                 _buildNewCar(),
                 const SizedBox(height: 10),
@@ -358,7 +358,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         height: 70,
         decoration: BoxDecoration(
           //color: Colors.white,
-          border: Border.all(color: Colors.grey),
+          border: Border.all(color: Colors.white),
           borderRadius: BorderRadius.circular(12.0),
         ),
         child: Image.asset('assets/images/brands/$brandName.png'),
@@ -420,7 +420,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               return _buildCarItem(vehicle);
             }).toList(),
             options: CarouselOptions(
-              height: 175,
+              height: 185,
               viewportFraction: 2 / 4,
               enableInfiniteScroll: true,
             ),
@@ -438,21 +438,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         final imageUrl = snapshot.data ?? defaultImage;
         return Container(
           width: 230,
-          margin: EdgeInsets.all(2.5),
+          margin: EdgeInsets.all(3.5),
           padding: EdgeInsets.all(5),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
+            border: Border.all(color: Colors.white),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
             children: <Widget>[
               Image.network(
                 imageUrl,
-                width: 100,
+                width: 90,
                 errorBuilder: (context, error, stackTrace) {
                   return Image.asset(
                     defaultImage,
-                    width: 100,
+                    width: 90,
                   );
                 },
               ),
@@ -481,9 +481,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 4),
                     _buildRentButton(vehicle),
-                    SizedBox(height: 10),
+                   // SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -668,7 +668,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
         );
       },
-      minWidth: 100,
       height: 40,
       splashColor: Colors.white12,
       color: Colors.teal,
@@ -677,7 +676,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
-          fontSize: 12,
+          fontSize: 10,
         ),
       ),
     );

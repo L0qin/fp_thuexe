@@ -164,7 +164,7 @@ class _InformationState extends State<Information> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Colors.teal.shade700, Colors.teal.shade200],
+          colors: [Colors.teal.shade600, Colors.teal.shade200],
         ),
       ),
       child: Center(

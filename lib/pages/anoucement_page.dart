@@ -11,43 +11,53 @@ class AnnouncementPage extends StatelessWidget {
       appBar: AppBar(
         // title: Text('Hành Trình Thuê Xe'),
       ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              SizedBox(height: 150),
-              Expanded(
-                child: _buildPromotionList(),
-              ),
-            ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.topRight,
+            colors: [Colors.teal.shade400, Colors.teal.shade200],
           ),
-          Positioned(
-            top: 110,
-            left: 10,
-            right: 10,
-            child: Container(
-              alignment: Alignment.centerRight,
-              // color: Colors.grey[200],
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 9),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      // Xử lý khi nhấn nút Xóa tất cả
-                      _showDeleteAllConfirmationDialog(context);
-                    },
-                    child: const Text(
-                      'Xóa tất cả',
-                      style: TextStyle(color: Colors.red),
-                      textAlign: TextAlign.end,
+        ),
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                SizedBox(height: 40),
+                Expanded(
+                  child: _buildPromotionList(),
+                ),
+              ],
+            ),
+            Positioned(
+              top: 2,
+              left: 5,
+              right: 5,
+              child: Container(
+                alignment: Alignment.centerRight,
+                // color: Colors.grey[200],
+                padding: EdgeInsets.symmetric(horizontal: 0, vertical: 9),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        // Xử lý khi nhấn nút Xóa tất cả
+                        _showDeleteAllConfirmationDialog(context);
+                      },
+                      child: const Text(
+                        'Xóa tất cả',
+                        style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold,fontSize: 15),
+                        textAlign: TextAlign.end,
+
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -122,7 +132,7 @@ class AnnouncementPage extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Colors.blue.shade800, Colors.blue.shade400],
+          colors: [Colors.blue.shade700, Colors.blue.shade400],
         ),
       ),
       child: Stack(
@@ -395,6 +405,7 @@ Widget _buildNewCar() {
 //lịch sử
 Widget _buildHistoryItem() {
   return Container(
+
     margin: EdgeInsets.all(13.0),
     child: Card(
       shape: RoundedRectangleBorder(
