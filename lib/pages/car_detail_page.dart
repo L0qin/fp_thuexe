@@ -308,7 +308,7 @@ class _DetailCarState extends State<DetailCar> {
             ),
           );
         } else {
-          return Center(child: Text('No vehicle details available'));
+          return Center(child: Text('Danh sách rỗng'));
         }
       },
     );
