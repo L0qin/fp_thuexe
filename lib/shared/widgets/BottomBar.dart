@@ -17,11 +17,10 @@ class _BottomBarState extends State<BottomBar> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    // HomePage content directly included here
     HomePage(),
     JourneyHistoryPage(),
     AnnouncementPage(),
-    Information()
+    Information(),
   ];
 
   @override
@@ -31,34 +30,28 @@ class _BottomBarState extends State<BottomBar> {
       bottomNavigationBar: SalomonBottomBar(
         currentIndex: _currentIndex,
         backgroundColor: Colors.white,
-        margin: const EdgeInsets.fromLTRB(25, 0, 25, 0),
+        margin: const EdgeInsets.fromLTRB(25, 5, 25, 5),
+        // itemPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 10), // Adjust padding if needed
         onTap: (i) => setState(() => _currentIndex = i),
         items: [
-          /// Home
           SalomonBottomBarItem(
-            icon: const Icon(Icons.home),
-            title: const Text("Trang chủ"),
+            icon: Icon(Icons.home, size: 30), // Adjust icon size
+            title: Text("Trang chủ", style: TextStyle(fontSize: 14)), // Adjust text style
             selectedColor: Colors.purple,
           ),
-
-          /// Likes
           SalomonBottomBarItem(
-            icon: const Icon(Icons.map),
-            title: const Text("Hành Trình"),
+            icon: Icon(Icons.map, size: 30),
+            title: Text("Hành Trình", style: TextStyle(fontSize: 14)),
             selectedColor: Colors.pink,
           ),
-
-          /// Search
           SalomonBottomBarItem(
-            icon: const Icon(Icons.notifications),
-            title: const Text("Thông báo"),
+            icon: Icon(Icons.notifications, size: 30),
+            title: Text("Thông báo", style: TextStyle(fontSize: 14)),
             selectedColor: Colors.orange,
           ),
-
-          /// Profile
           SalomonBottomBarItem(
-            icon: const Icon(Icons.person),
-            title: const Text("Thông tin"),
+            icon: Icon(Icons.person, size: 30),
+            title: Text("Thông tin", style: TextStyle(fontSize: 14)),
             selectedColor: Colors.teal,
           ),
         ],

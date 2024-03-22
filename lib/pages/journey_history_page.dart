@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
 
-// Ensure you have these imports
 import '../models/VehicleBooking.dart';
 import '../services/AuthService.dart';
 import '../services/BookingService.dart';
@@ -23,17 +22,17 @@ class _JourneyHistoryPageState extends State<JourneyHistoryPage> {
 
   void _fetchBookings() async {
     try {
-      final userId = await AuthService.getUserId(); // Wait for the userId
+      final userId = await AuthService.getUserId();
       final bookings = await BookingService.getBookingsByUserId(userId!);
       setState(() {
         futureBookings = Future.value(
-            bookings); // Set the futureBookings with the resolved future
+            bookings);
       });
     } catch (error) {
       print("Error fetching bookings: $error");
       setState(() {
         futureBookings = Future.value(
-            []); // In case of error, set futureBookings to an empty list
+            []);
       });
     }
   }
