@@ -58,7 +58,6 @@ class _PostTheCarState extends State<PostCar> {
   void fillFormWithDummyData() {
     _controllerCarTitle.text = "TEST CAR 3123123";
     _controllerModel.text = "T2024";
-    _selectedCarBrand = "Brand X";
     _controllerAddress.text = "123 Test Street, Test City";
     _controllerDescription.text =
         "This is a dummy description for testing purposes.This is a dummy description for testing purposes.This is a dummy description for testing purposes.";
@@ -109,7 +108,7 @@ class _PostTheCarState extends State<PostCar> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.popUntil(context, ModalRoute.withName('/'));
                   },
                   child: const Text('OK'),
                 ),

@@ -47,7 +47,9 @@ class AuthService {
 
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.remove('token'); // Remove the token from SharedPreferences
+    prefs.remove('userId');
+    prefs.remove('user');
+    prefs.remove('token');
   }
 
   static Future<bool> register(String username, String password,

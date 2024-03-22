@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fp_thuexe/models/User.dart';
 import 'package:fp_thuexe/pages/history_page.dart';
+import 'package:fp_thuexe/services/AuthService.dart';
 import 'package:fp_thuexe/services/UserService.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -34,7 +35,8 @@ class _InformationState extends State<Information> {
   }
 
   Future<void> fetchData() async {
-    user = await UserService.getUserById(1);
+    int? userId =await AuthService.getUserId();
+    user = await UserService.getUserById(userId!);
     setState(() {
       loadFetchedData(user!);
       _fullNameController.text = user?.fullName ?? "";

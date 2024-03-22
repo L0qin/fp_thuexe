@@ -302,6 +302,7 @@ class _DetailCarState extends State<DetailCar> {
                   _infoRow(Icons.account_balance, "Hãng", vehicle.manufacturer),
                   _infoRow(Icons.attach_money, "Giá thuê/ngày", "${vehicle.rentalPrice.toStringAsFixed(2)} VND"),
                   _infoRow(Icons.event_seat, "Số chỗ", "${vehicle.seating} chỗ"),
+                  _buildDescription(vehicle.description)
                 ],
               ),
             ),
@@ -312,6 +313,39 @@ class _DetailCarState extends State<DetailCar> {
       },
     );
   }
+
+  Widget _buildDescriptionCard(String description) {
+    // Calculate height based on description length; this is a simple approximation.
+    double height = 100 + (description.length / 20 * 10);
+    height = height.clamp(100.0, 300.0); // Ensure height is within reasonable bounds.
+
+    return Container(
+      padding: EdgeInsets.all(12), // Padding on all sides
+      height: height,
+      child: Card(
+        elevation: 5, // Adds shadow under the card for a lifted effect
+        child: Padding(
+          padding: EdgeInsets.all(12), // Padding inside the card
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.description, color: Colors.blueAccent), // Example icon
+              SizedBox(width: 10), // Space between icon and text
+              Expanded(
+                child: SingleChildScrollView( // Allows for scrolling if text is long
+                  child: Text(
+                    description,
+                    style: TextStyle(fontSize: 16), // Adjust text style as needed
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 
   Widget _infoRow(IconData icon, String title, String value, {bool isTitle = false}) {
     return Row(
