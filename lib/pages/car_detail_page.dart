@@ -684,49 +684,65 @@ class _DetailCarState extends State<DetailCar> {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 30, // Đường kính của hình ảnh bo tròn
-              backgroundColor: Colors.grey[300], // Màu nền của hình ảnh bo tròn
-              child: Icon(
-                Icons.account_circle, // Thay thế bằng hình ảnh của bạn
-                size: 50, // Kích thước của biểu tượng
-                color: Colors.grey[600], // Màu của biểu tượng
-              ),
-            ),
-            SizedBox(width: 20), // Khoảng cách giữa ảnh và văn bản
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'User 01',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10), // Khoảng cách giữa văn bản và đánh giá sao
-                  Row(
-                    children: [
-                      Text("Năm 2024")
-                    ],
-                  ),
-                ],
-              ),
-            ),
             Row(
               children: [
-                Icon(Icons.star, color: Colors.yellow[500]),
-                Text("4.0")
+                CircleAvatar(
+                  radius: 30, // Đường kính của hình ảnh bo tròn
+                  backgroundColor: Colors.grey[300], // Màu nền của hình ảnh bo tròn
+                  child: Icon(
+                    Icons.account_circle, // Thay thế bằng hình ảnh của bạn
+                    size: 50, // Kích thước của biểu tượng
+                    color: Colors.grey[600], // Màu của biểu tượng
+                  ),
+                ),
+                SizedBox(width: 20), // Khoảng cách giữa ảnh và văn bản
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'User 01',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10), // Khoảng cách giữa văn bản và đánh giá sao
+                      Row(
+                        children: [
+                          Text("Năm 2024")
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.star, color: Colors.yellow[500]),
+                    Text("4.0")
+                  ],
+                ),
               ],
+            ),
+            Divider(),// Khoảng cách giữa nội dung bình luận và hàng trên
+            Text(
+              "Nội dung bình luận của người dùng"
+                  " ", // Thay thế bằng nội dung bình luận thực tế
+
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.black87,
+              ),
             ),
           ],
         ),
       ),
     );
   }
+
 
 
   // Widget _buildEvaluate() {

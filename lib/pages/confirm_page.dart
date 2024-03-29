@@ -226,6 +226,7 @@ class _ConfirmPageState extends State<ConfirmPage> {
         backgroundColor: Colors.teal,
       ),
       body: _buildBody(),
+      bottomNavigationBar: _buildButton(),
     );
   }
 
@@ -239,15 +240,79 @@ class _ConfirmPageState extends State<ConfirmPage> {
             _buildRentingInfoCard(),
             SizedBox(height: 10.0),
             _buildProductInfoCard(),
-            SizedBox(height: 10.0),
+            _buildCommentForm(),
             _buildPaymentInfoCard(),
-            SizedBox(height: 10.0),
-            _buildButton(),
+
           ],
         ),
+
       ),
+
     );
   }
+  Widget _buildCommentForm() {
+    String comment = ''; // Biến để lưu trữ nội dung bình luận
+
+    return Column(
+      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+
+          Text(
+            'Thêm bình luận',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(width: 50,),
+          TextButton(onPressed: () {
+
+          }, child: Text('Gợi ý'))
+        ],),
+        Card(
+          color: Colors.white,
+          elevation: 5,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          margin: EdgeInsets.all(10),
+          child: TextField(
+            onChanged: (value) {
+              comment = value;
+            },
+            decoration: InputDecoration(
+              hintText: 'Nhập nội dung bình luận',
+              contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              filled: true, // Đánh dấu có nền
+              fillColor: Colors.grey[200], // Màu nền của TextField
+            ),
+            maxLines: 3,
+          ),
+        ),
+        SizedBox(height: 10),
+        // ElevatedButton(
+        //   onPressed: () {
+        //     // Xử lý khi người dùng nhấn nút gửi bình luận
+        //     if (comment.isNotEmpty) {
+        //       // Kiểm tra nếu nội dung bình luận không trống
+        //       // Thực hiện các hành động khác ở đây, ví dụ: gửi bình luận đến máy chủ
+        //       print('Nội dung bình luận: $comment');
+        //       // Sau khi xử lý, bạn có thể làm sạch biểu mẫu bằng cách đặt lại giá trị biến comment
+        //       comment = '';
+        //     }
+        //   },
+        //   child: Text('Gửi'),
+        // ),
+      ],
+    );
+  }
+
+
+
+
 
   Widget _buildRentingInfoCard() {
     return Container(
