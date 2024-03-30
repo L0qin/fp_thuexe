@@ -436,63 +436,75 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       builder: (context, snapshot) {
         final defaultImage = 'assets/images/cars/land_rover_0.png';
         final imageUrl = snapshot.data ?? defaultImage;
-        return Container(
-          width: 230,
-          margin: EdgeInsets.all(3.5),
-          padding: EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.white),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            children: <Widget>[
-              Image.network(
-                imageUrl,
-                width: 90,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    defaultImage,
-                    width: 90,
-                  );
-                },
+        return GestureDetector(
+          onTap: () {
+            // Thực hiện hành động chuyển trang ở đây
+            // Ví dụ:
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailCar(vehicle),
               ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      vehicle.carName,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+            );
+          },
+          child: Container(
+            width: 250,
+            margin: EdgeInsets.all(3.5),
+            padding: EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.white),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Image.network(
+                    imageUrl,
+                    width: 200,
+                    height: 90, // Set height to maintain aspect ratio
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        defaultImage,
+                        width: 90,
+                      );
+                    },
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    vehicle.carName,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Text(
-                      vehicle.model,
-                      style: TextStyle(
-                        fontSize: 14,
-                      ),
+                  ),
+                  Text(
+                    vehicle.model,
+                    style: TextStyle(
+                      fontSize: 14,
                     ),
-                    Text(
-                      '${vehicle.rentalPrice}d/Ngày',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  ),
+
+                  Text(
+                    '${vehicle.rentalPrice}d/Ngày',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-                    SizedBox(height: 4),
-                    _buildRentButton(vehicle),
-                   // SizedBox(height: 40),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },
     );
   }
+
+
+
 
   Widget _buildNewCar() {
     return Container(

@@ -34,11 +34,12 @@ class _ConfirmPageState extends State<ConfirmPage> {
 
   // Initialize _selectedDateTime2 to the day after tomorrow
   DateTime _selectedDateTime2 = DateTime.now().add(Duration(days: 2));
-  String? _selectedPaymentMethod = 'Tiền mặt';
+  String? _selectedPaymentMethod = 'Thanh toán bằng tiền mặt';
 
   final List<String> _paymentMethods = [
-    'ZaloPay',
-    'Tiền mặt',
+    'Thanh toán trực tuyến',
+    'Thanh toán bằng tiền mặt',
+    'Chuyển khoản ngân hàng',
   ];
 
   _ConfirmPageState(this._vehicle);
@@ -114,7 +115,7 @@ class _ConfirmPageState extends State<ConfirmPage> {
     }
 
     // Check if the selected payment method is ZaloPay
-    if (_selectedPaymentMethod == 'ZaloPay') {
+    if (_selectedPaymentMethod == 'Thanh toán trực tuyến') {
       // Show loading indicator
       showDialog(
         context: context,
@@ -242,14 +243,13 @@ class _ConfirmPageState extends State<ConfirmPage> {
             _buildProductInfoCard(),
             _buildCommentForm(),
             _buildPaymentInfoCard(),
-
+            _buildInfroNote(),
           ],
         ),
-
       ),
-
     );
   }
+
   Widget _buildCommentForm() {
     String comment = ''; // Biến để lưu trữ nội dung bình luận
 
@@ -259,19 +259,19 @@ class _ConfirmPageState extends State<ConfirmPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-
-          Text(
-            'Thêm bình luận',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+            Text(
+              'Thêm bình luận',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(width: 50,),
-          TextButton(onPressed: () {
-
-          }, child: Text('Gợi ý'))
-        ],),
+            SizedBox(
+              width: 50,
+            ),
+            TextButton(onPressed: () {}, child: Text('Gợi ý'))
+          ],
+        ),
         Card(
           color: Colors.white,
           elevation: 5,
@@ -285,7 +285,8 @@ class _ConfirmPageState extends State<ConfirmPage> {
             },
             decoration: InputDecoration(
               hintText: 'Nhập nội dung bình luận',
-              contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              contentPadding:
+                  EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               filled: true, // Đánh dấu có nền
               fillColor: Colors.grey[200], // Màu nền của TextField
             ),
@@ -306,13 +307,98 @@ class _ConfirmPageState extends State<ConfirmPage> {
         //   },
         //   child: Text('Gửi'),
         // ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          // Không có khoảng thụt vào
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 16, right: 16),
+              // Đặt khoảng lề bên trái là 16
+              child: Icon(Icons.not_listed_location_rounded, size: 25),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                "Giao dịch qua fp_thuexe để chúng tôi bảo vệ bạn tốt nhất trong trường hợp bị huỷ chuyến ngoài ý muốn & phát sinh sự cố có bảo hiểm",
+                style: TextStyle(fontSize: 15),
+              ),
+            ),
+          ],
+        )
       ],
     );
   }
 
-
-
-
+  Widget _buildInfroNote() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      // Thêm lề cho container
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Divider(height: 30, thickness: 1),
+          Row(
+            children: [
+              Text(
+                "Giấy tờ thuê xe",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(width: 10),
+              Icon(Icons.not_listed_location, size: 30),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            "Chọn 1 trong 2 hình thức:",
+            style: TextStyle(fontSize: 16),
+          ),
+          SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(Icons.insert_drive_file, size: 30),
+              SizedBox(width: 10),
+              Text(
+                "GPLX & CCCD gắn chíp (đối chiếu)",
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Icon(Icons.insert_drive_file, size: 30),
+              SizedBox(width: 10),
+              Text(
+                "GPLX (đối chiếu) & Passport (giữ lại)",
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          Divider(height: 30, thickness: 1),
+          Row(
+            children: [
+              Text(
+                "Tài sản thế chấp",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(width: 10),
+              Icon(Icons.not_listed_location, size: 30),
+            ],
+          ),
+          SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  "30 triệu (tiền mặt/chuyển khoảng cho chủ xe khi nhận xe) hoặc Xe máy (kèm cà vẹt gốc) giá trị 30 triệu",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
 
   Widget _buildRentingInfoCard() {
     return Container(
@@ -620,6 +706,14 @@ class _ConfirmPageState extends State<ConfirmPage> {
     );
   }
 
+// Define the state variables
+  bool _isDiscount10Checked = false;
+  bool _isInsuranceFreeChecked = false;
+  bool _isCoupon50Checked = false;
+  bool requiresDeposit = true; // Change this to true/false based on your policy
+  double depositPercentage = 0.3; // 30% deposit
+
+// Widget to build the payment information card
   Widget _buildPaymentInfoCard() {
     if (_selectedDateTime1 == null ||
         _selectedDateTime2 == null ||
@@ -632,7 +726,25 @@ class _ConfirmPageState extends State<ConfirmPage> {
     numberOfDays = max(1, numberOfDays); // Ensure a minimum of 1 day
 
     double totalPrice = _vehicle.rentalPrice * numberOfDays;
+    double sum = totalPrice;
+    // Apply discounts based on checkbox state
+    if (_isDiscount10Checked) {
+      sum -= (sum * 0.1); // Apply a 10% discount
+    }
+    if (_isInsuranceFreeChecked) {
+      // Apply insurance discount or waive insurance fee
+      // Update totalPrice accordingly
+    }
+    if (_isCoupon50Checked) {
+      // Apply coupon discount
+      // Update totalPrice accordingly
+    }
+    double depositAmount = 0.0;
+    if (requiresDeposit) {
+      depositAmount = sum - (sum * depositPercentage);
+    }
 
+    double remainingBalance = totalPrice - depositAmount;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -659,7 +771,57 @@ class _ConfirmPageState extends State<ConfirmPage> {
               _buildInfoTile("Giá thuê mỗi ngày", "${_vehicle.rentalPrice} đ"),
               _buildInfoTile("Số ngày thuê", "$numberOfDays ngày"),
               _buildInfoTile("Tổng giá", "$totalPrice đ"),
-              SizedBox(height: 30),
+              Divider(),
+              Text(
+                "Chọn khuyến mãi (nếu có)",
+                // Promotion selection (if available)
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 10),
+              CheckboxListTile(
+                title: Text("Giảm giá 10%"),
+                value: _isDiscount10Checked,
+                onChanged: (bool? value) {
+                  setState(() {
+                    _isDiscount10Checked = value!;
+                  });
+                },
+              ),
+              CheckboxListTile(
+                title: Text("Miễn phí bảo hiểm"),
+                value: _isInsuranceFreeChecked,
+                onChanged: (bool? value) {
+                  setState(() {
+                    _isInsuranceFreeChecked = value!;
+                  });
+                },
+              ),
+              CheckboxListTile(
+                title: Text("Coupon giảm giá 50%"),
+                value: _isCoupon50Checked,
+                onChanged: (bool? value) {
+                  setState(() {
+                    _isCoupon50Checked = value!;
+                  });
+                },
+              ),
+              Divider(),
+              _buildInfoTile("Tổng giá", "$sum đ"),
+              if (requiresDeposit) ...[
+                _buildInfoTile(
+                    "Đặt cọc", "${depositAmount.toStringAsFixed(2)} đ"),
+                _buildInfoTile("Số dư còn lại",
+                    "${remainingBalance.toStringAsFixed(2)} đ"),
+              ] else ...[
+                _buildInfoTile(
+                    "Thành tiền", "${totalPrice.toStringAsFixed(2)} đ"),
+                _buildInfoTile("Thanh toán khi nhận xe",
+                    "Vui lòng thanh toán ${totalPrice.toStringAsFixed(2)} đ khi nhận xe"),
+              ],
+              Divider(),
               Text(
                 "Chọn phương thức thanh toán",
                 style: TextStyle(
@@ -687,6 +849,10 @@ class _ConfirmPageState extends State<ConfirmPage> {
                 },
                 hint: Text("Select a payment method"),
               ),
+              SizedBox(height: 20),
+
+              // Hiển thị nút thanh toán
+
             ],
           ),
         ),
@@ -706,24 +872,61 @@ class _ConfirmPageState extends State<ConfirmPage> {
       ),
     );
   }
-
+ bool _isPolicyAgreed =true;
   Widget _buildButton() {
     return Container(
       margin: EdgeInsets.all(12),
-      child: MaterialButton(
-        onPressed: () {
-          _createBooking();
-        },
-        height: 50,
-        minWidth: double.infinity,
-        color: Colors.teal,
-        child: Text(
-          "Thuê",
-          style: TextStyle(color: Colors.white, fontSize: 25),
-        ),
+      child: Column(  // Wrap button with a Column for better layout
+        mainAxisSize: MainAxisSize.min,  // Prevent unnecessary space
+        children: [
+          Row(  // Add a Row for checkbox and label
+            children: [
+              Checkbox(
+                activeColor: Colors.green,
+                value: _isPolicyAgreed,
+                onChanged: (bool? value) {
+                  setState(() {
+                    _isPolicyAgreed = value!;
+                  });
+                },
+              ),
+              Text(
+                "Tôi đồng ý với các điều khoản và chính sách",
+                style: TextStyle(fontSize: 14,decoration: TextDecoration.underline),
+
+              ),
+            ],
+          ),
+          SizedBox(height: 10),  // Add spacing between checkbox and button
+          MaterialButton(
+            onPressed: () {
+              if (_isPolicyAgreed) {
+                _createBooking();  // Call booking function only if agreed
+              } else {
+                // Show message or handle user not agreeing
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Vui lòng đồng ý với chính sách trước khi gửi yêu cầu"),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            height: 50,
+            minWidth: double.infinity,
+            color: Colors.teal,
+            child: Text(
+              "Gửi yêu cầu thuê xe",
+              style: TextStyle(color: Colors.white, fontSize: 25),
+            ),
+          ),
+        ],
       ),
     );
   }
+
+
+
 
   Widget _cardTimeWidget(BuildContext context) {
     return Container(

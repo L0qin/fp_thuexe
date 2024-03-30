@@ -79,10 +79,11 @@ class _DetailCarState extends State<DetailCar> {
             ),
             _buildCarInfo2(),
             _buildEvaluate(),
-
-            SizedBox(
-              height: 20,
+            Divider(
+              height: 30,
+              thickness: 1,
             ),
+            _buildInfroNote(),
             _buildContactRow(),
 
             //_buildElevatedButton(),
@@ -90,6 +91,190 @@ class _DetailCarState extends State<DetailCar> {
         ),
       )),
       bottomNavigationBar: _buildElevatedButton(),
+    );
+  }
+  bool _showFullText = false;
+  Widget _buildInfroNote() {
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                "Giấy tờ thuê xe",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(width: 10),
+              Icon(Icons.not_listed_location, size: 30),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            "Chọn 1 trong 2 hình thức:",
+            style: TextStyle(fontSize: 16),
+          ),
+          SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(Icons.newspaper, size: 30),
+              SizedBox(width: 10),
+              Text(
+                "GPLX & CCCD gắn chíp (đối chiếu)",
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Icon(Icons.insert_drive_file, size: 30),
+              SizedBox(width: 10),
+              Text(
+                "GPLX (đối chiếu) & Passport (giữ lại)",
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          Divider(height: 30, thickness: 1),
+          Row(
+            children: [
+              Text(
+                "Tài sản thế chấp",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(width: 10),
+              Icon(Icons.not_listed_location, size: 30),
+            ],
+          ),
+          SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  "30 triệu (tiền mặt/chuyển khoảng cho chủ xe khi nhận xe) hoặc Xe máy (kèm cà vẹt gốc) giá trị 30 triệu",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Divider(height: 30, thickness: 1),
+              Text(
+                "Điều khoản:",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "Quy định khác:",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.navigate_next),
+                      SizedBox(width: 8),
+                      Text("Sử dụng xe có mục đích.",style: TextStyle(fontSize: 16),),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.navigate_next),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          "Không sử dụng thuê xe có mục đích phi pháp. Trái pháp luật",style: TextStyle(fontSize: 16),),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.navigate_next),
+                      SizedBox(width: 8),
+                      Text("Không sử dụng thuê xe cầm cố, thuế chấp.",style: TextStyle(fontSize: 16),),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.navigate_next),
+                      SizedBox(width: 8),
+                      Expanded(child: Text("Không hút thuốc, nhả kẹo cao su, xả rác trong xe.",style: TextStyle(fontSize: 16),),)
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.navigate_next),
+                      SizedBox(width: 8),
+                      Text("Không chở các hàng cấm hoặc gây cháy nổ.",style: TextStyle(fontSize: 16),),
+                    ],
+                  ),
+                  _showFullText
+                      ?
+                      Column(children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(Icons.navigate_next),
+                            SizedBox(width: 8),
+                            Expanded(child: Text("Không chở hoa quả, Thực phẩm nặng mùi trong xe.",style: TextStyle(fontSize: 16),),)
+                          ],
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(Icons.navigate_next),
+                            SizedBox(width: 8),
+                            Expanded(child: Text("Khi trả xe nếu xe bẩn hoặc có mùi trong xe.Khách hàng"
+                                "vui lòng vệ sinh xe sạch sẽ hoặc gửi phụ thu phí vệ sinh xe "
+                                "Trân trọng cảm ơn. Chúc quý khách hàng có những chuyến đi tuyệt vời!.",style: TextStyle(fontSize: 16),),)
+                          ],
+                        ),
+                        Row(children: [Expanded(child: Text("Trân trọng cảm ơn. Chúc quý khách hàng có những chuyến đi tuyệt vời!",style: TextStyle(fontSize: 16),))],)
+                       
+
+                      ],)
+
+                      : Row(
+                    children: [
+
+                      SizedBox(width: 1), // Khoảng cách giữa văn bản và nút "Xem thêm"
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _showFullText = !_showFullText;
+                          });
+                        },
+                        child: Text(
+                          _showFullText ? "Thu gọn" : "Xem thêm...",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                ],
+              ),
+
+              Divider(height: 30,thickness: 1,),
+
+            ],
+          )
+        ],
+      ),
     );
   }
 
@@ -510,13 +695,13 @@ class _DetailCarState extends State<DetailCar> {
                     children: [
                       Container(
                         width: 150, // Adjust width as needed
-                        child: buildRow(Icons.cabin, "Bản đồ",
+                        child: buildRow(Icons.pin_drop, "Bản đồ",
                             overflow: TextOverflow.ellipsis),
                       ),
                       SizedBox(width: 30),
                       Container(
                         width: 100, // Adjust width as needed for "ETC"
-                        child: buildRow(Icons.home, "Bluetooh",
+                        child: buildRow(Icons.bluetooth, "Bluetooh",
                             overflow: TextOverflow.ellipsis),
                       ),
                     ],
@@ -530,7 +715,7 @@ class _DetailCarState extends State<DetailCar> {
                       SizedBox(width: 30),
                       Container(
                         width: 100, // Adjust width as needed for "ETC"
-                        child: buildRow(Icons.home, "Camera hành trình"),
+                        child: buildRow(Icons.camera_alt, "Camera hành trình"),
                       ),
                     ],
                   ),
@@ -538,12 +723,12 @@ class _DetailCarState extends State<DetailCar> {
                     children: [
                       Container(
                         width: 150, // Adjust width as needed
-                        child: buildRow(Icons.cabin, "Wifi/4G"),
+                        child: buildRow(Icons.wifi, "Wifi/4G"),
                       ),
                       SizedBox(width: 30),
                       Container(
                         width: 100, // Adjust width as needed for "ETC"
-                        child: buildRow(Icons.home, "Khe cắm USB"),
+                        child: buildRow(Icons.usb, "Khe cắm USB"),
                       ),
                     ],
                   ),
@@ -583,6 +768,7 @@ class _DetailCarState extends State<DetailCar> {
       },
     );
   }
+
   Widget _buildEvaluate() {
     return Container(
       color: Colors.grey[200],
@@ -597,7 +783,8 @@ class _DetailCarState extends State<DetailCar> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 10), // Khoảng cách giữa tiêu đề và danh sách đánh giá
+          SizedBox(height: 10),
+          // Khoảng cách giữa tiêu đề và danh sách đánh giá
           SizedBox(
             height: 200,
             child: ListView.builder(
@@ -606,6 +793,10 @@ class _DetailCarState extends State<DetailCar> {
                 return _buildEvaluateCard();
               },
             ),
+          ),
+
+          SizedBox(
+            height: 15,
           ),
           SizedBox(
             width: 500,
@@ -617,8 +808,10 @@ class _DetailCarState extends State<DetailCar> {
                 borderRadius: BorderRadius.circular(10), // Độ bo tròn của góc
               ),
               height: 50,
-              color: Colors.teal, // Màu nền của nút
-              textColor: Colors.white, // Màu chữ
+              color: Colors.teal,
+              // Màu nền của nút
+              textColor: Colors.white,
+              // Màu chữ
               child: Text(
                 'Xem thêm',
                 style: TextStyle(
@@ -626,11 +819,7 @@ class _DetailCarState extends State<DetailCar> {
                 ),
               ),
             ),
-          )
-
-
-
-
+          ),
         ],
       ),
     );
@@ -641,7 +830,8 @@ class _DetailCarState extends State<DetailCar> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          contentPadding: EdgeInsets.zero, // Loại bỏ khoảng trống xung quanh nội dung
+          contentPadding: EdgeInsets.zero,
+          // Loại bỏ khoảng trống xung quanh nội dung
           content: SingleChildScrollView(
             child: Container(
               width: 1000,
@@ -676,10 +866,6 @@ class _DetailCarState extends State<DetailCar> {
     );
   }
 
-
-
-
-
   Widget _buildEvaluateCard() {
     return Card(
       child: Padding(
@@ -690,8 +876,10 @@ class _DetailCarState extends State<DetailCar> {
             Row(
               children: [
                 CircleAvatar(
-                  radius: 30, // Đường kính của hình ảnh bo tròn
-                  backgroundColor: Colors.grey[300], // Màu nền của hình ảnh bo tròn
+                  radius: 30,
+                  // Đường kính của hình ảnh bo tròn
+                  backgroundColor: Colors.grey[300],
+                  // Màu nền của hình ảnh bo tròn
                   child: Icon(
                     Icons.account_circle, // Thay thế bằng hình ảnh của bạn
                     size: 50, // Kích thước của biểu tượng
@@ -710,11 +898,10 @@ class _DetailCarState extends State<DetailCar> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 10), // Khoảng cách giữa văn bản và đánh giá sao
+                      SizedBox(height: 10),
+                      // Khoảng cách giữa văn bản và đánh giá sao
                       Row(
-                        children: [
-                          Text("Năm 2024")
-                        ],
+                        children: [Text("Năm 2024")],
                       ),
                     ],
                   ),
@@ -727,10 +914,10 @@ class _DetailCarState extends State<DetailCar> {
                 ),
               ],
             ),
-            Divider(),// Khoảng cách giữa nội dung bình luận và hàng trên
+            Divider(), // Khoảng cách giữa nội dung bình luận và hàng trên
             Text(
               "Nội dung bình luận của người dùng"
-                  " ", // Thay thế bằng nội dung bình luận thực tế
+              " ", // Thay thế bằng nội dung bình luận thực tế
 
               style: TextStyle(
                 fontSize: 14,
@@ -742,8 +929,6 @@ class _DetailCarState extends State<DetailCar> {
       ),
     );
   }
-
-
 
   // Widget _buildEvaluate() {
   //   return Container(
@@ -803,7 +988,6 @@ class _DetailCarState extends State<DetailCar> {
   //     ),
   //   );
   // }
-
 
   Widget _buildDescriptionCard(String description) {
     // Calculate height based on description length; this is a simple approximation.
