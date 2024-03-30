@@ -5,10 +5,10 @@ import 'package:http/http.dart' as http;
 import 'ServiceConstants.dart';
 
 class ImageService {
-  static const String baseUrl = ServiceConstants.baseUrl;
+  static const String baseUrl = "${ServiceConstants.baseUrl}/images";
 
   static Future<String> getVehicleMainImageURLById(int id) async {
-    final url = '$baseUrl/images/mainimage/$id';
+    final url = '$baseUrl/mainimage/$id';
     final response = await http.get(
       Uri.parse(url),
     );
@@ -19,7 +19,7 @@ class ImageService {
       if (imageName.toString().isEmpty) {
         return "";
       }
-      final imageURL = '$baseUrl/images/getimages/$imageName';
+      final imageURL = '$baseUrl/getimages/$imageName';
       return imageURL;
     } else {
       throw Exception('Failed to load image');
@@ -27,12 +27,12 @@ class ImageService {
   }
 
   static String getImageByName(String imageName) {
-    final imageURL = '$baseUrl/images/getimages/$imageName';
+    final imageURL = '$baseUrl/getimages/$imageName';
     return imageURL;
   }
 
   static Future<List<String>> getAllVehicleImageURLsById(int id) async {
-    final url = '$baseUrl/images/allimage/$id';
+    final url = '$baseUrl/allimage/$id';
     final response = await http.get(
       Uri.parse(url),
     );
@@ -40,7 +40,7 @@ class ImageService {
       final List<dynamic> imagesData = json.decode(response.body);
       List<String> imageUrls = imagesData.map((imageData) {
         final imageName = imageData['hinh'];
-        return imageName.isEmpty ? "" : '$baseUrl/images/getimages/$imageName';
+        return imageName.isEmpty ? "" : '$baseUrl/getimages/$imageName';
       }).toList();
       return imageUrls;
     } else {
@@ -50,7 +50,7 @@ class ImageService {
 
   static Future<String> postImage(
       String loaiHinh, String maXe, File imageFile) async {
-    final url = '$baseUrl/images';
+    final url = '$baseUrl';
     final token = await AuthService.getToken();
     if (token == null) {
       throw Exception('Token not found');
@@ -81,7 +81,7 @@ class ImageService {
       final dynamic responseData =
           json.decode(await response.stream.bytesToString());
       final String imageUrl =
-          '$baseUrl/images/getimages/${responseData["hinh"]}';
+          '$baseUrl/getimages/${responseData["hinh"]}';
       return imageUrl;
     } else {
       throw Exception('Failed to post image');
@@ -91,7 +91,7 @@ class ImageService {
   // Update an existing image
   static Future<void> updateImage(
       int id, Map<String, dynamic> imageData, String token) async {
-    final url = '$baseUrl/images/$id';
+    final url = '$baseUrl/$id';
     final response = await http.put(Uri.parse(url),
         headers: {'Authorization': token}, body: json.encode(imageData));
     if (response.statusCode != 200) {
@@ -101,7 +101,7 @@ class ImageService {
 
   // Delete an existing image
   static Future<void> deleteImage(int id, String token) async {
-    final url = '$baseUrl/images/$id';
+    final url = '$baseUrl/$id';
     final response =
         await http.delete(Uri.parse(url), headers: {'Authorization': token});
     if (response.statusCode != 200) {

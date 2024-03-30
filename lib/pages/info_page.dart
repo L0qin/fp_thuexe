@@ -35,7 +35,7 @@ class _InformationState extends State<Information> {
   }
 
   Future<void> fetchData() async {
-    int? userId =await AuthService.getUserId();
+    int? userId = await AuthService.getUserId();
     user = await UserService.getUserById(userId!);
     setState(() {
       loadFetchedData(user!);
@@ -116,39 +116,37 @@ class _InformationState extends State<Information> {
         Navigator.of(context).pop(); // Close the dialog
         showDialog(
           context: context,
-          builder: (context) =>
-              AlertDialog(
-                title: Text('Thành công'),
-                content: Text('Cập nhật thông tin người dùng thành công.'),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text('OK'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      // Optionally, if you're navigating or need to refresh the page, do it here
-                    },
-                  ),
-                ],
+          builder: (context) => AlertDialog(
+            title: Text('Thành công'),
+            content: Text('Cập nhật thông tin người dùng thành công.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  // Optionally, if you're navigating or need to refresh the page, do it here
+                },
               ),
+            ],
+          ),
         );
       }
     } catch (e) {
       Navigator.of(context).pop(); // Close the dialog
       showDialog(
         context: context,
-        builder: (context) =>
-            AlertDialog(
-              title: Text('Lỗi'),
-              content: const Text("Có lỗi khi cập nhật htông tin người dùng"),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
+        builder: (context) => AlertDialog(
+          title: Text('Lỗi'),
+          content: const Text("Có lỗi khi cập nhật htông tin người dùng"),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
+          ],
+        ),
       );
     }
   }
@@ -194,7 +192,7 @@ class _InformationState extends State<Information> {
                         child: Text(
                           'Chỉnh Sửa',
                           style:
-                          TextStyle(decoration: TextDecoration.underline),
+                              TextStyle(decoration: TextDecoration.underline),
                         ),
                       ),
                       _buildDivider(),
@@ -246,7 +244,8 @@ class _InformationState extends State<Information> {
     final String imageUrl = user!.profilePicture ?? "";
     return ClipRRect(
       borderRadius: BorderRadius.circular(50), // Clip to circle
-      child: Material( // Use Material widget to enable splash effect
+      child: Material(
+        // Use Material widget to enable splash effect
         color: Colors.transparent, // Make Material widget transparent
         child: InkWell(
           splashColor: Colors.teal.withOpacity(0.5),
@@ -255,9 +254,8 @@ class _InformationState extends State<Information> {
           },
           child: CircleAvatar(
             radius: 50,
-            backgroundImage: imageUrl.isNotEmpty
-                ? NetworkImage(imageUrl)
-                : null,
+            backgroundImage:
+                imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
             child: imageUrl.isEmpty ? Icon(Icons.person, size: 50) : null,
             onBackgroundImageError: (exception, stackTrace) {},
           ),
@@ -268,7 +266,9 @@ class _InformationState extends State<Information> {
 
   Future<void> _editProfilePicture() async {
     final ImagePicker _picker = ImagePicker();
-    void _pickImage(ImageSource source) async {
+
+    // Function to handle image picking
+    Future<void> _pickImage(ImageSource source) async {
       try {
         final XFile? pickedFile = await _picker.pickImage(source: source);
         if (pickedFile != null) {
@@ -287,7 +287,7 @@ class _InformationState extends State<Information> {
                     },
                   ),
                   TextButton(
-                    child: Text("Lưu"),
+                    child: Text("Save"),
                     onPressed: () async {
                       Navigator.of(context).pop(); // Close the dialog
                       bool success = await UserService.updateUserProfilePicture(
@@ -295,30 +295,33 @@ class _InformationState extends State<Information> {
                       if (success) {
                         // Fetch the updated user details from the backend
                         User? updatedUser =
-                        await UserService.getUserById(user!.userId);
+                            await UserService.getUserById(user!.userId);
                         if (updatedUser != null) {
                           setState(() {
-                            user = updatedUser;
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text("Thông báo"),
-                                  content:
-                                  Text("Cập nhật ảnh đại diện thành công."),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      child: Text("OK"),
-                                      onPressed: () {
-                                        Navigator.of(context)
-                                            .pop(); // Close the dialog
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
+                            user =
+                                updatedUser; // Assuming 'user' holds the user profile including the image
+                            // Consider triggering a UI element that uses the image URL from the 'user' object to refresh
                           });
+                          // Consider moving the success dialog outside setState if showDialog causes issues
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("Notification"),
+                                content: Text(
+                                    "Profile picture updated successfully."),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text("OK"),
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         }
                       } else {
                         // Show a failure dialog
@@ -326,8 +329,9 @@ class _InformationState extends State<Information> {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: Text("Lỗi"),
-                              content: Text("Cập nhật ảnh đại diện thất bại."),
+                              title: Text("Error"),
+                              content:
+                                  Text("Failed to update profile picture."),
                               actions: <Widget>[
                                 TextButton(
                                   child: Text("OK"),
@@ -352,6 +356,8 @@ class _InformationState extends State<Information> {
         print('Error picking image: $e');
       }
     }
+
+    // Consider adding logic here to trigger _pickImage with the desired ImageSource (e.g., camera, gallery)
 
     // Show the bottom sheet/dialog for image source selection
     showModalBottomSheet(
@@ -447,7 +453,7 @@ class _InformationState extends State<Information> {
                 label2,
                 style: TextStyle(color: Colors.grey, fontSize: 14),
                 overflow:
-                TextOverflow.ellipsis, // Handle overflow for second label
+                    TextOverflow.ellipsis, // Handle overflow for second label
               ),
             ),
           ],

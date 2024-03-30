@@ -96,6 +96,7 @@ class _ConfirmPageState extends State<ConfirmPage> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
+
           return AlertDialog(
             title: Text("Lỗi"),
             content: Text(

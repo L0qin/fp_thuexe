@@ -5,28 +5,13 @@ import 'ServiceConstants.dart';
 import 'AuthService.dart'; // Ensure AuthService provides a method to get a token
 
 class BookingService {
-  static final String baseUrl = ServiceConstants.baseUrl;
-
-  // Get all bookings
-  static Future<List<dynamic>> getAllBookings() async {
-    final token = await AuthService.getToken();
-    final response = await http.get(
-      Uri.parse('$baseUrl/datxe'),
-      headers: {'Authorization': ' $token'},
-    );
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to load bookings');
-    }
-  }
+  static const String baseUrl = "${ServiceConstants.baseUrl}/bookings";
 
   // Get a specific booking by ID
   static Future<dynamic> getBookingById(int bookingId) async {
     final token = await AuthService.getToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/datxe/$bookingId'),
+      Uri.parse('$baseUrl/$bookingId'),
       headers: {'Authorization': ' $token'},
     );
 
@@ -41,16 +26,16 @@ class BookingService {
   static Future<List<Booking?>?> getBookingsByUserId(int userId) async {
     final token = await AuthService.getToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/datxe/user/$userId'),
+      Uri.parse('$baseUrl/all/$userId'),
       headers: {'Authorization': ' $token'},
     );
-
+    print("mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm");
+    print(jsonDecode(response.body));
     if (response.statusCode == 200) {
       List<dynamic> jsonList = jsonDecode(response.body);
       print((jsonList.map((json) => Booking.fromJson(json)).toList()).toString());
       return jsonList.map((json) => Booking.fromJson(json)).toList();
     } else {
-      // Resolve to an empty list in case of error.
       return [];
     }
   }
@@ -59,7 +44,7 @@ class BookingService {
   static Future<void> createBooking(Map<String, dynamic> bookingData) async {
     final token = await AuthService.getToken();
     final response = await http.post(
-      Uri.parse('$baseUrl/datxe'),
+      Uri.parse('$baseUrl/create'),
       headers: {
         'Authorization': ' $token',
         'Content-Type': 'application/json',
@@ -78,7 +63,7 @@ class BookingService {
   static Future<void> updateBooking(int bookingId, Map<String, dynamic> bookingData) async {
     final token = await AuthService.getToken();
     final response = await http.put(
-      Uri.parse('$baseUrl/datxe/$bookingId'),
+      Uri.parse('$baseUrl/$bookingId'),
       headers: {
         'Authorization': ' $token',
         'Content-Type': 'application/json',
@@ -97,7 +82,7 @@ class BookingService {
   static Future<void> deleteBooking(int bookingId) async {
     final token = await AuthService.getToken();
     final response = await http.delete(
-      Uri.parse('$baseUrl/datxe/$bookingId'),
+      Uri.parse('$baseUrl/$bookingId'),
       headers: {'Authorization': ' $token'},
     );
 
@@ -112,7 +97,7 @@ class BookingService {
   static Future<void> closeBooking(int bookingId, int vehicleId) async {
     final token = await AuthService.getToken();
     final response = await http.put(
-      Uri.parse('$baseUrl/datxe/close/$bookingId'),
+      Uri.parse('$baseUrl/close/$bookingId'),
       headers: {
         'Authorization': ' $token',
         'Content-Type': 'application/json',

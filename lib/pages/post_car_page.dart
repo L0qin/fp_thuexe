@@ -80,6 +80,8 @@ class _PostTheCarState extends State<PostCar> {
       1,
     );
 
+
+
     // Ensure default values are set if fields are empty
     if (_vehicle!.carName.isEmpty) _vehicle!.carName = "";
     if (_vehicle!.model.isEmpty) _vehicle!.model = "";

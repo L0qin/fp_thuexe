@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  static const String baseUrl = ServiceConstants.baseUrl;
+  static const String baseUrl = "${ServiceConstants.baseUrl}/users";
 
   static Future<String?> login(String username, String password) async {
     final url = '$baseUrl/login';
@@ -22,6 +22,7 @@ class AuthService {
           'password': password,
         }),
       );
+
       if (response.statusCode == 200) {
         final token = jsonDecode(response.body)['token'];
         final userId = jsonDecode(response.body)['userId'];
@@ -32,7 +33,6 @@ class AuthService {
           _saveUser(user);
           return token;
         } else {
-          // Handle case where user is null
           return null;
         }
       } else {

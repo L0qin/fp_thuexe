@@ -6,7 +6,7 @@ import 'AuthService.dart';
 import 'ServiceConstants.dart';
 
 class UserService {
-  static const String baseUrl = ServiceConstants.baseUrl;
+  static const String baseUrl = "${ServiceConstants.baseUrl}/users";
 
   // Method to retrieve user data by ID
   static Future<User?> getUserById(int userId) async {
@@ -15,23 +15,25 @@ class UserService {
       throw Exception('Token not found');
     }
 
-    final url = '$baseUrl/users/$userId';
+    final url = '$baseUrl/$userId';
     final response = await http.get(
       Uri.parse(url),
       headers: {'Authorization': ' $token'},
     );
 
+
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
+
       return User(
-        jsonData['ma_nguoi_dung'],
-        jsonData['ten_nguoi_dung'],
-        jsonData['mat_khau_hash'],
-        jsonData['ho_ten'],
-        '$baseUrl/images/getimages/' + jsonData['hinh_dai_dien'],
-        DateTime.parse(jsonData['ngay_dang_ky']),
-        jsonData['so_dien_thoai'],
-        jsonData['dia_chi_nguoi_dung'],
+        jsonData['ma_nguoi_dung'] as int, // Assuming ma_nguoi_dung is always non-null and an int
+        jsonData['ten_nguoi_dung'] as String, // Assuming ten_nguoi_dung is always non-null
+        "", // Assuming mat_khau_hash is always non-null
+        jsonData['ho_ten'] as String, // Assuming ho_ten is always non-null
+        jsonData['hinh_dai_dien'] == null ? '' : '${ServiceConstants.baseUrl}/images/getimages/${jsonData['hinh_dai_dien']}',
+        jsonData['ngay_dang_ky'] == null ? null : DateTime.parse(jsonData['ngay_dang_ky']),
+        jsonData['so_dien_thoai'], // Assuming so_dien_thoai can be null
+        jsonData['dia_chi_nguoi_dung'], // Assuming dia_chi_nguoi_dung can be null
       );
     } else {
       throw Exception('Failed to load user data');
@@ -45,7 +47,8 @@ class UserService {
       throw Exception('Token not found');
     }
 
-    final url = '$baseUrl/userimages';
+    final url = '${ServiceConstants.baseUrl}/images/userimages';
+    print(url.toString());
     var request = http.MultipartRequest('POST', Uri.parse(url))
       ..headers['Authorization'] =
           ' $token';
@@ -64,6 +67,7 @@ class UserService {
     request.files.add(multipartFile);
 
     var response = await request.send();
+    print(response.headers);
 
     if (response.statusCode == 200) {
       return true;
@@ -81,7 +85,7 @@ class UserService {
     required String phoneNumber,
     required String address,
   }) async {
-    final url = '$baseUrl/register';
+    const url = '$baseUrl/register';
     final response = await http.post(
       Uri.parse(url),
       headers: {
@@ -109,38 +113,6 @@ class UserService {
     }
   }
 
-  // Method to retrieve all users
-  static Future<List<User>> getAllUsers() async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      throw Exception('Token not found');
-    }
-
-    final url = '$baseUrl/users';
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {'Authorization': token},
-    );
-
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonData = jsonDecode(response.body);
-      return jsonData.map((userJson) {
-        return User(
-          userJson['ma_nguoi_dung'],
-          userJson['ten_nguoi_dung'],
-          userJson['mat_khau_hash'],
-          userJson['ho_ten'] ?? "",
-          userJson['hinh_dai_dien'] ?? "",
-          DateTime.parse(userJson['ngay_dang_ky']),
-          userJson['so_dien_thoai'] ?? "",
-          userJson['dia_chi_nguoi_dung'] ?? "",
-        );
-      }).toList();
-    } else {
-      throw Exception('Failed to load users');
-    }
-  }
-
   // Method to update an existing user
   static Future<bool> updateUser(
       int userId, String fullName, String phoneNumber, String address) async {
@@ -149,7 +121,7 @@ class UserService {
       throw Exception('Token not found');
     }
 
-    final url = '$baseUrl/users/$userId';
+    final url = '$baseUrl/$userId';
     final response = await http.put(
       Uri.parse(url),
       headers: {
@@ -157,9 +129,9 @@ class UserService {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        'ho_ten': fullName,
-        'so_dien_thoai': phoneNumber,
-        'dia_chi_nguoi_dung': address,
+        'fullName': fullName,
+        'phoneNumber': phoneNumber,
+        'address': address,
       }),
     );
 

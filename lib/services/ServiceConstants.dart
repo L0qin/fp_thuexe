@@ -1,5 +1,5 @@
 class ServiceConstants {
-  static const String baseUrl = 'http://192.168.1.149:3000';
+  static const String baseUrl = 'http://192.168.1.159:3000/api';
   static const Map<String, String> authHeaders = {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer 1',

@@ -37,8 +37,6 @@ class VehicleService {
 
   // Method to retrieve all vehicles
   static Future<List<Vehicle>> getAllVehicles() async {
-
-
     final url = '$baseUrl/vehicles';
     final response = await http.get(
       Uri.parse(url),
