@@ -9,20 +9,17 @@ class ImageService {
 
   static Future<String> getVehicleMainImageURLById(int id) async {
     final url = '$baseUrl/mainimage/$id';
-    final response = await http.get(
-      Uri.parse(url),
-    );
-
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
-      final imageName = json.decode(response.body)["hinh"];
-
+      final body = json.decode(response.body);
+      final imageName = body["hinh"] ?? "";
       if (imageName.toString().isEmpty) {
         return "";
       }
       final imageURL = '$baseUrl/getimages/$imageName';
       return imageURL;
     } else {
-      throw Exception('Failed to load image');
+      return "";
     }
   }
 
@@ -80,8 +77,7 @@ class ImageService {
     if (response.statusCode == 201) {
       final dynamic responseData =
           json.decode(await response.stream.bytesToString());
-      final String imageUrl =
-          '$baseUrl/getimages/${responseData["hinh"]}';
+      final String imageUrl = '$baseUrl/getimages/${responseData["hinh"]}';
       return imageUrl;
     } else {
       throw Exception('Failed to post image');

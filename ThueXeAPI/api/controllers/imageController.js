@@ -22,7 +22,16 @@ exports.getMainImageByVehicleId = (req, res) => {
             console.error(`Error fetching main image for vehicle ID ${id}:`, err);
             return res.status(500).json({ message: 'Error fetching main image for vehicle' });
         }
-        // Adjustments here should reflect any changes in how images are classified or stored
+
+        // Check if there's no result or the result is empty
+        if (!result[0]) {
+            // Here you can return a specific message indicating no image was found
+            // Or possibly provide a default image's data if applicable
+            return res.status(404).json({ message: 'No main image found for this vehicle' });
+        }
+
+        // If there is a result, return it
+        console.log(result[0]);
         res.json(result[0]);
     });
 };
@@ -31,7 +40,7 @@ exports.getMainImageByVehicleId = (req, res) => {
 exports.getAllImagesByVehicleId = (req, res) => {
 
     const { id } = req.params;
-    db.query('SELECT * FROM hinhanh WHERE ma_xe = ?', [id], (err, result) => {
+    db.query('SELECT * FROM hinhanh WHERE ma_xe = ? AND ( loai_hinh = 1 OR  loai_hinh = 2)', [id], (err, result) => {
         if (err) {
             console.error(`Error fetching all images for vehicle ID ${id}:`, err);
             return res.status(500).json({ message: 'Error fetching images for vehicle' });
