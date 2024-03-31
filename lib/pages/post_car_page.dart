@@ -33,12 +33,13 @@ class _PostTheCarState extends State<PostCar> {
 
   File? _mainImage;
   List<File> _otherImages = [];
+  List<File> _paperImages = [];
 
   final _picker = ImagePicker();
 
   Future<void> postImages(String maXe) async {
     try {
-      // Post main image
+      // Post main image if it exists
       if (_mainImage != null) {
         await ImageService.postImage('1', maXe, _mainImage!);
       }
@@ -48,10 +49,16 @@ class _PostTheCarState extends State<PostCar> {
         await ImageService.postImage('0', maXe, imageFile);
       }
 
+      // Post paper images
+      for (var imageFile in _paperImages) {
+        await ImageService.postImage('3', maXe, imageFile);
+      }
+
+      // Indicate success
       print('Images posted successfully');
     } catch (e) {
       print('Error posting images: $e');
-      // Handle errors
+      // Optionally, you could handle or display the error here
     }
   }
 
@@ -65,85 +72,101 @@ class _PostTheCarState extends State<PostCar> {
     _controllerSeating.text = "5";
   }
 
-  void _submitForm() async {
+  Future<void> _submitForm() async {
+    // Validate images
+    final imageValidationMessage = await _validateImages();
+    if (imageValidationMessage != null) {
+      _showDialog(context, 'Cần Chú Ý', imageValidationMessage);
+      return;
+    }
+
+    // Validate fields
+    final fieldValidationMessage = _validateFields();
+    if (fieldValidationMessage != null) {
+      _showDialog(context, 'Lỗi', fieldValidationMessage);
+      return;
+    }
+
+    // Create the Vehicle object
+    // Note: Make sure the _vehicle object creation logic is correct as per your requirements
     _vehicle = Vehicle(
       -1,
+      // Assuming this is a placeholder for 'id'
       _controllerCarTitle.text,
       0,
+      // Assuming this is a placeholder for 'status'
       _controllerModel.text,
-      _selectedCarBrand,
+      _selectedCarBrand!,
       _controllerAddress.text,
       _controllerDescription.text,
       double.tryParse(_controllerRentalPrice.text) ?? 0.0,
       int.tryParse(_controllerSeating.text) ?? 0,
       _user.userId,
-      1,
+      1, // Assuming this is a placeholder for 'category'
     );
-
-
-
-    // Ensure default values are set if fields are empty
-    if (_vehicle!.carName.isEmpty) _vehicle!.carName = "";
-    if (_vehicle!.model.isEmpty) _vehicle!.model = "";
-    if (_vehicle!.manufacturer.isEmpty) _vehicle!.manufacturer = "";
-    if (_vehicle!.address.isEmpty) _vehicle!.address = "";
-    if (_vehicle!.description.isEmpty) _vehicle!.description = "";
-    if (_vehicle!.carId == null) _vehicle!.carId = -1;
-    if (_vehicle!.status == null) _vehicle!.status = -1;
-    if (_vehicle!.ownerId == null) _vehicle!.ownerId = -1;
-    if (_vehicle!.categoryId == null) _vehicle!.categoryId = -1;
-
-    // Post the vehicle to the server
     try {
-      final insertId = await VehicleService.postVehicle(_vehicle!);
-      if (insertId != null) {
-        // Post images using the insert ID
-        await postImages(insertId.toString());
-
-        // Show success dialog
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Success'),
-              content: Text('Đăng xe thành công Id: $insertId'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.popUntil(context, ModalRoute.withName('/'));
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Error'),
-              content: Text('Đăng xe thất bại'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+      // Post the vehicle to the server and obtain its ID
+      final vehicleId = await VehicleService.postVehicle(_vehicle!);
+      if (vehicleId == null) {
+        _showDialog(context, 'Lỗi', 'Không thể đăng ký xe.');
+        return;
       }
+      postImages(vehicleId.toString());
+      // If everything was successful, show a success message
+      _showDialog(context, 'Thành công', 'Xe đã được đăng thành công.');
     } catch (e) {
-      print('Error: $e');
-      // Handle errors
+      // Log error and show an error message
+      print('Error during vehicle registration: $e');
+      _showDialog(context, 'Lỗi', 'Đã xảy ra lỗi trong quá trình đăng ký xe.');
     }
   }
 
-  Future<void> getImage(bool isMainImage) async {
+  void _showDialog(BuildContext context, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Đóng'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<String?> _validateImages() async {
+    if (_mainImage == null) return 'Ảnh chính là bắt buộc.';
+    if (_otherImages.isEmpty) return 'Ít nhất một ảnh khác là bắt buộc.';
+    if (_paperImages.isEmpty) return 'Ảnh giấy tờ là bắt buộc.';
+    return null; // Indicates all image conditions are met
+  }
+
+  String? _validateFields() {
+    if (_controllerCarTitle.text.isEmpty)
+      return 'Tiêu đề xe không được để trống.';
+    if (_controllerModel.text.isEmpty) return 'Model xe không được để trống.';
+    if (_selectedCarBrand == null || _selectedCarBrand!.isEmpty)
+      return 'Thương hiệu xe không được để trống.';
+    if (_controllerAddress.text.isEmpty) return 'Địa chỉ không được để trống.';
+    if (_controllerDescription.text.isEmpty)
+      return 'Mô tả xe không được để trống.';
+    if (_controllerRentalPrice.text.isEmpty ||
+        double.tryParse(_controllerRentalPrice.text) == null)
+      return 'Giá thuê không được để trống và phải là một số.';
+    if (_controllerSeating.text.isEmpty ||
+        int.tryParse(_controllerSeating.text) == null)
+      return 'Số chỗ ngồi không được để trống và phải là một số nguyên.';
+    return null; // Indicates all field conditions are met
+  }
+
+  Future<void> getImage(int imageType) async {
     final pickedFiles = await _picker
         .getMultiImage(); // Use getMultiImage to select multiple images
 
@@ -151,8 +174,10 @@ class _PostTheCarState extends State<PostCar> {
       setState(() {
         for (var pickedFile in pickedFiles) {
           File imageFile = File(pickedFile.path);
-          if (isMainImage) {
+          if (imageType == 0) {
             _mainImage = imageFile;
+          } else if (imageType == 3) {
+            _paperImages.add(imageFile);
           } else {
             _otherImages.add(imageFile);
           }
@@ -401,6 +426,15 @@ class _PostTheCarState extends State<PostCar> {
                 ),
               ),
               _buildOtherImageUpload(_otherImages),
+              SizedBox(height: 10.0),
+              Text(
+                "Ảnh giấy tờ xe liên quan",
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              _buildPaperImageUpload(_paperImages),
             ],
           ),
         ),
@@ -501,7 +535,7 @@ class _PostTheCarState extends State<PostCar> {
 
     return GestureDetector(
       onTap: () {
-        getImage(true);
+        getImage(0);
       },
       child: image != null
           ? Stack(
@@ -554,7 +588,88 @@ class _PostTheCarState extends State<PostCar> {
   Widget _buildOtherImageUpload(List<File> images) {
     return GestureDetector(
       onTap: () {
-        getImage(false);
+        getImage(1);
+      },
+      child: SizedBox(
+        child: ListView(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          children: [
+            Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              children: [
+                ...images.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  File image = entry.value;
+                  return index < images.length
+                      ? Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.file(
+                                image,
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                height: MediaQuery.of(context).size.width * 0.2,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  iconSize: 16,
+                                  padding: EdgeInsets.zero,
+                                  icon: Icon(Icons.close),
+                                  onPressed: () {
+                                    setState(() {
+                                      images.removeAt(index);
+                                    });
+                                  },
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          height: MediaQuery.of(context).size.width * 0.2,
+                          child: Container(
+                            color: Colors.grey[300],
+                            child: Icon(Icons.add_a_photo,
+                                size: 50, color: Colors.grey[600]),
+                          ),
+                        );
+                }).toList(),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.2,
+                  height: MediaQuery.of(context).size.width * 0.2,
+                  child: Container(
+                    color: Colors.grey[300],
+                    child: Icon(Icons.add_a_photo,
+                        size: 50, color: Colors.grey[600]),
+                  ),
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaperImageUpload(List<File> images) {
+    return GestureDetector(
+      onTap: () {
+        getImage(3);
       },
       child: SizedBox(
         child: ListView(

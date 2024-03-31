@@ -520,6 +520,8 @@
           const vehicle = vehiclesMap.get(vehicleId); // Fetch vehicle data
           const modalBody = document.querySelector('#vehicleDetailsModal .modal-body');
 
+          
+
           // Initialize dynamic content with a container for vertical layout
           let content = `<div class="container">`;
 
@@ -562,6 +564,7 @@
 
           // Section for vehicle papers, if they exist
           if (vehicle.paperImages && vehicle.paperImages.length > 0) {
+
             // Section for vehicle images carousel
             content += `
             <div class="text-center mb-4">
@@ -570,10 +573,10 @@
                 <div class="carousel-inner">`;
 
             // Ensure all vehicle images are added to the carousel correctly
-            vehicle.paperImages.forEach((paperImages, index) => {
+            vehicle.paperImages.forEach((paperImage, index) => {
               content += `
           <div class="carousel-item ${index == 0 ? 'active' : ''}">
-            <img src="/api/images/getimages/${image}" class="d-block w-100" alt="Ảnh Xe" style="max-height: 400px;"
+            <img src="/api/images/getimages/${paperImage}" class="d-block w-100" alt="Ảnh Xe" style="max-height: 400px;"
                  onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">
           </div>`;
             });
@@ -593,8 +596,8 @@
         </div>`;
             // Thumbnails for vehicle images
             content += `<div class="d-flex justify-content-center mt-2">`;
-            vehicle.images.forEach((image) => {
-              content += `<img src="/api/images/getimages/${image}" class="img-fluid img-thumbnail m-1" style="width: 100px; height: auto;" alt="Thumbnail" onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">`;
+            vehicle.paperImages.forEach((paperImage) => {
+              content += `<img src="/api/images/getimages/${paperImage}" class="img-fluid img-thumbnail m-1" style="width: 100px; height: auto;" alt="Thumbnail" onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">`;
             });
             content += `</div></div>`; // Close vehicle images section
 

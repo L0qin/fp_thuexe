@@ -81,6 +81,31 @@ exports.getAllUnverifiedVehicles = (req, res) => {
             // Splitting the vehicle images and paper images into separate arrays
             const vehicleImages = vehicleJson.vehicle_images ? vehicleJson.vehicle_images.split(',') : [];
             const paperImages = vehicleJson.paper_images ? vehicleJson.paper_images.split(',') : [];
+            console.log({
+                vehicleId: vehicleJson.ma_xe,
+                vehicleName: vehicleJson.ten_xe,
+                status: vehicleJson.trang_thai,
+                model: vehicleJson.model,
+                manufacturer: vehicleJson.hang_sx,
+                description: vehicleJson.mo_ta,
+                address: {
+                    streetAddress: vehicleJson.dia_chi,
+                    city: vehicleJson.thanh_pho,
+                    country: vehicleJson.quoc_gia,
+                    zipCode: vehicleJson.zip_code,
+                },
+                rentalPrice: vehicleJson.gia_thue,
+                seats: vehicleJson.so_cho,
+                ownerId: vehicleJson.chu_so_huu,
+                vehicleTypeId: vehicleJson.ma_loai_xe,
+                owner: {
+                    name: vehicleJson.owner_name,
+                    avatar: vehicleJson.owner_avatar,
+                },
+                images: vehicleImages,
+                mainImage: vehicleImages.length > 0 ? vehicleImages[0] : null,
+                paperImages: paperImages, // Added field for paper images
+            });
             return {
                 vehicleId: vehicleJson.ma_xe,
                 vehicleName: vehicleJson.ten_xe,
@@ -107,7 +132,6 @@ exports.getAllUnverifiedVehicles = (req, res) => {
                 paperImages: paperImages, // Added field for paper images
             };
         });
-
         res.json(vehicles);
     });
 };

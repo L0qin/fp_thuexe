@@ -261,7 +261,7 @@ class _ConfirmPageState extends State<ConfirmPage> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Text(
-              'Thêm bình luận',
+              'Ghi chú cho chủ xe',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -285,7 +285,7 @@ class _ConfirmPageState extends State<ConfirmPage> {
               comment = value;
             },
             decoration: InputDecoration(
-              hintText: 'Nhập nội dung bình luận',
+              hintText: 'Nhập nội dung ghi chú',
               contentPadding:
                   EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               filled: true, // Đánh dấu có nền

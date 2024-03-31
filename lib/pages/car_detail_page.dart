@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -37,12 +38,15 @@ class _DetailCarState extends State<DetailCar> {
     _imagesFuture = ImageService.getAllVehicleImageURLsById(vehicle!.carId);
     _vehicleFuture = VehicleService.getVehicleById(vehicle!.carId);
     _userFuture = UserService.getUserById(vehicle.ownerId);
+    _randomContent = randomContentSelection();
     super.initState();
   }
 
   @override
   void dispose() {
     super.dispose();
+
+
   }
 
   Future<int?> getUserIdFromSharedPrefs() async {
@@ -73,16 +77,9 @@ class _DetailCarState extends State<DetailCar> {
           children: [
             _buildCarouselSlider(),
             _buildCarInfo(),
-            _buildOwnerInfo(),
-            SizedBox(
-              height: 5,
-            ),
             _buildCarInfo2(),
-            _buildEvaluate(),
-            Divider(
-              height: 30,
-              thickness: 1,
-            ),
+            _buildOwnerInfo(),
+            _buildComment(),
             _buildInfroNote(),
             _buildContactRow(),
 
@@ -93,7 +90,7 @@ class _DetailCarState extends State<DetailCar> {
       bottomNavigationBar: _buildElevatedButton(),
     );
   }
-
+  late Widget _randomContent;
   bool _showFullText = false;
 
   Widget _buildInfroNote() {
@@ -546,7 +543,6 @@ class _DetailCarState extends State<DetailCar> {
                       "${vehicle.rentalPrice.toStringAsFixed(2)} VND"),
                   _infoRow(
                       Icons.event_seat, "Số chỗ", "${vehicle.seating} chỗ"),
-                  _buildDescription(vehicle.description)
                 ],
               ),
             ),
@@ -606,16 +602,6 @@ class _DetailCarState extends State<DetailCar> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Đặc Điểm',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.black),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -639,7 +625,7 @@ class _DetailCarState extends State<DetailCar> {
                           ),
                           SizedBox(height: 5),
                           Text(
-                            "Ghế",
+                            "${vehicle.seating} chỗ",
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.normal,
@@ -669,7 +655,7 @@ class _DetailCarState extends State<DetailCar> {
                           ),
                           SizedBox(height: 5),
                           Text(
-                            "Số tự động",
+                            "N/A",
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.normal,
@@ -698,7 +684,7 @@ class _DetailCarState extends State<DetailCar> {
                           ),
                           SizedBox(height: 5),
                           Text(
-                            "xăng",
+                            "N/A",
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.normal,
@@ -708,10 +694,6 @@ class _DetailCarState extends State<DetailCar> {
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _buildDescription(vehicle.description),
                   SizedBox(
                     height: 5,
                   ),
@@ -725,73 +707,11 @@ class _DetailCarState extends State<DetailCar> {
                   SizedBox(
                     height: 10,
                   ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 150, // Adjust width as needed
-                        child: buildRow(Icons.pin_drop, "Bản đồ",
-                            overflow: TextOverflow.ellipsis),
-                      ),
-                      SizedBox(width: 30),
-                      Container(
-                        width: 100, // Adjust width as needed for "ETC"
-                        child: buildRow(Icons.bluetooth, "Bluetooh",
-                            overflow: TextOverflow.ellipsis),
-                      ),
-                    ],
+                  _randomContent,
+                  SizedBox(
+                    height: 5,
                   ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 150, // Adjust width as needed
-                        child: buildRow(Icons.cabin, "Màn hình"),
-                      ),
-                      SizedBox(width: 30),
-                      Container(
-                        width: 100, // Adjust width as needed for "ETC"
-                        child: buildRow(Icons.camera_alt, "Camera hành trình"),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 150, // Adjust width as needed
-                        child: buildRow(Icons.wifi, "Wifi/4G"),
-                      ),
-                      SizedBox(width: 30),
-                      Container(
-                        width: 100, // Adjust width as needed for "ETC"
-                        child: buildRow(Icons.usb, "Khe cắm USB"),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 150, // Adjust width as needed
-                        child: buildRow(Icons.cabin, "Cảm biến va chạm"),
-                      ),
-                      SizedBox(width: 30),
-                      Container(
-                        width: 100, // Adjust width as needed for "ETC"
-                        child: buildRow(Icons.home, "Túi Khí"),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 150, // Adjust width as needed
-                        child: buildRow(Icons.cabin, "Lốp dự phòng"),
-                      ),
-                      SizedBox(width: 30),
-                      Container(
-                        width: 100, // Adjust width as needed for "ETC"
-                        child: buildRow(Icons.home, "ETC"),
-                      ),
-                    ],
-                  ),
+                  _buildDescription(vehicle.description),
                 ],
               ),
             ),
@@ -803,7 +723,7 @@ class _DetailCarState extends State<DetailCar> {
     );
   }
 
-  Widget _buildEvaluate() {
+  Widget _buildComment() {
     return Container(
       color: Colors.grey[200],
       padding: EdgeInsets.all(16.0),
@@ -824,7 +744,7 @@ class _DetailCarState extends State<DetailCar> {
             child: ListView.builder(
               itemCount: 5,
               itemBuilder: (context, index) {
-                return _buildEvaluateCard();
+                return _buildCommentCard();
               },
             ),
           ),
@@ -880,7 +800,7 @@ class _DetailCarState extends State<DetailCar> {
                     child: ListView.builder(
                       itemCount: 5,
                       itemBuilder: (context, index) {
-                        return _buildEvaluateCard();
+                        return _buildCommentCard();
                       },
                     ),
                   ),
@@ -900,7 +820,7 @@ class _DetailCarState extends State<DetailCar> {
     );
   }
 
-  Widget _buildEvaluateCard() {
+  Widget _buildCommentCard() {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -963,65 +883,6 @@ class _DetailCarState extends State<DetailCar> {
       ),
     );
   }
-
-  // Widget _buildEvaluate() {
-  //   return Container(
-  //     color: Colors.grey[200], // Màu nền cho Container
-  //     padding: EdgeInsets.all(16.0), // Độ lùi các đường viền của Container
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Text("Đánh giá"),
-  //         SizedBox(height: 20), // Khoảng cách giữa "Đánh giá" và Card
-  //         Card(
-  //           child: Padding(
-  //             padding: const EdgeInsets.all(16.0),
-  //             child: Row(
-  //               children: [
-  //                 CircleAvatar(
-  //                   radius: 30, // Đường kính của hình ảnh bo tròn
-  //                   backgroundColor: Colors.grey[300], // Màu nền của hình ảnh bo tròn
-  //                   child: Icon(
-  //                     Icons.account_circle, // Thay thế bằng hình ảnh của bạn
-  //                     size: 50, // Kích thước của biểu tượng
-  //                     color: Colors.grey[600], // Màu của biểu tượng
-  //                   ),
-  //                 ),
-  //                 SizedBox(width: 20), // Khoảng cách giữa ảnh và văn bản
-  //                 Expanded(
-  //                   child: Column(
-  //                     crossAxisAlignment: CrossAxisAlignment.start,
-  //                     children: [
-  //                       Text(
-  //                         'User 01',
-  //                         style: TextStyle(
-  //                           fontSize: 18,
-  //                           fontWeight: FontWeight.bold,
-  //                         ),
-  //                       ),
-  //                       SizedBox(height: 10), // Khoảng cách giữa văn bản và đánh giá sao
-  //                       Row(
-  //                         children: [
-  //                         Text("Năm 2024")
-  //                         ],
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //                 Row(
-  //                   children: [
-  //                     Icon(Icons.star, color: Colors.yellow[500]),
-  //                     Text("4.0")
-  //                   ],
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildDescriptionCard(String description) {
     // Calculate height based on description length; this is a simple approximation.
@@ -1228,4 +1089,59 @@ class _DetailCarState extends State<DetailCar> {
       ),
     );
   }
+
+
+  Widget buildContentRow(IconData icon, String text, {TextOverflow overflow = TextOverflow.visible}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Icon(icon, size: 24), // Ensure consistent icon size
+        SizedBox(width: 8),
+        Expanded(child: Text(text, overflow: overflow)),
+      ],
+    );
+  }
+
+  Widget randomContentSelection() {
+    final List<Widget> twoItemRows = [
+      Row(children: [Container(width: 150, child: buildContentRow(Icons.pin_drop, "Bản đồ", overflow: TextOverflow.ellipsis)), SizedBox(width: 30), Container(width: 100, child: buildRow(Icons.bluetooth, "Bluetooth", overflow: TextOverflow.ellipsis))]),
+      Row(children: [Container(width: 150, child: buildContentRow(Icons.cabin, "Màn hình")), SizedBox(width: 30), Container(width: 100, child: buildRow(Icons.camera_alt, "Camera hành trình"))]),
+      Row(children: [Container(width: 150, child: buildContentRow(Icons.wifi, "Wifi/4G")), SizedBox(width: 30), Container(width: 100, child: buildRow(Icons.usb, "Khe cắm USB"))]),
+    ];
+
+    // Define rows with one item (for potentially being placed at the bottom)
+    final List<Widget> oneItemRows = [
+      Container(width: 150, child: buildContentRow(Icons.cabin, "Cảm biến va chạm")),
+      Container(width: 150, child: buildContentRow(Icons.home, "Túi Khí")),
+      Container(width: 150, child: buildContentRow(Icons.cabin, "Lốp dự phòng")),
+    ];
+
+    final rand = Random();
+    final selectedContent = <Widget>[];
+
+    // Shuffle and select two-item rows
+    twoItemRows.shuffle();
+    int twoItemCount = rand.nextInt(twoItemRows.length); // Select how many two-item rows to include
+    selectedContent.addAll(twoItemRows.take(twoItemCount));
+
+    // Shuffle and potentially add one one-item row at the bottom
+    oneItemRows.shuffle();
+    if (rand.nextBool() && twoItemCount < twoItemRows.length) { // Ensure we don't always add a one-item row and it does not exceed total available two-item rows
+      selectedContent.add(
+        Row(
+          children: [
+            oneItemRows.first, // Just add the first one-item row after shuffling
+            SizedBox(width: 30), // Placeholder to maintain spacing
+            Container(width: 100), // Empty container to maintain layout
+          ],
+        ),
+      );
+    }
+    if (selectedContent.isEmpty) {
+      return Text("Không có thông tin.", textAlign: TextAlign.center);
+    }
+
+    return Column(children: selectedContent);
+  }
+
 }
