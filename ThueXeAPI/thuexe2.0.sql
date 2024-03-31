@@ -67,11 +67,14 @@ CREATE TABLE IF NOT EXISTS `datxe` (
   `ma_dat_xe` int NOT NULL AUTO_INCREMENT,
   `ngay_bat_dau` date NOT NULL,
   `ngay_ket_thuc` date NOT NULL,
-  `trang_thai_dat_xe` int NOT NULL,
+  `trang_thai_dat_xe` int DEFAULT 0,
   `dia_chi_nhan_xe` int DEFAULT NULL,
   `tong_tien_thue` decimal(10,2) DEFAULT NULL,
   `ma_xe` int DEFAULT NULL,
   `ma_nguoi_dat_xe` int NOT NULL,
+  `ma_chu_xe` int NOT NULL,
+  `ghi_chu` text NULL,
+  `giam_gia` int NULL,
   PRIMARY KEY (`ma_dat_xe`),
   KEY `datxe_fk_1` (`ma_xe`),
   KEY `datxe_fk_2` (`ma_nguoi_dat_xe`),
@@ -82,9 +85,9 @@ CREATE TABLE IF NOT EXISTS `datxe` (
 -- Dumping data for table `datxe`
 --
 
-INSERT INTO `datxe` (`ma_dat_xe`, `ngay_bat_dau`, `ngay_ket_thuc`, `trang_thai_dat_xe`, `dia_chi_nhan_xe`, `tong_tien_thue`, `ma_xe`, `ma_nguoi_dat_xe`) VALUES
-(1, '2023-12-10', '2023-12-12', 1, 1, '1000000.00', 1, 1),
-(2, '2023-12-15', '2023-12-20', 1, 2, '6000000.00', 2, 2);
+INSERT INTO `datxe` (`ma_dat_xe`, `ngay_bat_dau`, `ngay_ket_thuc`, `trang_thai_dat_xe`, `dia_chi_nhan_xe`, `tong_tien_thue`, `ma_xe`, `ma_nguoi_dat_xe`,`ma_chu_xe`) VALUES
+(1, '2023-12-10', '2023-12-12', 1, 1, '1000000.00', 1, 1,1),
+(2, '2023-12-15', '2023-12-20', 1, 2, '6000000.00', 2, 2,1);
 
 -- --------------------------------------------------------
 

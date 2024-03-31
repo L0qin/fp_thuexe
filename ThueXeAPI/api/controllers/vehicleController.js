@@ -289,3 +289,40 @@ exports.deleteVehicle = (req, res) => {
         });
     });
 };
+
+exports.addReview = (req, res) => {
+    const { ma_xe, ma_nguoi_dung, so_sao, binh_luan } = req.body;
+
+    // SQL query to insert a new comment
+    const query = `
+        INSERT INTO danhgia (ma_xe, ma_nguoi_dung, so_sao, binh_luan)
+        VALUES (?, ?, ?, ?)
+    `;
+
+    // Assuming 'db' is your database connection object
+    db.query(query, [ma_xe, ma_nguoi_dung, so_sao, binh_luan], (error, results) => {
+        if (error) {
+            console.error('Error adding comment:', error);
+            return res.status(500).send({ message: 'Error adding comment' });
+        }
+        res.status(201).send({ message: 'Comment added successfully', commentId: results.insertId });
+    });
+};
+
+exports.getAllVehicleReviews = (req, res) => {
+    const { ma_xe } = req.params;
+
+    // SQL query to select all comments for a given vehicle
+    const query = `
+        SELECT * FROM danhgia WHERE ma_xe = ?
+    `;
+
+    // Assuming 'db' is your database connection object
+    db.query(query, [ma_xe], (error, results) => {
+        if (error) {
+            console.error('Error fetching comments:', error);
+            return res.status(500).send({ message: 'Error fetching comments' });
+        }
+        res.status(200).send(results);
+    });
+};

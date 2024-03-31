@@ -1,16 +1,46 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/Review.dart';
 import '../models/Vehicle.dart';
 import 'AuthService.dart';
 import 'ServiceConstants.dart';
 
 class VehicleService {
-  static const String baseUrl = ServiceConstants.baseUrl;
+  static const String baseUrl = "${ServiceConstants.baseUrl}/vehicles";
+
+  static Future<List<Review>> getAllVehicleReviews(int maXe) async {
+    final url = '$baseUrl/getAllVehicleReviews/$maXe';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = jsonDecode(response.body);
+      return jsonData.map((json) => Review.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load Reviews');
+    }
+  }
+
+  static Future<void> addReview(
+      int maXe, int maNguoiDung, int soSao, String binhLuan) async {
+    final url = '$baseUrl/addReview/';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'ma_xe': maXe,
+        'ma_nguoi_dung': maNguoiDung,
+        'so_sao': soSao,
+        'binh_luan': binhLuan,
+      }),
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Failed to add Review');
+    }
+  }
 
   static Future<Vehicle?> getVehicleById(int vehicleId) async {
-
-
-    final url = '$baseUrl/vehicles/$vehicleId';
+    final url = '$baseUrl/$vehicleId';
     final response = await http.get(
       Uri.parse(url),
     );
@@ -37,7 +67,7 @@ class VehicleService {
 
   // Method to retrieve all vehicles
   static Future<List<Vehicle>> getAllVehicles() async {
-    final url = '$baseUrl/vehicles';
+    final url = '$baseUrl';
     final response = await http.get(
       Uri.parse(url),
     );
@@ -66,9 +96,7 @@ class VehicleService {
 
   // Method to search vehicles based on a keyword
   static Future<List<Vehicle>> searchVehicles(String keyword) async {
-
-
-    final url = '$baseUrl/vehicles/search/$keyword';
+    final url = '$baseUrl/search/$keyword';
     final response = await http.get(
       Uri.parse(url),
     );
@@ -101,7 +129,7 @@ class VehicleService {
       throw Exception('Token not found');
     }
 
-    final url = '$baseUrl/vehicles';
+    final url = '$baseUrl';
     final response = await http.post(
       Uri.parse(url),
       headers: {
@@ -124,7 +152,8 @@ class VehicleService {
 
     if (response.statusCode == 201) {
       final dynamic responseData = json.decode(response.body);
-      final int? insertId = responseData['id']; // Assuming 'id' is the key for insertId
+      final int? insertId =
+          responseData['id']; // Assuming 'id' is the key for insertId
       print('Vehicle posted successfully with ID: $insertId');
       return insertId;
     } else {
@@ -132,4 +161,30 @@ class VehicleService {
       return null;
     }
   }
+
+  static Future<bool> checkBookable(int userId) async {
+    final token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
+    final url =
+        '$baseUrl/checkBookable?ma_nguoi_dat_xe=$userId'; // Adjust the URL based on your actual endpoint
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token', // Ensure proper formatting for the Authorization header
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = json.decode(response.body);
+      return responseBody['isBookable'];
+    } else {
+      // Consider handling different status codes and errors more specifically
+      throw Exception('Failed to check if user can book');
+    }
+  }
+
 }

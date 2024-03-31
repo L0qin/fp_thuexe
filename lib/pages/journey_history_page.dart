@@ -12,7 +12,7 @@ class JourneyHistoryPage extends StatefulWidget {
 }
 
 class _JourneyHistoryPageState extends State<JourneyHistoryPage> {
-  Future<List<Booking?>?>? futureBookings;
+  Future<List<Booking?>>? futureBookings;
 
   @override
   void initState() {
@@ -23,7 +23,7 @@ class _JourneyHistoryPageState extends State<JourneyHistoryPage> {
   void _fetchBookings() async {
     try {
       final userId = await AuthService.getUserId();
-      final bookings = await BookingService.getBookingsByUserId(userId!);
+      final bookings = await BookingService.getAllUserBookings(userId!);
       setState(() {
         futureBookings = Future.value(
             bookings);
@@ -45,7 +45,7 @@ class _JourneyHistoryPageState extends State<JourneyHistoryPage> {
         backgroundColor: Colors.teal.shade700,
 
       ),
-      body: FutureBuilder<List<Booking?>?>(
+      body: FutureBuilder<List<Booking?>>(
         future: futureBookings,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -59,18 +59,17 @@ class _JourneyHistoryPageState extends State<JourneyHistoryPage> {
             // Map through the bookings and create a list of widgets to display
             List<Widget> bookingWidgets = snapshot.data!
                 .map((booking) => JourneyHistoryItem(
-                      carType: "Giao dịch Id: #${booking!.bookingId}",
-                      renterName: booking!.customerId.toString(),
-                      location: booking.receivingAddress,
-                      rentalDuration: "${booking.rentalDays} ngày",
-                      cost: "${booking.totalRentalCost} VNĐ",
-                      tripStart: booking.startDate.toString(),
-                      tripEnd: booking.endDate.toString(),
-                      paymentMethod: "Tiền mặt",
-                      contactSupport: "support@example.com",
-                    ))
+              carType: "Giao dịch Id: #${booking?.id}",
+              renterName: booking?.userId.toString() ?? 'Unknown',
+              location: "Hà Nội",
+              rentalDuration: "1 ngày",
+              cost: "${booking?.totalRental ?? 0} VNĐ",
+              tripStart: booking?.startDate.toString() ?? 'Unknown',
+              tripEnd: booking?.endDate.toString() ?? 'Unknown',
+              paymentMethod: "Tiền mặt",
+              contactSupport: "support@example.com",
+            ))
                 .toList();
-
             return SingleChildScrollView(
               padding: EdgeInsets.all(16.0),
               child: Column(
@@ -80,7 +79,7 @@ class _JourneyHistoryPageState extends State<JourneyHistoryPage> {
             );
           }
         },
-      ),
+      )
     );
   }
 

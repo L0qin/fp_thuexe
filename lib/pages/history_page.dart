@@ -26,7 +26,7 @@ class HistoryPage extends StatelessWidget {
             // Proceed to fetch bookings only if the user ID is valid
             final userId = snapshot.data!;
             return FutureBuilder<List<Booking?>?>(
-              future: BookingService.getBookingsByUserId(userId),
+              future: BookingService.getAllUserBookings(userId),
               builder: (context, bookingSnapshot) {
                 if (bookingSnapshot.connectionState ==
                     ConnectionState.waiting) {
@@ -49,7 +49,7 @@ class HistoryPage extends StatelessWidget {
       ),
     );
   }
-
+//======================================================================
   Widget _buildBookingCard(BuildContext context, Booking booking) {
     return Card(
       margin: EdgeInsets.all(10.0),
@@ -62,14 +62,14 @@ class HistoryPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               _buildBookingHeader(booking),
-              SizedBox(height: 10.0),
-              Text('Số ngày thuê: ${booking.rentalDays} ngày',
-                  style: TextStyle(fontSize: 16.0)),
-              SizedBox(height: 5.0),
-              Text('Tổng tiền: ${booking.totalRentalCost}vnđ',
-                  style: TextStyle(fontSize: 16.0)),
-              SizedBox(height: 10.0),
-              _buildStatusText(booking.status),
+              // SizedBox(height: 10.0),
+              // Text('Số ngày thuê: ${booking.rentalDays} ngày',
+              //     style: TextStyle(fontSize: 16.0)),
+              // SizedBox(height: 5.0),
+              // Text('Tổng tiền: ${booking.totalRentalCost}vnđ',
+              //     style: TextStyle(fontSize: 16.0)),
+              // SizedBox(height: 10.0),
+              // _buildStatusText(booking.status),
             ],
           ),
         ),
@@ -81,7 +81,7 @@ class HistoryPage extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Giao dịch id: #${booking.bookingId}',
+        Text('Giao dịch id: #${booking.id}',
             style: TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,

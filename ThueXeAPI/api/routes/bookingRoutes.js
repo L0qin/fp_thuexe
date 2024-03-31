@@ -3,34 +3,27 @@ const router = express.Router();
 const authenticateToken = require('../../middleware/authenticate');
 
 const {
-    getAllBookings,
-    getBookingById,
     createBooking,
-    closeBooking,
-    updateBooking,
-    deleteBooking,
-    getBookingsByUserId
+    confirmBooking,
+    completeBooking,
+    cancelBooking,
+    getBookingsByUserId,
+    checkBookable,
+    getManageBooking
 } = require('../controllers/bookingController');
 
-// Route to get all bookings
-router.get('/', authenticateToken, getAllBookings);
+router.post('/create/', authenticateToken, createBooking);
 
-// Route to get a specific booking by ID
-router.get('/:id', authenticateToken, getBookingById);
+router.put('/confirmBooking/:id', authenticateToken, confirmBooking);
 
-// Route to create a new booking
-router.post('/create', authenticateToken, createBooking);
+router.put('/completeBooking/:id', authenticateToken, completeBooking);
 
-// Route to close a booking
-router.put('/close/:id', authenticateToken, closeBooking);
+router.put('/cancelBooking/:id', authenticateToken, cancelBooking);
 
-// Route to update a specific booking
-router.put('/:id', authenticateToken, updateBooking);
+router.get('/allUserBookings/:ma_nguoi_dat_xe', authenticateToken, getBookingsByUserId);
 
-// Route to delete a booking
-router.delete('/:id', authenticateToken, deleteBooking);
+router.get('/checkBookable/:ma_nguoi_dat_xe', authenticateToken, checkBookable);
 
-// Route to get bookings for a specific user by their ID
-router.get('/all/:ma_nguoi_dat_xe', authenticateToken, getBookingsByUserId);
+router.get('/getManageBooking/:ma_chu_xe', authenticateToken, getManageBooking);
 
 module.exports = router;

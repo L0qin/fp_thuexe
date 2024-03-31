@@ -10,6 +10,7 @@ import 'package:fp_thuexe/services/UserService.dart';
 import 'package:intl/intl.dart';
 
 import '../models/User.dart';
+import '../models/VehicleBooking.dart';
 import '../services/AuthService.dart';
 import '../services/BookingService.dart';
 
@@ -28,11 +29,10 @@ class _ConfirmPageState extends State<ConfirmPage> {
   late User _userOwner;
   Vehicle _vehicle;
   late String imgURL;
+  late TextEditingController tecNotes= TextEditingController();
 
-  // Initialize _selectedDateTime1 to tomorrow
   DateTime _selectedDateTime1 = DateTime.now().add(Duration(days: 1));
 
-  // Initialize _selectedDateTime2 to the day after tomorrow
   DateTime _selectedDateTime2 = DateTime.now().add(Duration(days: 2));
   String? _selectedPaymentMethod = 'Thanh toán bằng tiền mặt';
 
@@ -41,6 +41,93 @@ class _ConfirmPageState extends State<ConfirmPage> {
     'Thanh toán bằng tiền mặt',
     'Chuyển khoản ngân hàng',
   ];
+
+
+  void _createBooking() async {
+    int customerId = _user.userId;
+    String notes = tecNotes.text;
+    DateTime startDate = _selectedDateTime1;
+    DateTime endDate = _selectedDateTime2;
+    int? pickupAddressId = 1; // Assuming this is obtained elsewhere in your code
+    int userId = _user.userId;
+    int ownerId =_userOwner.userId;
+    int carId = _vehicle.carId;
+
+    // Check if the user is trying to rent their own vehicle
+    if (customerId == _userOwner.userId) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text(
+                "You cannot rent your own vehicle. Please choose another vehicle."),
+            actions: <Widget>[
+              TextButton(
+                child: Text("Ok"),
+                onPressed: () {
+                  Navigator.popUntil(context, ModalRoute.withName('/'));
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    // Create a Booking object
+    Booking booking = Booking(
+      startDate: startDate,
+      endDate: endDate,
+      pickupAddressId: pickupAddressId,
+      totalRental: 0, // This value needs to be calculated or provided accordingly
+      carId: carId,
+      userId: userId,
+      ownerId: ownerId,
+      notes: notes,
+      discount: 0, // Provide this value if applicable
+    );
+
+    try {
+      // Attempting to create a booking via the BookingService
+      bool bookingCreated = await BookingService.createBooking(booking);
+      if (bookingCreated) {
+        // Navigate to the SuccessPage on successful booking
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SuccessPage(), // Ensure SuccessPage is defined in your application
+          ),
+        );
+      } else {
+        // You may choose to handle this case differently since bookingCreated being false
+        // does not necessarily indicate an exception but rather an unsuccessful booking attempt.
+        throw Exception('The booking could not be created.');
+      }
+    } catch (e) {
+      // Show a dialog on failure
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text("Failed to create booking. Please try again: $e"),
+            actions: <Widget>[
+              TextButton(
+                child: Text("Close"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+
 
   _ConfirmPageState(this._vehicle);
 
@@ -82,140 +169,6 @@ class _ConfirmPageState extends State<ConfirmPage> {
     }
   }
 
-  void _createBooking() async {
-    int status = 0;
-    String receivingAddress = _user.address;
-    int customerId = _user.userId;
-
-    // Calculate the rental cost
-    int rentalDays = _selectedDateTime2.difference(_selectedDateTime1).inDays;
-    int totalRentalCost = (rentalDays * _vehicle.rentalPrice).toInt();
-
-    // Prevent users from renting their own vehicle
-    if (customerId == _userOwner.userId) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-
-          return AlertDialog(
-            title: Text("Lỗi"),
-            content: Text(
-                "Bạn không thể thuê xe của chính mình,\n vui lòng chọn xe khác"),
-            actions: <Widget>[
-              TextButton(
-                child: Text("Ok"),
-                onPressed: () {
-                  Navigator.popUntil(context, ModalRoute.withName('/'));
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    // Check if the selected payment method is ZaloPay
-    if (_selectedPaymentMethod == 'Thanh toán trực tuyến') {
-      // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return Center(child: CircularProgressIndicator());
-        },
-      );
-      var result = await FlutterZaloPaySdk.payOrder(
-          zpToken: 'uUfsWgfLkRLzq6W2uNXTCxrfxs51auny');
-      Navigator.pop(context);
-      if (result != null) {
-        var paymentResult = await FlutterZaloPaySdk.payOrder(
-            zpToken: "uUfsWgfLkRLzq6W2uNXTCxrfxs51auny");
-        if (paymentResult == FlutterZaloPayStatus.success) {
-        } else {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Payment Error"),
-                content: Text("Failed to process payment. Please try again."),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text("Close"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-          return;
-        }
-      } else {
-        // Payment initiation failed
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Payment Error"),
-              content: Text("Failed to initiate payment. Please try again."),
-              actions: <Widget>[
-                TextButton(
-                  child: Text("Close"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-        return; // Exit the function if unable to initiate payment
-      }
-    }
-
-    Map<String, dynamic> bookingData = {
-      'ngay_bat_dau': _selectedDateTime1.toIso8601String(),
-      'ngay_ket_thuc': _selectedDateTime2.toIso8601String(),
-      'trang_thai_dat_xe': status,
-      'dia_chi_nhan_xe': receivingAddress,
-      'so_ngay_thue': rentalDays,
-      'tong_tien_thue': totalRentalCost,
-      'ma_xe': _vehicle.carId,
-      'ma_nguoi_dat_xe': customerId,
-    };
-
-    try {
-      await BookingService.createBooking(bookingData);
-      // Navigate to the SuccessPage on successful booking
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                SuccessPage()), // Replace SuccessPage() with the actual success page widget
-      );
-    } catch (e) {
-      // Show a dialog on failure
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Error"),
-            content: Text("Failed to create booking. Please try again."),
-            actions: <Widget>[
-              TextButton(
-                child: Text("Close"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -281,11 +234,10 @@ class _ConfirmPageState extends State<ConfirmPage> {
           ),
           margin: EdgeInsets.all(10),
           child: TextField(
-            onChanged: (value) {
-              comment = value;
-            },
+            controller: tecNotes,
             decoration: InputDecoration(
               hintText: 'Nhập nội dung ghi chú',
+
               contentPadding:
                   EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               filled: true, // Đánh dấu có nền

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fp_thuexe/models/User.dart';
 import 'package:fp_thuexe/pages/history_page.dart';
+import 'package:fp_thuexe/pages/manage_booking_page.dart';
 import 'package:fp_thuexe/services/AuthService.dart';
 import 'package:fp_thuexe/services/UserService.dart';
 import 'package:image_picker/image_picker.dart';
@@ -207,6 +208,17 @@ class _InformationState extends State<Information> {
                         child: _buildMenuRow(
                             Icons.history, "Đặt xe", "Chuyến đi và lịch sử"),
                       ),
+                      _buildDivider(),
+                      InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ManageRentalsScreen(),
+                            ));
+                          },
+                          child: _buildMenuRow(
+                              Icons.car_rental_rounded, "Quản lý cho thuê")),
                       _buildDivider(),
                       InkWell(
                           onTap: () {},

@@ -11,6 +11,7 @@ import 'package:fp_thuexe/services/ImageService.dart';
 import 'package:fp_thuexe/services/UserService.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
+import '../models/Review.dart';
 import '../models/Vehicle.dart';
 import '../services/VehicleService.dart';
 import 'confirm_page.dart';
@@ -30,6 +31,7 @@ class _DetailCarState extends State<DetailCar> {
   late Future<List<String>> _imagesFuture;
   late Future<Vehicle?> _vehicleFuture;
   late Future<User?> _userFuture;
+  late Future<List<Review>> _futureReviews;
 
   _DetailCarState(this.vehicle);
 
@@ -38,6 +40,7 @@ class _DetailCarState extends State<DetailCar> {
     _imagesFuture = ImageService.getAllVehicleImageURLsById(vehicle!.carId);
     _vehicleFuture = VehicleService.getVehicleById(vehicle!.carId);
     _userFuture = UserService.getUserById(vehicle.ownerId);
+    _futureReviews = VehicleService.getAllVehicleReviews(vehicle.carId) ;
     _randomContent = randomContentSelection();
     super.initState();
   }
@@ -45,8 +48,6 @@ class _DetailCarState extends State<DetailCar> {
   @override
   void dispose() {
     super.dispose();
-
-
   }
 
   Future<int?> getUserIdFromSharedPrefs() async {
@@ -79,7 +80,7 @@ class _DetailCarState extends State<DetailCar> {
             _buildCarInfo(),
             _buildCarInfo2(),
             _buildOwnerInfo(),
-            _buildComment(),
+            _buildReview(vehicle.carId),
             _buildInfroNote(),
             _buildContactRow(),
 
@@ -90,6 +91,7 @@ class _DetailCarState extends State<DetailCar> {
       bottomNavigationBar: _buildElevatedButton(),
     );
   }
+
   late Widget _randomContent;
   bool _showFullText = false;
 
@@ -723,7 +725,8 @@ class _DetailCarState extends State<DetailCar> {
     );
   }
 
-  Widget _buildComment() {
+  Widget _buildReview(int maXe) {
+    List<Review> listReviews = [];
     return Container(
       color: Colors.grey[200],
       padding: EdgeInsets.all(16.0),
@@ -738,38 +741,56 @@ class _DetailCarState extends State<DetailCar> {
             ),
           ),
           SizedBox(height: 10),
-          // Khoảng cách giữa tiêu đề và danh sách đánh giá
-          SizedBox(
-            height: 200,
-            child: ListView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return _buildCommentCard();
-              },
-            ),
-          ),
+          FutureBuilder<List<Review>>(
+            future: _futureReviews,
+            // Fetch reviews asynchronously
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // Display a loading indicator while waiting for the reviews
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                // If an error occurred, display an error message
+                return Text('Error: ${snapshot.error}');
+              } else if (snapshot.hasData) {
+                // When we have data, display the review cards
+                final reviews = snapshot.data!;
+                listReviews = reviews;
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: 300, // Maximum height
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: List.generate(reviews.length, (index) {
+                        return _buildReviewCard(reviews[index]);
+                      }),
+                    ),
+                  ),
+                );
 
-          SizedBox(
-            height: 15,
+              } else {
+                // If there are no reviews or data is not available, display a message
+                return Text('Chưa có đánh giá nào.');
+              }
+            },
           ),
+          SizedBox(height: 15),
           SizedBox(
-            width: 500,
-            child: MaterialButton(
+            width: double.infinity,
+            child: TextButton(
               onPressed: () {
-                _showDialogFullScreen(context);
+                _showDialogFullScreen(context,
+                    listReviews); // Ensure context and listReviews are correctly managed
               },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10), // Độ bo tròn của góc
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.teal, // Text color
               ),
-              height: 50,
-              color: Colors.teal,
-              // Màu nền của nút
-              textColor: Colors.white,
-              // Màu chữ
               child: Text(
                 'Xem thêm',
                 style: TextStyle(
-                  fontSize: 16, // Kích thước chữ
+                  decoration: TextDecoration.underline, // Underline the text
+                  fontSize: 16, // Text size
+                  color: Colors.teal, // Text color
                 ),
               ),
             ),
@@ -779,40 +800,36 @@ class _DetailCarState extends State<DetailCar> {
     );
   }
 
-  void _showDialogFullScreen(BuildContext context) {
-    showDialog(
+  void _showDialogFullScreen(BuildContext context, List<Review> reviews) {
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true, // Allows the sheet to take full screen if needed
       builder: (BuildContext context) {
-        return AlertDialog(
-          contentPadding: EdgeInsets.zero,
-          // Loại bỏ khoảng trống xung quanh nội dung
-          content: SingleChildScrollView(
-            child: Container(
-              width: 1000,
-              color: Colors.white,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(height: 10),
-                  SizedBox(
-                    height: 200,
-                    child: ListView.builder(
-                      itemCount: 5,
-                      itemBuilder: (context, index) {
-                        return _buildCommentCard();
-                      },
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
+        // Use a Container to control the height of the modal bottom sheet
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.75, // Occupies 75% of screen height
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: reviews.length,
+                    itemBuilder: (context, index) {
+                      // Assuming _buildReviewCard is your method to build each review item
+                      return _buildReviewCard(reviews[index]);
                     },
-                    child: Text('Đóng'),
                   ),
-                ],
-              ),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context), // Closes the bottom sheet
+                  child: Text('Đóng'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, backgroundColor: Colors.teal, // Text color
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -820,7 +837,7 @@ class _DetailCarState extends State<DetailCar> {
     );
   }
 
-  Widget _buildCommentCard() {
+  Widget _buildReviewCard(Review review) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -831,48 +848,44 @@ class _DetailCarState extends State<DetailCar> {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  // Đường kính của hình ảnh bo tròn
                   backgroundColor: Colors.grey[300],
-                  // Màu nền của hình ảnh bo tròn
                   child: Icon(
-                    Icons.account_circle, // Thay thế bằng hình ảnh của bạn
-                    size: 50, // Kích thước của biểu tượng
-                    color: Colors.grey[600], // Màu của biểu tượng
+                    Icons.account_circle,
+                    size: 50,
+                    color: Colors.grey[600],
                   ),
                 ),
-                SizedBox(width: 20), // Khoảng cách giữa ảnh và văn bản
+                SizedBox(width: 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'User 01',
+                        'User ${review.userId}',
+                        // Dynamically display user ID or name if you have it
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       SizedBox(height: 10),
-                      // Khoảng cách giữa văn bản và đánh giá sao
-                      Row(
-                        children: [Text("Năm 2024")],
-                      ),
+                      Text(
+                          "Date: ${review.dateTime.year}-${review.dateTime.month}-${review.dateTime.day}"),
                     ],
                   ),
                 ),
                 Row(
                   children: [
                     Icon(Icons.star, color: Colors.yellow[500]),
-                    Text("4.0")
+                    Text("${review.stars.toStringAsFixed(1)}")
+                    // Assuming `stars` is an int. Use toStringAsFixed for double
                   ],
                 ),
               ],
             ),
-            Divider(), // Khoảng cách giữa nội dung bình luận và hàng trên
+            Divider(),
             Text(
-              "Nội dung bình luận của người dùng"
-              " ", // Thay thế bằng nội dung bình luận thực tế
-
+              review.comment, // Display actual comment
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.black87,
@@ -926,7 +939,8 @@ class _DetailCarState extends State<DetailCar> {
       children: [
         Row(
           children: [
-            if (!isTitle) Icon(icon, color: Colors.teal.shade400), // Assuming `icon` is defined elsewhere as an IconData
+            if (!isTitle) Icon(icon, color: Colors.teal.shade400),
+            // Assuming `icon` is defined elsewhere as an IconData
             SizedBox(width: 10),
             Text(title,
                 style: TextStyle(
@@ -1090,8 +1104,8 @@ class _DetailCarState extends State<DetailCar> {
     );
   }
 
-
-  Widget buildContentRow(IconData icon, String text, {TextOverflow overflow = TextOverflow.visible}) {
+  Widget buildContentRow(IconData icon, String text,
+      {TextOverflow overflow = TextOverflow.visible}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -1104,16 +1118,37 @@ class _DetailCarState extends State<DetailCar> {
 
   Widget randomContentSelection() {
     final List<Widget> twoItemRows = [
-      Row(children: [Container(width: 150, child: buildContentRow(Icons.pin_drop, "Bản đồ", overflow: TextOverflow.ellipsis)), SizedBox(width: 30), Container(width: 100, child: buildRow(Icons.bluetooth, "Bluetooth", overflow: TextOverflow.ellipsis))]),
-      Row(children: [Container(width: 150, child: buildContentRow(Icons.cabin, "Màn hình")), SizedBox(width: 30), Container(width: 100, child: buildRow(Icons.camera_alt, "Camera hành trình"))]),
-      Row(children: [Container(width: 150, child: buildContentRow(Icons.wifi, "Wifi/4G")), SizedBox(width: 30), Container(width: 100, child: buildRow(Icons.usb, "Khe cắm USB"))]),
+      Row(children: [
+        Container(
+            width: 150,
+            child: buildContentRow(Icons.pin_drop, "Bản đồ",
+                overflow: TextOverflow.ellipsis)),
+        SizedBox(width: 30),
+        Container(
+            width: 100,
+            child: buildRow(Icons.bluetooth, "Bluetooth",
+                overflow: TextOverflow.ellipsis))
+      ]),
+      Row(children: [
+        Container(width: 150, child: buildContentRow(Icons.cabin, "Màn hình")),
+        SizedBox(width: 30),
+        Container(
+            width: 100, child: buildRow(Icons.camera_alt, "Camera hành trình"))
+      ]),
+      Row(children: [
+        Container(width: 150, child: buildContentRow(Icons.wifi, "Wifi/4G")),
+        SizedBox(width: 30),
+        Container(width: 100, child: buildRow(Icons.usb, "Khe cắm USB"))
+      ]),
     ];
 
     // Define rows with one item (for potentially being placed at the bottom)
     final List<Widget> oneItemRows = [
-      Container(width: 150, child: buildContentRow(Icons.cabin, "Cảm biến va chạm")),
+      Container(
+          width: 150, child: buildContentRow(Icons.cabin, "Cảm biến va chạm")),
       Container(width: 150, child: buildContentRow(Icons.home, "Túi Khí")),
-      Container(width: 150, child: buildContentRow(Icons.cabin, "Lốp dự phòng")),
+      Container(
+          width: 150, child: buildContentRow(Icons.cabin, "Lốp dự phòng")),
     ];
 
     final rand = Random();
@@ -1121,18 +1156,23 @@ class _DetailCarState extends State<DetailCar> {
 
     // Shuffle and select two-item rows
     twoItemRows.shuffle();
-    int twoItemCount = rand.nextInt(twoItemRows.length); // Select how many two-item rows to include
+    int twoItemCount = rand.nextInt(
+        twoItemRows.length); // Select how many two-item rows to include
     selectedContent.addAll(twoItemRows.take(twoItemCount));
 
     // Shuffle and potentially add one one-item row at the bottom
     oneItemRows.shuffle();
-    if (rand.nextBool() && twoItemCount < twoItemRows.length) { // Ensure we don't always add a one-item row and it does not exceed total available two-item rows
+    if (rand.nextBool() && twoItemCount < twoItemRows.length) {
+      // Ensure we don't always add a one-item row and it does not exceed total available two-item rows
       selectedContent.add(
         Row(
           children: [
-            oneItemRows.first, // Just add the first one-item row after shuffling
-            SizedBox(width: 30), // Placeholder to maintain spacing
-            Container(width: 100), // Empty container to maintain layout
+            oneItemRows.first,
+            // Just add the first one-item row after shuffling
+            SizedBox(width: 30),
+            // Placeholder to maintain spacing
+            Container(width: 100),
+            // Empty container to maintain layout
           ],
         ),
       );
@@ -1143,5 +1183,4 @@ class _DetailCarState extends State<DetailCar> {
 
     return Column(children: selectedContent);
   }
-
 }
