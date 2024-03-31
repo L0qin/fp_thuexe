@@ -6,7 +6,6 @@ const secretKey = process.env.JWT_SECRET;
 
 exports.loginAdmin = (req, res) => {
     const { username, password } = req.body;
-    console.log(req.body);
 
     if (!username || !password) {
         return res.status(400).json({ message: 'Username and password are required' });
@@ -38,7 +37,6 @@ exports.loginAdmin = (req, res) => {
 
 exports.getAdmin = (req, res) => {
     const { id } = req.params;
-    console.log(req.body);
     db.query('SELECT * FROM nguoidung WHERE ma_nguoi_dung = ? and loai_nguoi_dung = 1', [id], (err, result) => {
         if (err) {
             console.error("Error fetching user: ", err);
@@ -123,7 +121,7 @@ exports.getAllVehicles = (req, res) => {
             nguoidung.ho_ten AS owner_name, nguoidung.hinh_dai_dien AS owner_avatar,
             ThongTinCoBanXe.model, ThongTinCoBanXe.hang_sx, ThongTinKyThuatXe.mo_ta, ThongTinCoBanXe.so_cho,
             DiaChi.dia_chi, DiaChi.thanh_pho, DiaChi.quoc_gia, DiaChi.zip_code,
-            GROUP_CONCAT(DISTINCT CASE WHEN hinhanh.loai_hinh = 1 THEN hinhanh.hinh END SEPARATOR ',') AS vehicle_images,
+            GROUP_CONCAT(DISTINCT CASE WHEN hinhanh.loai_hinh != 3 THEN hinhanh.hinh END SEPARATOR ',') AS vehicle_images,
             GROUP_CONCAT(DISTINCT CASE WHEN hinhanh.loai_hinh = 3 THEN hinhanh.hinh END SEPARATOR ',') AS paper_images
         FROM xe
         INNER JOIN ThongTinCoBanXe ON xe.ma_xe = ThongTinCoBanXe.ma_xe
@@ -142,7 +140,6 @@ exports.getAllVehicles = (req, res) => {
         const vehicles = results.map(vehicleJson => {
             const vehicleImages = vehicleJson.vehicle_images ? vehicleJson.vehicle_images.split(',') : [];
             const paperImages = vehicleJson.paper_images ? vehicleJson.paper_images.split(',') : [];
-            console.log(paperImages);
             return {
                 vehicleId: vehicleJson.ma_xe,
                 vehicleName: vehicleJson.ten_xe,

@@ -44,8 +44,6 @@ exports.getAllImagesByVehicleId = (req, res) => {
             console.error(`Error fetching all images for vehicle ID ${id}:`, err);
             return res.status(500).json({ message: 'Error fetching images for vehicle' });
         }
-        console.log("=======");
-        console.log(result);
         res.json(result);
     });
 };

@@ -72,7 +72,6 @@ exports.searchVehicles = (req, res) => {
                 ma_loai_xe: vehicleJson.ma_loai_xe
             };
         });
-        console.log(vehicles);
         res.json(vehicles);
     });
 };

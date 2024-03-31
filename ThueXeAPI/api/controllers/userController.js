@@ -100,7 +100,6 @@ exports.getUser = (req, res) => {
 exports.modifyUser = (req, res) => {
     const { id } = req.params;
     const { fullName, phoneNumber, address } = req.body;
-    console.log(req.params);
     let queryParts = [];
     let queryParams = [];
 

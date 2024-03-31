@@ -584,82 +584,120 @@
     });
   </script>
 
-  <Script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const table = document.querySelector('.table');
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const table = document.querySelector('.table');
 
-      table.addEventListener('click', (e) => {
-        const vehicleId = e.target.dataset.vehicleId;
-        if (e.target.dataset.action === 'details') {
-          const vehicle = vehiclesMap.get(vehicleId); // Fetch vehicle data
-          const modalBody = document.querySelector('#vehicleDetailsModal .modal-body');
+    table.addEventListener('click', (e) => {
+      const vehicleId = e.target.dataset.vehicleId;
+      if (e.target.dataset.action === 'details') {
+        const vehicle = vehiclesMap.get(vehicleId); // Fetch vehicle data
+        const modalBody = document.querySelector('#vehicleDetailsModal .modal-body');
 
-          // Start building the dynamic content
-          let content = `
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-md-6">
-                <!-- Carousel for vehicle images -->
-                <div id="vehicleImagesCarousel" class="carousel slide" data-bs-ride="carousel">
-                  <div class="carousel-inner">`;
+        // Initialize dynamic content with a container for vertical layout
+        let content = `<div class="container">`;
 
-          // Add carousel items
-          vehicle.images.forEach((image, index) => {
-            content += `
-            <div class="carousel-item ${index === 0 ? 'active' : ''}">
-              <img src="/api/images/getimages/${image}" class="d-block w-100" alt="Vehicle Image"
-                  onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">
-            </div>`;
-          });
+        // Section for vehicle images carousel
+        content += `
+          <div class="text-center mb-4">
+            <h5>Ảnh Xe</h5>
+            <div id="vehicleImagesCarousel" class="carousel slide" data-bs-ride="carousel" style="max-width: 500px; margin: auto;">
+              <div class="carousel-inner">`;
 
+        // Ensure all vehicle images are added to the carousel correctly
+        vehicle.images.forEach((image, index) => {
           content += `
-                  </div>
-                  <button class="carousel-control-prev" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                  </button>
-                  <button class="carousel-control-next" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                  </button>
-                </div>
-                <!-- Thumbnails -->
-                <div class="d-flex justify-content-center mt-2">`;
+        <div class="carousel-item ${index == 0 ? 'active' : ''}">
+          <img src="/api/images/getimages/${image}" class="d-block w-100" alt="Ảnh Xe" style="max-height: 400px;"
+               onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">
+        </div>`;
+        });
 
-          // Add thumbnails
-          vehicle.images.forEach((image, index) => {
-            content += `
-            <img src="/api/images/getimages/${image}" class="img-fluid img-thumbnail m-1" style="width: 100px; height: auto;" alt="Thumbnail ${index + 1}"
-                onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">`;
-          });
-
-          content += `
-                </div>
-              </div>
-              <div class="col-md-6">
-                <!-- Vehicle details -->
-                <h4>${vehicle.vehicleName} (${vehicle.model})</h4>
-                <p><strong>Manufacturer:</strong> ${vehicle.manufacturer}</p>
-                <p><strong>Description:</strong> ${vehicle.description}</p>
-                <p><strong>Rental Price:</strong> $${vehicle.rentalPrice} / day</p>
-                <p><strong>Seats:</strong> ${vehicle.seats}</p>
-                <p><strong>Location:</strong> ${vehicle.address.streetAddress}, ${vehicle.address.city}</p>
-                <p><strong>Owner:</strong> ${vehicle.owner.name}</p>
-              </div>
+        content += `
             </div>
-          </div>`;
+            <button class="carousel-control-prev" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Trước</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Tiếp theo</span>
+            </button>
+          </div>
+        </div>
+      </div>`;
+        // Thumbnails for vehicle images
+        content += `<div class="d-flex justify-content-center mt-2">`;
+        vehicle.images.forEach((image) => {
+          content += `<img src="/api/images/getimages/${image}" class="img-fluid img-thumbnail m-1" style="width: 100px; height: auto;" alt="Thumbnail" onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">`;
+        });
+        content += `</div></div>`; // Close vehicle images section
 
-          modalBody.innerHTML = content;
 
-          // Show the modal
-          var myModal = new bootstrap.Modal(document.getElementById('vehicleDetailsModal'));
-          myModal.show();
+        // Section for vehicle papers, if they exist
+        if (vehicle.paperImages && vehicle.paperImages.length > 0) {
+          // Section for vehicle images carousel
+          content += `
+          <div class="text-center mb-4">
+            <h5>Ảnh Xe</h5>
+            <div id="vehicleImagesCarousel" class="carousel slide" data-bs-ride="carousel" style="max-width: 500px; margin: auto;">
+              <div class="carousel-inner">`;
+
+          // Ensure all vehicle images are added to the carousel correctly
+          vehicle.paperImages.forEach((paperImages, index) => {
+            content += `
+        <div class="carousel-item ${index == 0 ? 'active' : ''}">
+          <img src="/api/images/getimages/${image}" class="d-block w-100" alt="Ảnh Xe" style="max-height: 400px;"
+               onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">
+        </div>`;
+          });
+
+          content += `
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Trước</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Tiếp theo</span>
+            </button>
+          </div>
+        </div>
+      </div>`;
+          // Thumbnails for vehicle images
+          content += `<div class="d-flex justify-content-center mt-2">`;
+          vehicle.images.forEach((image) => {
+            content += `<img src="/api/images/getimages/${image}" class="img-fluid img-thumbnail m-1" style="width: 100px; height: auto;" alt="Thumbnail" onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">`;
+          });
+          content += `</div></div>`; // Close vehicle images section
+
+        } else {
+          content += `<div class="text-center mb-4"><p>Không có ảnh giấy tờ cho xe này.</p></div>`;
         }
-      });
+
+        // Vehicle details section
+        content += `
+        <div class="mb-4">
+          <h4>Thông Tin Xe</h4>
+          <p><strong>Tên Xe:</strong> ${vehicle.vehicleName}</p>
+          <p><strong>Model:</strong> ${vehicle.model}</p>
+          <p><strong>Hãng SX:</strong> ${vehicle.manufacturer}</p>
+          <p><strong>Mô Tả:</strong> ${vehicle.description}</p>
+          <p><strong>Giá Thuê:</strong> ${vehicle.rentalPrice} / ngày</p>
+          <p><strong>Số Chỗ:</strong> ${vehicle.seats}</p>
+          <p><strong>Vị Trí:</strong> ${vehicle.address.streetAddress}, ${vehicle.address.city}</p>
+          <p><strong>Chủ Sở Hữu:</strong> ${vehicle.owner.name}</p>
+        </div>`;
+
+        content += `</div>`; // Close container div
+        modalBody.innerHTML = content;
+        var myModal = new bootstrap.Modal(document.getElementById('vehicleDetailsModal'));
+        myModal.show();
+      }
     });
-
-  </Script>
-
+  });
+</script>
 
 
 
