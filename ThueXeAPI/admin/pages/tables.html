@@ -22,7 +22,7 @@
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <title>
-    Argon Dashboard 2 by Creative Tim
+    Vehicle Rental Admin
   </title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -509,83 +509,128 @@
         });
     });
   </script>
-  <Script>
-document.addEventListener('DOMContentLoaded', () => {
-  const table = document.querySelector('.table');
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const table = document.querySelector('.table');
 
-  table.addEventListener('click', (e) => {
-    const vehicleId = e.target.dataset.vehicleId;
-    if (e.target.dataset.action === 'details') {
-      const vehicle = vehiclesMap.get(vehicleId); // Fetch vehicle data
-      const modalBody = document.querySelector('#vehicleDetailsModal .modal-body');
+      table.addEventListener('click', (e) => {
+        const vehicleId = e.target.dataset.vehicleId;
+        if (e.target.dataset.action === 'details') {
+          const vehicle = vehiclesMap.get(vehicleId); // Fetch vehicle data
+          const modalBody = document.querySelector('#vehicleDetailsModal .modal-body');
 
-      // Start building the dynamic content
-      let content = `
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-md-6">
-              <!-- Carousel for vehicle images -->
-              <div id="vehicleImagesCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">`;
+          // Start building the dynamic content
+          let content = `
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-12">
+                <!-- Carousel for vehicle images -->
+                <h5>Ảnh Xe</h5>
+                <div id="vehicleImagesCarousel" class="carousel slide" data-bs-ride="carousel">
+                  <div class="carousel-inner">`;
 
-      // Add carousel items
-      vehicle.images.forEach((image, index) => {
-        content += `
-          <div class="carousel-item ${index === 0 ? 'active' : ''}">
-            <img src="/api/images/getimages/${image}" class="d-block w-100" alt="Vehicle Image"
-                onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">
-          </div>`;
-      });
+          // Add carousel items for vehicle images
+          vehicle.images.forEach((image, index) => {
+            content += `
+                  <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                    <img src="/api/images/getimages/${image}" class="d-block w-100" alt="Ảnh Xe"
+                        onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">
+                  </div>`;
+          });
 
-      content += `
+          content += `
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Trước</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Tiếp theo</span>
+                  </button>
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="prev">
-                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="next">
-                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Next</span>
-                </button>
-              </div>
-              <!-- Thumbnails -->
-              <div class="d-flex justify-content-center mt-2">`;
+                <!-- Thumbnails for vehicle images -->
+                <div class="d-flex justify-content-center mt-2">`;
 
-      // Add thumbnails
-      vehicle.images.forEach((image, index) => {
-        content += `
-          <img src="/api/images/getimages/${image}" class="img-fluid img-thumbnail m-1" style="width: 100px; height: auto;" alt="Thumbnail ${index + 1}"
-              onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">`;
+          // Add thumbnails for vehicle images
+          vehicle.images.forEach((image, index) => {
+            content += `
+                  <img src="/api/images/getimages/${image}" class="img-fluid img-thumbnail m-1" style="width: 100px; height: auto;" alt="Thumbnail ${index + 1}"
+                      onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">`;
+          });
+
+          content += `
+                </div>
+              </div>
+            </div>`;
+
+          // Check if paperImages exist and is not empty before trying to append them
+          if (vehicle.paperImages && vehicle.paperImages.length > 0) {
+            content += `
+            <div class="row mt-3">
+              <div class="col-12">
+                <h5>Ảnh Giấy Tờ Xe</h5>
+                <!-- Carousel for vehicle papers -->
+                <div id="vehiclePapersCarousel" class="carousel slide" data-bs-ride="carousel">
+                  <div class="carousel-inner">`;
+
+            // Add carousel items for vehicle papers
+            vehicle.paperImages.forEach((image, index) => {
+              content += `
+                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                      <img src="/api/images/getimages/${image}" class="d-block w-100" alt="Ảnh Giấy Tờ"
+                          onerror="this.onerror=null;this.src='/admin/assets/img/document-placeholder.png';">
+                    </div>`;
+            });
+
+            content += `
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#vehiclePapersCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Trước</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#vehiclePapersCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Tiếp theo</span>
+                  </button>
+                </div>
+              </div>
+            </div>`;
+
+            content += `            
+            <div class="row mt-3">
+              <div class="col-12">
+                <!-- Vehicle details -->
+                <h4>Thông Tin Xe</h4>
+                <p><strong>Tên Xe:</strong> ${vehicle.vehicleName}</p>
+                <p><strong>Model:</strong> ${vehicle.model}</p>
+                <p><strong>Hãng SX:</strong> ${vehicle.manufacturer}</p>
+                <p><strong>Mô Tả:</strong> ${vehicle.description}</p>
+                <p><strong>Giá Thuê:</strong> ${vehicle.rentalPrice} / ngày</p>
+                <p><strong>Số Chỗ:</strong> ${vehicle.seats}</p>
+                <p><strong>Vị Trí:</strong> ${vehicle.address.streetAddress}, ${vehicle.address.city}</p>
+                <p><strong>Chủ Sở Hữu:</strong> ${vehicle.owner.name}</p>
+              </div>
+            </div>`;
+          } else {
+            // Optionally, handle the case when there are no paper images
+            content += `
+            <div class="row mt-3">
+              <div class="col-12">
+                <p>Không có ảnh giấy tờ cho xe này.</p>
+              </div>
+            </div>`;
+          }
+
+          modalBody.innerHTML = content;
+
+          // Show the modal
+          var myModal = new bootstrap.Modal(document.getElementById('vehicleDetailsModal'));
+          myModal.show();
+        }
       });
-
-      content += `
-              </div>
-            </div>
-            <div class="col-md-6">
-              <!-- Vehicle details -->
-              <h4>${vehicle.vehicleName} (${vehicle.model})</h4>
-              <p><strong>Manufacturer:</strong> ${vehicle.manufacturer}</p>
-              <p><strong>Description:</strong> ${vehicle.description}</p>
-              <p><strong>Rental Price:</strong> $${vehicle.rentalPrice} / day</p>
-              <p><strong>Seats:</strong> ${vehicle.seats}</p>
-              <p><strong>Location:</strong> ${vehicle.address.streetAddress}, ${vehicle.address.city}</p>
-              <p><strong>Owner:</strong> ${vehicle.owner.name}</p>
-            </div>
-          </div>
-        </div>`;
-
-      modalBody.innerHTML = content;
-
-      // Show the modal
-      var myModal = new bootstrap.Modal(document.getElementById('vehicleDetailsModal'));
-      myModal.show();
-    }
-  });
-});
-
-  </Script>
-
-
+    });
+  </script>
 
 
   <!-- ======================================================================================================================================= -->

@@ -62,7 +62,8 @@ exports.getAllUnverifiedVehicles = (req, res) => {
             nguoidung.ho_ten AS owner_name, nguoidung.hinh_dai_dien AS owner_avatar,
             ThongTinCoBanXe.model, ThongTinCoBanXe.hang_sx, ThongTinKyThuatXe.mo_ta, ThongTinCoBanXe.so_cho,
             DiaChi.dia_chi, DiaChi.thanh_pho, DiaChi.quoc_gia, DiaChi.zip_code,
-            GROUP_CONCAT(hinhanh.hinh SEPARATOR ',') AS vehicle_images
+            GROUP_CONCAT(DISTINCT CASE WHEN hinhanh.loai_hinh != 3 THEN hinhanh.hinh END SEPARATOR ',') AS vehicle_images,
+            GROUP_CONCAT(DISTINCT CASE WHEN hinhanh.loai_hinh = 3 THEN hinhanh.hinh END SEPARATOR ',') AS paper_images
         FROM xe
         INNER JOIN ThongTinCoBanXe ON xe.ma_xe = ThongTinCoBanXe.ma_xe
         INNER JOIN ThongTinKyThuatXe ON xe.ma_xe = ThongTinKyThuatXe.ma_xe
@@ -79,7 +80,9 @@ exports.getAllUnverifiedVehicles = (req, res) => {
         }
 
         const vehicles = results.map(vehicleJson => {
+            // Splitting the vehicle images and paper images into separate arrays
             const vehicleImages = vehicleJson.vehicle_images ? vehicleJson.vehicle_images.split(',') : [];
+            const paperImages = vehicleJson.paper_images ? vehicleJson.paper_images.split(',') : [];
             return {
                 vehicleId: vehicleJson.ma_xe,
                 vehicleName: vehicleJson.ten_xe,
@@ -103,6 +106,7 @@ exports.getAllUnverifiedVehicles = (req, res) => {
                 },
                 images: vehicleImages,
                 mainImage: vehicleImages.length > 0 ? vehicleImages[0] : null,
+                paperImages: paperImages, // Added field for paper images
             };
         });
 
@@ -110,14 +114,17 @@ exports.getAllUnverifiedVehicles = (req, res) => {
     });
 };
 
+
 exports.getAllVehicles = (req, res) => {
+    // Modified query to fetch paper images in a separate row grouping
     const query = `
         SELECT 
-            xe.ma_xe, xe.ten_xe, xe.trang_thai, xe.gia_thue, xe.chu_so_huu, xe.ma_loai_xe, xe.da_xac_minh ,
+            xe.ma_xe, xe.ten_xe, xe.trang_thai, xe.gia_thue, xe.chu_so_huu, xe.ma_loai_xe, xe.da_xac_minh,
             nguoidung.ho_ten AS owner_name, nguoidung.hinh_dai_dien AS owner_avatar,
             ThongTinCoBanXe.model, ThongTinCoBanXe.hang_sx, ThongTinKyThuatXe.mo_ta, ThongTinCoBanXe.so_cho,
             DiaChi.dia_chi, DiaChi.thanh_pho, DiaChi.quoc_gia, DiaChi.zip_code,
-            GROUP_CONCAT(hinhanh.hinh SEPARATOR ',') AS vehicle_images
+            GROUP_CONCAT(DISTINCT CASE WHEN hinhanh.loai_hinh = 1 THEN hinhanh.hinh END SEPARATOR ',') AS vehicle_images,
+            GROUP_CONCAT(DISTINCT CASE WHEN hinhanh.loai_hinh = 3 THEN hinhanh.hinh END SEPARATOR ',') AS paper_images
         FROM xe
         INNER JOIN ThongTinCoBanXe ON xe.ma_xe = ThongTinCoBanXe.ma_xe
         INNER JOIN ThongTinKyThuatXe ON xe.ma_xe = ThongTinKyThuatXe.ma_xe
@@ -134,6 +141,8 @@ exports.getAllVehicles = (req, res) => {
 
         const vehicles = results.map(vehicleJson => {
             const vehicleImages = vehicleJson.vehicle_images ? vehicleJson.vehicle_images.split(',') : [];
+            const paperImages = vehicleJson.paper_images ? vehicleJson.paper_images.split(',') : [];
+            console.log(paperImages);
             return {
                 vehicleId: vehicleJson.ma_xe,
                 vehicleName: vehicleJson.ten_xe,
@@ -158,12 +167,14 @@ exports.getAllVehicles = (req, res) => {
                 },
                 images: vehicleImages,
                 mainImage: vehicleImages.length > 0 ? vehicleImages[0] : null,
+                paperImages: paperImages, // Added field for paper images
             };
         });
 
         res.json(vehicles);
     });
 };
+
 
 
 // Function to approve a vehicle
