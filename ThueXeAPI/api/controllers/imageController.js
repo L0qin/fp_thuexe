@@ -31,7 +31,6 @@ exports.getMainImageByVehicleId = (req, res) => {
         }
 
         // If there is a result, return it
-        console.log(result[0]);
         res.json(result[0]);
     });
 };
