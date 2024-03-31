@@ -5,16 +5,34 @@ const authenticateToken = require('../../middleware/authenticate');
 const { 
     loginAdmin,
     getAdmin,
-    getAllUnverifiedVehicles
+    getAllUnverifiedVehicles,
+    getAllVehicles,
+    approveVehicle,
+    denyVehicle,
+    activateUser,
+    deactivateUser,
+    getAllUsers,
+    deleteVehicle
 } = require('../controllers/adminController');
 
-// Login route
 router.post('/login', loginAdmin);
 
-// Route to get all unverified vehicles - Moved up to be before the more general /:id route
+router.delete('/deleteVehicle/:ma_xe', authenticateToken, deleteVehicle);
+
+router.get('/getAllUsers', authenticateToken, getAllUsers);
+
 router.get('/getAllUnverifiedVehicles', authenticateToken, getAllUnverifiedVehicles);
 
-// Route to get a specific admin by ID - Moved after specific routes
+router.get('/getAllVehicles', authenticateToken, getAllVehicles);
+
 router.get('/:id', authenticateToken, getAdmin);
+
+router.put('/approveVehicle/:ma_xe', authenticateToken, approveVehicle);
+
+router.put('/denyVehicle/:ma_xe', authenticateToken, denyVehicle);
+
+router.put('/activateUser/:ma_nguoi_dung', authenticateToken, activateUser);
+
+router.put('/deactivateUser/:ma_nguoi_dung', authenticateToken, deactivateUser);
 
 module.exports = router;

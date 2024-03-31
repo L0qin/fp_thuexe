@@ -60,6 +60,11 @@ exports.loginUser = (req, res) => {
         
         const user = results[0];
 
+        // Check if user is deactivated (trang_thai of -1)
+        if (user.trang_thai === -1) {
+            return res.status(403).json({ message: 'This account has been deactivated' });
+        }
+
         // Compare the hashed password
         const match = await bcrypt.compare(password, user.mat_khau_hash);
         if (!match) {
@@ -71,6 +76,7 @@ exports.loginUser = (req, res) => {
         res.json({ token, userId: user.ma_nguoi_dung });
     });
 };
+
 
 exports.getUser = (req, res) => {
     const { id } = req.params;

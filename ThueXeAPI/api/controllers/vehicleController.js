@@ -8,7 +8,7 @@ exports.getAllVehicles = (req, res) => {
     INNER JOIN ThongTinCoBanXe ON xe.ma_xe = ThongTinCoBanXe.ma_xe
     INNER JOIN ThongTinKyThuatXe ON xe.ma_xe = ThongTinKyThuatXe.ma_xe
     LEFT JOIN DiaChi ON xe.ma_dia_chi = DiaChi.ma_dia_chi
-    WHERE xe.da_xac_minh = 1`;
+    WHERE xe.da_xac_minh = 1 AND xe.trang_thai = 0`;
 
     db.query(query, (err, results) => {
         if (err) {
@@ -35,11 +35,10 @@ exports.getAllVehicles = (req, res) => {
     });
 };
 
-//err
 // Search vehicles
 exports.searchVehicles = (req, res) => {
     // Extract the search query parameter
-    const { keyword } = req.query;
+    const { keyword } = req.params;
 
     const query = `
     SELECT xe.ma_xe, xe.ten_xe, xe.trang_thai, ThongTinCoBanXe.model, ThongTinCoBanXe.hang_sx, ThongTinKyThuatXe.mo_ta, DiaChi.dia_chi, xe.gia_thue, ThongTinCoBanXe.so_cho, xe.chu_so_huu, xe.ma_loai_xe
@@ -47,7 +46,7 @@ exports.searchVehicles = (req, res) => {
     INNER JOIN ThongTinCoBanXe ON xe.ma_xe = ThongTinCoBanXe.ma_xe
     INNER JOIN ThongTinKyThuatXe ON xe.ma_xe = ThongTinKyThuatXe.ma_xe
     LEFT JOIN DiaChi ON xe.ma_dia_chi = DiaChi.ma_dia_chi
-    WHERE xe.ten_xe LIKE ? OR ThongTinCoBanXe.model LIKE ? OR ThongTinCoBanXe.hang_sx LIKE ?`;
+    WHERE (xe.ten_xe LIKE ? OR ThongTinCoBanXe.model LIKE ? OR ThongTinCoBanXe.hang_sx LIKE ?) AND xe.trang_thai = 0 AND xe.da_xac_minh = 1`;
 
     // Use '%' wildcards to search for any text containing the search term
     const searchTerm = `%${keyword}%`;
@@ -57,12 +56,12 @@ exports.searchVehicles = (req, res) => {
             console.error('Error searching for vehicles:', err);
             return res.status(500).json({ message: 'Error searching for vehicles' });
         }
-        // Transforming the results to include the search term
+        // Transforming the results to include only available vehicles
         const vehicles = results.map(vehicleJson => {
             return {
                 ma_xe: vehicleJson.ma_xe,
                 ten_xe: vehicleJson.ten_xe,
-                trang_thai: vehicleJson.trang_thai,
+                trang_thai: vehicleJson.trang_thai, // This should always be 0 due to the query filter
                 model: vehicleJson.model,
                 hang_sx: vehicleJson.hang_sx,
                 mo_ta: vehicleJson.mo_ta,
@@ -77,8 +76,6 @@ exports.searchVehicles = (req, res) => {
         res.json(vehicles);
     });
 };
-
-
 
 // Get a specific vehicle by ID with detailed information
 exports.getVehicleById = (req, res) => {

@@ -63,7 +63,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" href="../pages/tables.html">
+          <a class="nav-link " href="../pages/tables.html">
             <div
               class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="fa fa-check text-primary text-sm opacity-10"></i>
@@ -72,7 +72,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/vehicles.html">
+          <a class="nav-link active" href="../pages/vehicles.html">
             <div
               class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="fa fa-car text-primary text-sm opacity-10"></i>
@@ -229,7 +229,18 @@
         <div class="col-12">
           <div class="card mb-4">
             <div class="card-header pb-0">
-              <h6>Danh sách xe chờ duyệt</h6>
+              <div>
+                <h6>Danh sách xe trong hệ thống</h6>
+                <div class="mt-3">
+                  <label for="vehicleStatusFilter" class="form-label">Trạng thái xe:</label>
+                  <select class="form-select" id="vehicleStatusFilter">
+                    <option value="all">Tất cả</option>
+                    <option value="approved">đã duyệt</option>
+                    <option value="pending">chờ duyệt</option>
+                    <option value="denied">đã từ chối</option>
+                  </select>
+                </div>
+              </div>
             </div>
             <div class="card-body px-0 pt-0 pb-2">
               <div class="table-responsive p-0">
@@ -448,7 +459,7 @@
         return; // Stop executing the script
       }
 
-      fetch('/api/admins/getAllUnverifiedVehicles/', {
+      fetch('/api/admins/getAllVehicles/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -465,41 +476,7 @@
           const tableBody = document.querySelector('table tbody');
           vehicles.forEach(vehicle => {
             vehiclesMap.set(vehicle.vehicleId.toString(), vehicle);
-
-            const mainImageUrl = vehicle.mainImage ? `/api/images/getimages/${vehicle.mainImage}` : '../assets/img/vehicle-placeholder.png'; // Adjust the path as needed
-            const ownerAvatarUrl = vehicle.owner.avatar ? `/api/images/getimages/${vehicle.owner.avatar}` : '../assets/img/user-placeholder.png'; // Ensure this path is correct
-            const vehiclePlaceHolderImageUrl = '../assets/img/vehicle-placeholder.png';
-
-            const vehicleNameCell = `
-                                    <td>
-                                        <div class="d-flex px-2 py-1">
-                                            <div>
-                                                <img src="${mainImageUrl}" class="avatar avatar-sm me-3" alt="Vehicle Image" onerror="this.onerror=null; this.src='${vehiclePlaceHolderImageUrl}'">
-                                            </div>
-                                            <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">${vehicle.vehicleName}</h6>
-                                                <p class="text-xs text-secondary mb-0">${vehicle.model}, ${vehicle.manufacturer}</p>
-                                            </div>
-                                        </div>
-                                    </td>`;
-
-            userPlaceHolderImageUrl = '../assets/img/user-placeholder.png';
-            const ownerCell = `
-                          <td class="align-items-center">
-                              <img src="${ownerAvatarUrl}" class="rounded-circle me-2" style="width:30px; height:30px; object-fit: cover;" alt="Owner Avatar" onerror="this.onerror=null; this.src='${userPlaceHolderImageUrl}'">
-                              <p class="text-xs font-weight-bold mb-0" style="margin-bottom: 0 !important;">${vehicle.owner.name}</p>
-                          </td>`;
-
-            const statusCell = '<td class="align-middle text-center text-sm"><span class="badge badge-sm bg-gradient-secondary">Chờ duyệt</span></td>';
-            const actionsCell = `<td class="align-middle text-center">
-                        <button class="btn btn-primary btn-sm me-1" data-action="details" data-vehicle-id="${vehicle.vehicleId}">Chi tiết</button>
-                        <button class="btn btn-success btn-sm me-1" data-action="approve" data-vehicle-id="${vehicle.vehicleId}">Duyệt</button>
-                        <button class="btn btn-danger btn-sm" data-action="deny" data-vehicle-id="${vehicle.vehicleId}">Từ chối</button>
-                    </td>`;
-
-
-            const row = document.createElement('tr');
-            row.innerHTML = vehicleNameCell + ownerCell + statusCell + actionsCell;
+            const row = createVehicleRow(vehicle);
             tableBody.appendChild(row);
           });
         })
@@ -507,83 +484,182 @@
           console.error('Error:', error);
           alert(`Error: ${error.message}`);
         });
+
+      const statusFilter = document.getElementById('vehicleStatusFilter');
+
+      statusFilter.addEventListener('change', function () {
+        filterAndDisplayVehicles(this.value);
+      });
+
+      function filterAndDisplayVehicles(filter) {
+        const tableBody = document.querySelector('table tbody');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        vehiclesMap.forEach((vehicle, vehicleId) => {
+          let matchesFilter = false;
+          switch (filter) {
+            case 'all':
+              matchesFilter = true;
+              break;
+            case 'approved':
+              matchesFilter = vehicle.verification == '1';
+              break;
+            case 'pending':
+              matchesFilter = vehicle.verification == '0';
+              break;
+            case 'denied':
+              matchesFilter = vehicle.verification == '-1';
+              break;
+          }
+
+          if (matchesFilter) {
+            const row = createVehicleRow(vehicle);
+            tableBody.appendChild(row);
+          }
+        });
+      }
+
+      function createVehicleRow(vehicle) {
+        // Placeholder URLs for images, adjust as necessary
+        const mainImageUrl = vehicle.mainImage ? `/api/images/getimages/${vehicle.mainImage}` : '../assets/img/vehicle-placeholder.png';
+        const ownerAvatarUrl = vehicle.owner.avatar ? `/api/images/getimages/${vehicle.owner.avatar}` : '../assets/img/user-placeholder.png';
+        const vehiclePlaceholderImageUrl = '../assets/img/vehicle-placeholder.png';
+
+        // Create table row element
+        const row = document.createElement('tr');
+
+        // Vehicle Name and Details Cell
+        const vehicleNameCell = `
+    <td>
+      <div class="d-flex px-2 py-1">
+        <div>
+          <img src="${mainImageUrl}" class="avatar avatar-sm me-3" alt="Vehicle Image" onerror="this.onerror=null; this.src='${vehiclePlaceholderImageUrl}';">
+        </div>
+        <div class="d-flex flex-column justify-content-center">
+          <h6 class="mb-0 text-sm">${vehicle.vehicleName}</h6>
+          <p class="text-xs text-secondary mb-0">${vehicle.model}, ${vehicle.manufacturer}</p>
+        </div>
+      </div>
+    </td>`;
+
+        // Owner Cell
+        const ownerCell = `
+    <td class="align-middle">
+      <div class="d-flex align-items-center">
+        <img src="${ownerAvatarUrl}" class="rounded-circle me-2" style="width:30px; height:30px; object-fit: cover;" alt="Owner Avatar" onerror="this.onerror=null; this.src='${vehiclePlaceholderImageUrl}';">
+        <p class="text-xs font-weight-bold mb-0">${vehicle.owner.name}</p>
+      </div>
+    </td>`;
+
+        // Status Cell - You might need to adjust the badge colors based on actual vehicle status
+        let statusBadgeClass = 'bg-gradient-secondary'; // Default class
+        if (vehicle.verification == '1') {
+          statusBadgeClass = 'bg-gradient-success';
+        } else if (vehicle.verification == '0') {
+          statusBadgeClass = 'badge badge-sm bg-gradient-secondary';
+        } else if (vehicle.verification == '-1') {
+          statusBadgeClass = 'bg-gradient-danger';
+        }
+        const statusCell = `
+    <td class="align-middle text-center text-sm">
+      <span class="badge badge-sm ${statusBadgeClass}">${vehicle.verification == 1 ? "Đã duyêt" : (vehicle.verification == 0 ? "Chờ duyệt" : "Đã từ chối")}</span>
+    </td>`;
+
+        // Actions Cell
+        const actionsCell = `
+    <td class="align-middle text-center">
+      <button class="btn btn-primary btn-sm me-1" data-action="details" data-vehicle-id="${vehicle.vehicleId}">Chi tiết</button>
+      <button class="btn btn-danger btn-sm" data-action="delete" data-vehicle-id="${vehicle.vehicleId}">Xoá</button>
+    </td>`;
+
+        // Assemble the row
+        row.innerHTML = vehicleNameCell + ownerCell + statusCell + actionsCell;
+
+        return row;
+      }
+
+
+      // Initial display
+      filterAndDisplayVehicles('all');
     });
   </script>
+
   <Script>
-document.addEventListener('DOMContentLoaded', () => {
-  const table = document.querySelector('.table');
+    document.addEventListener('DOMContentLoaded', () => {
+      const table = document.querySelector('.table');
 
-  table.addEventListener('click', (e) => {
-    const vehicleId = e.target.dataset.vehicleId;
-    if (e.target.dataset.action === 'details') {
-      const vehicle = vehiclesMap.get(vehicleId); // Fetch vehicle data
-      const modalBody = document.querySelector('#vehicleDetailsModal .modal-body');
+      table.addEventListener('click', (e) => {
+        const vehicleId = e.target.dataset.vehicleId;
+        if (e.target.dataset.action === 'details') {
+          const vehicle = vehiclesMap.get(vehicleId); // Fetch vehicle data
+          const modalBody = document.querySelector('#vehicleDetailsModal .modal-body');
 
-      // Start building the dynamic content
-      let content = `
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-md-6">
-              <!-- Carousel for vehicle images -->
-              <div id="vehicleImagesCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">`;
+          // Start building the dynamic content
+          let content = `
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-6">
+                <!-- Carousel for vehicle images -->
+                <div id="vehicleImagesCarousel" class="carousel slide" data-bs-ride="carousel">
+                  <div class="carousel-inner">`;
 
-      // Add carousel items
-      vehicle.images.forEach((image, index) => {
-        content += `
-          <div class="carousel-item ${index === 0 ? 'active' : ''}">
-            <img src="/api/images/getimages/${image}" class="d-block w-100" alt="Vehicle Image"
-                onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">
-          </div>`;
-      });
+          // Add carousel items
+          vehicle.images.forEach((image, index) => {
+            content += `
+            <div class="carousel-item ${index === 0 ? 'active' : ''}">
+              <img src="/api/images/getimages/${image}" class="d-block w-100" alt="Vehicle Image"
+                  onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">
+            </div>`;
+          });
 
-      content += `
+          content += `
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                  </button>
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="prev">
-                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="next">
-                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Next</span>
-                </button>
-              </div>
-              <!-- Thumbnails -->
-              <div class="d-flex justify-content-center mt-2">`;
+                <!-- Thumbnails -->
+                <div class="d-flex justify-content-center mt-2">`;
 
-      // Add thumbnails
-      vehicle.images.forEach((image, index) => {
-        content += `
-          <img src="/api/images/getimages/${image}" class="img-fluid img-thumbnail m-1" style="width: 100px; height: auto;" alt="Thumbnail ${index + 1}"
-              onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">`;
+          // Add thumbnails
+          vehicle.images.forEach((image, index) => {
+            content += `
+            <img src="/api/images/getimages/${image}" class="img-fluid img-thumbnail m-1" style="width: 100px; height: auto;" alt="Thumbnail ${index + 1}"
+                onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">`;
+          });
+
+          content += `
+                </div>
+              </div>
+              <div class="col-md-6">
+                <!-- Vehicle details -->
+                <h4>${vehicle.vehicleName} (${vehicle.model})</h4>
+                <p><strong>Manufacturer:</strong> ${vehicle.manufacturer}</p>
+                <p><strong>Description:</strong> ${vehicle.description}</p>
+                <p><strong>Rental Price:</strong> $${vehicle.rentalPrice} / day</p>
+                <p><strong>Seats:</strong> ${vehicle.seats}</p>
+                <p><strong>Location:</strong> ${vehicle.address.streetAddress}, ${vehicle.address.city}</p>
+                <p><strong>Owner:</strong> ${vehicle.owner.name}</p>
+              </div>
+            </div>
+          </div>`;
+
+          modalBody.innerHTML = content;
+
+          // Show the modal
+          var myModal = new bootstrap.Modal(document.getElementById('vehicleDetailsModal'));
+          myModal.show();
+        }
       });
-
-      content += `
-              </div>
-            </div>
-            <div class="col-md-6">
-              <!-- Vehicle details -->
-              <h4>${vehicle.vehicleName} (${vehicle.model})</h4>
-              <p><strong>Manufacturer:</strong> ${vehicle.manufacturer}</p>
-              <p><strong>Description:</strong> ${vehicle.description}</p>
-              <p><strong>Rental Price:</strong> $${vehicle.rentalPrice} / day</p>
-              <p><strong>Seats:</strong> ${vehicle.seats}</p>
-              <p><strong>Location:</strong> ${vehicle.address.streetAddress}, ${vehicle.address.city}</p>
-              <p><strong>Owner:</strong> ${vehicle.owner.name}</p>
-            </div>
-          </div>
-        </div>`;
-
-      modalBody.innerHTML = content;
-
-      // Show the modal
-      var myModal = new bootstrap.Modal(document.getElementById('vehicleDetailsModal'));
-      myModal.show();
-    }
-  });
-});
+    });
 
   </Script>
+
 
 
 
@@ -594,19 +670,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const table = document.querySelector('.table');
 
       table.addEventListener('click', (e) => {
-        if (e.target.dataset.action === 'approve' || e.target.dataset.action === 'deny') {
-          // Confirmation step
-          const actionConfirm = e.target.dataset.action === 'approve' ? 'Xác nhận duyệt xe?' : 'Từ chối xe?';
-          if (!confirm(actionConfirm)) {
-            // If the user clicks "Cancel", stop the function
+        if (e.target.dataset.action === 'delete') {
+          if (!confirm("Xoá xe này?")) {
             return;
           }
 
           const vehicleId = e.target.dataset.vehicleId;
-          const isApproveAction = e.target.dataset.action === 'approve';
-          const actionPath = isApproveAction ? '/api/admins/approveVehicle' : '/api/admins/denyVehicle';
-          fetch(`${actionPath}/${vehicleId}`, {
-            method: 'PUT',
+          fetch(`/api/admins/deleteVehicle/${vehicleId}`, {
+            method: 'DELETE', 
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `${localStorage.getItem('adminToken')}`
@@ -616,42 +687,22 @@ document.addEventListener('DOMContentLoaded', () => {
               if (response.ok) {
                 return response.json();
               }
+              alert(response.body);
               throw new Error('Network response was not ok.');
             })
             .then(data => {
               console.log(data.message);
-              // Update the row to indicate the action
-              let clickedRow = e.target.closest('tr');
-              if (clickedRow) {
-                // Update the "Trạng thái" column
-                let statusColumn = clickedRow.children[2]; // Assuming "Trạng thái" is the third column
-                // Clear existing content
-                statusColumn.innerHTML = '';
-                // Create the badge span element
-                const statusBadge = document.createElement('span');
-                statusBadge.classList.add('badge', 'badge-sm');
-                // Set the badge's text and background color
-                if (isApproveAction) {
-                  statusBadge.textContent = 'Đã duyệt'; // "Approved"
-                  statusBadge.classList.add('bg-gradient-success'); // Assuming green color for approval
-                } else {
-                  statusBadge.textContent = 'Đã từ chối'; // "Denied"
-                  statusBadge.classList.add('bg-gradient-danger'); // Assuming red color for denial
-                }
-                // Append the badge to the status column
-                statusColumn.appendChild(statusBadge);
-
-                // Disable all action buttons in this row
-                let buttons = clickedRow.querySelectorAll('button');
-                buttons.forEach(button => button.disabled = true);
-              }
-
+              window.location.reload();
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+              console.error('Error:', error);
+              alert(`Error: ${error.message}`);
+            });
         }
       });
     });
   </script>
+
 
 
 </body>

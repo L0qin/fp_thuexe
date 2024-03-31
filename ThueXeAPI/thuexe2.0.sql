@@ -299,6 +299,7 @@ CREATE TABLE IF NOT EXISTS `nguoidung` (
   `so_dien_thoai` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `dia_chi_nguoi_dung` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `loai_nguoi_dung` int DEFAULT '0',
+  `trang_thai` int DEFAULT '1',
   PRIMARY KEY (`ma_nguoi_dung`)
 ) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -410,10 +411,10 @@ DROP TABLE IF EXISTS `xe`;
 CREATE TABLE IF NOT EXISTS `xe` (
   `ma_xe` int NOT NULL AUTO_INCREMENT,
   `ten_xe` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `trang_thai` int NOT NULL,
+  `trang_thai` int DEFAULT 0,
   `chu_so_huu` int NOT NULL,
   `ma_loai_xe` int NOT NULL,
-  `gia_thue` decimal(10,2) DEFAULT NULL,
+  `gia_thue` decimal(10,2) DEFAULT 0,
   `ma_dia_chi` int DEFAULT NULL,
   `da_xac_minh` int DEFAULT '0',
   PRIMARY KEY (`ma_xe`),
