@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/ManageBooking.dart';
 import '../models/VehicleBooking.dart';
 import 'ServiceConstants.dart';
 import 'AuthService.dart';
@@ -141,7 +142,7 @@ class BookingService {
     }
   }
 
-  static Future<List<dynamic>?> getManagedBookings(int ownerId) async {
+  static Future<List<ManageBooking>?> getManagedBookings(int ownerId) async {
     final token = await AuthService.getToken();
     if (token == null) {
       throw Exception('Token not found');
@@ -151,19 +152,26 @@ class BookingService {
     final response = await http.get(
       Uri.parse(url),
       headers: {
-        'Authorization': ' $token',
+        'Authorization': ' $token', // Make sure the token is correctly prefixed with 'Bearer ' if needed
         'Content-Type': 'application/json',
       },
     );
 
     if (response.statusCode == 200) {
-      // Decode the JSON response and return it
-      final List<dynamic> bookings = jsonDecode(response.body)['bookings'];
-      return bookings;
+      // Assuming the list of bookings is under a key in the JSON response
+      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      if (jsonResponse.containsKey('data')) { // Replace 'data' with the actual key used by your API
+        final List<dynamic> bookingsData = jsonResponse['data'];
+        List<ManageBooking> bookings = bookingsData.map((bookingJson) => ManageBooking.fromJson(bookingJson)).toList();
+        return bookings;
+      } else {
+        print('The expected key was not found in the response.');
+        return null;
+      }
     } else {
-      // Optionally, you can handle different status codes differently
       print('Failed to fetch managed bookings: ${response.body}');
       return null; // or throw an exception based on your error handling strategy
     }
   }
+
 }

@@ -14,11 +14,11 @@ const {
 
 router.post('/create/', authenticateToken, createBooking);
 
-router.put('/confirmBooking/:id', authenticateToken, confirmBooking);
+router.put('/confirmBooking/:ma_dat_xe', authenticateToken, confirmBooking);
 
-router.put('/completeBooking/:id', authenticateToken, completeBooking);
+router.put('/completeBooking/:ma_dat_xe', authenticateToken, completeBooking);
 
-router.put('/cancelBooking/:id', authenticateToken, cancelBooking);
+router.put('/cancelBooking/:ma_dat_xe', authenticateToken, cancelBooking);
 
 router.get('/allUserBookings/:ma_nguoi_dat_xe', authenticateToken, getBookingsByUserId);
 

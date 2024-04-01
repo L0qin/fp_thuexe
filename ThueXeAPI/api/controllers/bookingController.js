@@ -83,98 +83,111 @@ function scheduleCancellationTask(bookingId) {
     });
   }
 
-  exports.confirmBooking = async (req, res) => {
-    const { ma_dat_xe } = req.body;
+  exports.confirmBooking = (req, res) => {
+    const { ma_dat_xe } = req.params;
     const trang_thai_dat_xe = 1;
   
-    try {
-      // First, update the booking status
-      const updateBookingQuery = `
-        UPDATE datxe
-        SET trang_thai_dat_xe = ?
-        WHERE ma_dat_xe = ?
-      `;
-      const [bookingResult] = await db.query(updateBookingQuery, [trang_thai_dat_xe, ma_dat_xe]);
-  
-      if (bookingResult.affectedRows === 0) {
-        return res.status(404).json({ message: "Booking not found" });
+    // First, update the booking status
+    const updateBookingQuery = `
+      UPDATE datxe
+      SET trang_thai_dat_xe = ?
+      WHERE ma_dat_xe = ?
+    `;
+    db.query(updateBookingQuery, [trang_thai_dat_xe, ma_dat_xe], (error, bookingResult) => {
+        if (error) {
+            console.log(error.message);
+            return res.status(500).json({ message: "Error confirming booking", error: error.message });
+        }
+        
+        console.log(bookingResult.affectedRows);
+        if (bookingResult.affectedRows === 0) {
+            return res.status(404).json({ message: "Booking not found" });
+        }
+
+        // Then, update the vehicle status
+        const updateVehicleQuery = `
+          UPDATE xe
+          SET trang_thai = 1
+          WHERE ma_xe = (SELECT ma_xe FROM datxe WHERE ma_dat_xe = ?)
+        `;
+        db.query(updateVehicleQuery, [ma_dat_xe], (error) => {
+            if (error) {
+                console.log(error.message);
+                return res.status(500).json({ message: "Error confirming booking", error: error.message });
+            }
+            res.json({ message: "Booking confirmed successfully" });
+        });
+    });
+};
+
+exports.completeBooking = (req, res) => {
+  const { ma_dat_xe } = req.params;
+  const trang_thai_dat_xe = 2; // Assuming "2" indicates completed
+
+  // First, update the booking status
+  const updateBookingQuery = `
+      UPDATE datxe
+      SET trang_thai_dat_xe = ?
+      WHERE ma_dat_xe = ?
+  `;
+  db.query(updateBookingQuery, [trang_thai_dat_xe, ma_dat_xe], (error, bookingResult) => {
+      if (error) {
+          return res.status(500).json({ message: "Error completing booking", error: error.message });
       }
-  
+
+      if (bookingResult.affectedRows === 0) {
+          return res.status(404).json({ message: "Booking not found" });
+      }
+
       // Then, update the vehicle status
       const updateVehicleQuery = `
-        UPDATE xe
-        SET trang_thai = 1
-        WHERE ma_xe = (SELECT ma_xe FROM datxe WHERE ma_dat_xe = ?)
+          UPDATE xe
+          SET trang_thai = 0
+          WHERE ma_xe = (SELECT ma_xe FROM datxe WHERE ma_dat_xe = ?)
       `;
-      await db.query(updateVehicleQuery, [ma_dat_xe]);
-  
-      res.json({ message: "Booking confirmed successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Error confirming booking", error: error.message });
-    }
-  };
-  
-  exports.completeBooking = async (req, res) => {
-    const { ma_dat_xe } = req.body;
-    const trang_thai_dat_xe = 2; // Assuming "2" indicates completed
-  
-    try {
-      // First, update the booking status
-      const updateBookingQuery = `
-        UPDATE datxe
-        SET trang_thai_dat_xe = ?
-        WHERE ma_dat_xe = ?
-      `;
-      const [bookingResult] = await db.query(updateBookingQuery, [trang_thai_dat_xe, ma_dat_xe]);
-  
-      if (bookingResult.affectedRows === 0) {
-        return res.status(404).json({ message: "Booking not found" });
+      db.query(updateVehicleQuery, [ma_dat_xe], (error) => {
+          if (error) {
+              return res.status(500).json({ message: "Error completing booking", error: error.message });
+          }
+          res.json({ message: "Booking completed successfully" });
+      });
+  });
+};
+
+exports.cancelBooking = (req, res) => {
+  const { ma_dat_xe } = req.params;
+  const trang_thai_dat_xe = -1; // Assuming "-1" indicates canceled
+
+  // First, update the booking status
+  const updateBookingQuery = `
+      UPDATE datxe
+      SET trang_thai_dat_xe = ?
+      WHERE ma_dat_xe = ?
+  `;
+  db.query(updateBookingQuery, [trang_thai_dat_xe, ma_dat_xe], (error, bookingResult) => {
+      if (error) {
+          return res.status(500).json({ message: "Error canceling booking", error: error.message });
       }
-  
+
+      if (bookingResult.affectedRows === 0) {
+          return res.status(404).json({ message: "Booking not found" });
+      }
+
       // Then, update the vehicle status
       const updateVehicleQuery = `
-        UPDATE xe
-        SET trang_thai = 0
-        WHERE ma_xe = (SELECT ma_xe FROM datxe WHERE ma_dat_xe = ?)
+          UPDATE xe
+          SET trang_thai = 0
+          WHERE ma_xe = (SELECT ma_xe FROM datxe WHERE ma_dat_xe = ?)
       `;
-      await db.query(updateVehicleQuery, [ma_dat_xe]);
-  
-      res.json({ message: "Booking completed successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Error completing booking", error: error.message });
-    }
-  };
-  
-  exports.cancelBooking = async (req, res) => {
-    const { ma_dat_xe } = req.body;
-    const trang_thai_dat_xe = -1;
-  
-    try {
-      // First, update the booking status
-      const updateBookingQuery = `
-        UPDATE datxe
-        SET trang_thai_dat_xe = ?
-        WHERE ma_dat_xe = ?
-      `;
-      const [bookingResult] = await db.query(updateBookingQuery, [trang_thai_dat_xe, ma_dat_xe]);
-  
-      if (bookingResult.affectedRows === 0) {
-        return res.status(404).json({ message: "Booking not found" });
-      }
-  
-      // Then, update the vehicle status
-      const updateVehicleQuery = `
-        UPDATE xe
-        SET trang_thai = 0
-        WHERE ma_xe = (SELECT ma_xe FROM datxe WHERE ma_dat_xe = ?)
-      `;
-      await db.query(updateVehicleQuery, [ma_dat_xe]);
-  
-      res.json({ message: "Booking canceled successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Error canceling booking", error: error.message });
-    }
-  };
+      db.query(updateVehicleQuery, [ma_dat_xe], (error) => {
+          if (error) {
+              return res.status(500).json({ message: "Error canceling booking", error: error.message });
+          }
+          res.json({ message: "Booking canceled successfully" });
+      });
+  });
+};
+
   
   exports.getBookingsByUserId = async (req, res) => {
     const { ma_nguoi_dat_xe } = req.params; // Assuming the user ID is sent as a URL parameter
@@ -222,90 +235,43 @@ function scheduleCancellationTask(bookingId) {
     });
   };
   
-  exports.getManageBooking = async (req, res) => {
+  exports.getManageBooking = (req, res) => {
+    const { ma_chu_xe } = req.params;
+
+    const query = `
+        SELECT 
+            dx.ma_dat_xe,
+            dx.ngay_bat_dau,
+            dx.ngay_ket_thuc,
+            dx.trang_thai_dat_xe,
+            dc.dia_chi,
+            dx.tong_tien_thue,
+            dx.ghi_chu,
+            nd.ho_ten AS renter_name,
+            nd.dia_chi_nguoi_dung AS renter_address,
+            x.ten_xe,
+            nd.hinh_dai_dien AS renter_image
+        FROM datxe dx
+        JOIN xe x ON dx.ma_xe = x.ma_xe
+        JOIN diachi dc ON x.ma_dia_chi = dc.ma_dia_chi
+        JOIN nguoidung nd ON dx.ma_nguoi_dat_xe = nd.ma_nguoi_dung
+        LEFT JOIN hinhanh ha ON x.ma_xe = ha.ma_xe
+        WHERE dx.ma_chu_xe = ?
+        GROUP BY dx.ma_dat_xe
+        ORDER BY dx.ngay_bat_dau DESC
+    `;
+
+    db.query(query, [ma_chu_xe], (error, results) => {
+        if (error) {
+            return res.status(500).json({ message: "Error fetching booking data", error: error.message });
+        }
+
+        if (results.length > 0) {
+            res.json({ success: true, data: results });
+        } else {
+            res.status(404).json({ success: false, message: 'No bookings found for this owner.' });
+        }
+    });
+};
 
 
-  };
-  
-  /*
-  Write endpoint, the endpoint receive ma_chu_xe param, that function getall the datxe where ma_chu_xe = ma_chu_xe, and some related info from other table i list below:
-  exports.getManageBooking = async (req, res) => {
-    What i need: 
-         ngay_bat_dau
-        ngay_ket_thuc
-        trang_thai_dat_xe
-        dia_chi
-        tong_tien_thue
-        ghi_chu
-        ho_ten AS renter_name
-        dia_chi AS renter_address
-        ten_xe
-        hinh AS vehicle_image
-
-
-  };
-  
-  database:
-CREATE TABLE IF NOT EXISTS `datxe` (
-  `ma_dat_xe` int NOT NULL AUTO_INCREMENT,
-  `ngay_bat_dau` date NOT NULL,
-  `ngay_ket_thuc` date NOT NULL,
-  `trang_thai_dat_xe` int DEFAULT 0,
-  `dia_chi_nhan_xe` int DEFAULT NULL,
-  `tong_tien_thue` decimal(10,2) DEFAULT NULL,
-  `ma_xe` int DEFAULT NULL,
-  `ma_nguoi_dat_xe` int NOT NULL,
-  `ma_chu_xe` int NOT NULL,
-  `ghi_chu` text NULL,
-  `giam_gia` int NULL,
-  PRIMARY KEY (`ma_dat_xe`),
-  KEY `datxe_fk_1` (`ma_xe`),
-  KEY `datxe_fk_2` (`ma_nguoi_dat_xe`),
-  KEY `datxe_fk_3` (`dia_chi_nhan_xe`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `diachi` (
-  `ma_dia_chi` int NOT NULL AUTO_INCREMENT,
-  `dia_chi` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `thanh_pho` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `quoc_gia` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `zip_code` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`ma_dia_chi`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `hinhanh` (
-  `ma_hinh_anh` int NOT NULL AUTO_INCREMENT,
-  `loai_hinh` int NOT NULL,
-  `hinh` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ma_xe` int NOT NULL,
-  PRIMARY KEY (`ma_hinh_anh`),
-  KEY `hinhanh_fk_1` (`ma_xe`)
-) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `nguoidung` (
-  `ma_nguoi_dung` int NOT NULL AUTO_INCREMENT,
-  `ten_nguoi_dung` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `mat_khau_hash` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ho_ten` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `hinh_dai_dien` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `ngay_dang_ky` date NOT NULL,
-  `so_dien_thoai` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dia_chi_nguoi_dung` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `loai_nguoi_dung` int DEFAULT '0',
-  `trang_thai` int DEFAULT '1',
-  PRIMARY KEY (`ma_nguoi_dung`)
-) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-DROP TABLE IF EXISTS `xe`;
-CREATE TABLE IF NOT EXISTS `xe` (
-  `ma_xe` int NOT NULL AUTO_INCREMENT,
-  `ten_xe` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `trang_thai` int DEFAULT 0,
-  `chu_so_huu` int NOT NULL,
-  `ma_loai_xe` int NOT NULL,
-  `gia_thue` decimal(10,2) DEFAULT 0,
-  `ma_dia_chi` int DEFAULT NULL,
-  `da_xac_minh` int DEFAULT '0',
-  PRIMARY KEY (`ma_xe`),
-  KEY `chu_so_huu` (`chu_so_huu`),
-  KEY `ma_loai_xe` (`ma_loai_xe`),
-  KEY `ma_dia_chi` (`ma_dia_chi`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-  */
-  
