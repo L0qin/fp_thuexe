@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_zalopay_sdk/flutter_zalopay_sdk.dart';
 import 'package:fp_thuexe/models/Vehicle.dart';
 import 'package:fp_thuexe/pages/success_page.dart';
 import 'package:fp_thuexe/services/ImageService.dart';
+import 'package:fp_thuexe/services/OtherService.dart';
 import 'package:fp_thuexe/services/UserService.dart';
 import 'package:intl/intl.dart';
 
@@ -29,7 +31,7 @@ class _ConfirmPageState extends State<ConfirmPage> {
   late User _userOwner;
   Vehicle _vehicle;
   late String imgURL;
-  late TextEditingController tecNotes= TextEditingController();
+  late TextEditingController tecNotes = TextEditingController();
 
   DateTime _selectedDateTime1 = DateTime.now().add(Duration(days: 1));
 
@@ -42,16 +44,19 @@ class _ConfirmPageState extends State<ConfirmPage> {
     'Chuyển khoản ngân hàng',
   ];
 
+  var _selectedVoucher;
 
   void _createBooking() async {
     int customerId = _user.userId;
     String notes = tecNotes.text;
     DateTime startDate = _selectedDateTime1;
     DateTime endDate = _selectedDateTime2;
-    int? pickupAddressId = 1; // Assuming this is obtained elsewhere in your code
+    int? pickupAddressId =
+        1; // Assuming this is obtained elsewhere in your code
     int userId = _user.userId;
-    int ownerId =_userOwner.userId;
+    int ownerId = _userOwner.userId;
     int carId = _vehicle.carId;
+    int voucherId = _selectedVoucher;
 
     // Check if the user is trying to rent their own vehicle
     if (customerId == _userOwner.userId) {
@@ -81,7 +86,8 @@ class _ConfirmPageState extends State<ConfirmPage> {
       startDate: startDate,
       endDate: endDate,
       pickupAddressId: pickupAddressId,
-      totalRental: 0, // This value needs to be calculated or provided accordingly
+      totalRental: 0,
+      // This value needs to be calculated or provided accordingly
       carId: carId,
       userId: userId,
       ownerId: ownerId,
@@ -97,7 +103,8 @@ class _ConfirmPageState extends State<ConfirmPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SuccessPage(), // Ensure SuccessPage is defined in your application
+            builder: (context) =>
+                SuccessPage(), // Ensure SuccessPage is defined in your application
           ),
         );
       } else {
@@ -126,8 +133,6 @@ class _ConfirmPageState extends State<ConfirmPage> {
       );
     }
   }
-
-
 
   _ConfirmPageState(this._vehicle);
 
@@ -169,7 +174,6 @@ class _ConfirmPageState extends State<ConfirmPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -196,8 +200,10 @@ class _ConfirmPageState extends State<ConfirmPage> {
             SizedBox(height: 10.0),
             _buildProductInfoCard(),
             _buildCommentForm(),
+            _buildNotes(),
             _buildPaymentInfoCard(),
-            _buildInfroNote(),
+            _buildInfoNote1(),
+            _buildInfoNote2(),
           ],
         ),
       ),
@@ -205,8 +211,6 @@ class _ConfirmPageState extends State<ConfirmPage> {
   }
 
   Widget _buildCommentForm() {
-    String comment = ''; // Biến để lưu trữ nội dung bình luận
-
     return Column(
       // mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -246,110 +250,154 @@ class _ConfirmPageState extends State<ConfirmPage> {
             maxLines: 3,
           ),
         ),
-        SizedBox(height: 10),
-        // ElevatedButton(
-        //   onPressed: () {
-        //     // Xử lý khi người dùng nhấn nút gửi bình luận
-        //     if (comment.isNotEmpty) {
-        //       // Kiểm tra nếu nội dung bình luận không trống
-        //       // Thực hiện các hành động khác ở đây, ví dụ: gửi bình luận đến máy chủ
-        //       print('Nội dung bình luận: $comment');
-        //       // Sau khi xử lý, bạn có thể làm sạch biểu mẫu bằng cách đặt lại giá trị biến comment
-        //       comment = '';
-        //     }
-        //   },
-        //   child: Text('Gửi'),
-        // ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          // Không có khoảng thụt vào
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 16, right: 16),
-              // Đặt khoảng lề bên trái là 16
-              child: Icon(Icons.not_listed_location_rounded, size: 25),
-            ),
-            SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                "Giao dịch qua fp_thuexe để chúng tôi bảo vệ bạn tốt nhất trong trường hợp bị huỷ chuyến ngoài ý muốn & phát sinh sự cố có bảo hiểm",
-                style: TextStyle(fontSize: 15),
-              ),
-            ),
-          ],
-        )
       ],
     );
   }
 
-  Widget _buildInfroNote() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      // Thêm lề cho container
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Divider(height: 30, thickness: 1),
-          Row(
+  Widget _buildNotes() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: OtherService.getTerm(5), // Replace '1' with the appropriate id
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // Show loading indicator while fetching data
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          final title = snapshot.data?['title'] ?? "";
+          final content = snapshot.data?['content'] ?? "";
+
+          return Column(
             children: [
-              Text(
-                "Giấy tờ thuê xe",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              SizedBox(
+                height: 12,
               ),
-              SizedBox(width: 10),
-              Icon(Icons.not_listed_location, size: 30),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                // Không có khoảng thụt vào
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 16, right: 16),
+                    // Đặt khoảng lề bên trái là 16
+                    child: Icon(Icons.not_listed_location_rounded, size: 25),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          content,
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              )
             ],
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Chọn 1 trong 2 hình thức:",
-            style: TextStyle(fontSize: 16),
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(Icons.insert_drive_file, size: 30),
-              SizedBox(width: 10),
-              Text(
-                "GPLX & CCCD gắn chíp (đối chiếu)",
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Icon(Icons.insert_drive_file, size: 30),
-              SizedBox(width: 10),
-              Text(
-                "GPLX (đối chiếu) & Passport (giữ lại)",
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-          Divider(height: 30, thickness: 1),
-          Row(
-            children: [
-              Text(
-                "Tài sản thế chấp",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(width: 10),
-              Icon(Icons.not_listed_location, size: 30),
-            ],
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  "30 triệu (tiền mặt/chuyển khoảng cho chủ xe khi nhận xe) hoặc Xe máy (kèm cà vẹt gốc) giá trị 30 triệu",
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildInfoNote1() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: OtherService.getTerm(3),
+      // Assuming 1 is the ID you want to retrieve
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // Show loading indicator while fetching data
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          final title = snapshot.data?['title'];
+          final content = snapshot.data?['content'];
+
+          return Container(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Divider(height: 30, thickness: 1),
+                Row(
+                  children: [
+                    Text(
+                      title ?? "", // Display title from snapshot data
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(width: 10),
+                    Icon(Icons.not_listed_location, size: 30),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Text(
+                  content ?? "", // Display content from snapshot data
                   style: TextStyle(fontSize: 16),
                 ),
-              ),
-            ],
-          )
-        ],
-      ),
+              ],
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildInfoNote2() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: OtherService.getTerm(4),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Display a loading indicator while waiting for the data
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          // Display an error message if there's an error
+          return Text('Error: ${snapshot.error}');
+        } else {
+          // Once data is fetched successfully, display it
+          final title = snapshot.data?['title'];
+          final content = snapshot.data?['content'];
+
+          return Container(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Divider(height: 30, thickness: 1),
+                Row(
+                  children: [
+                    Text(
+                      title ?? "", // Display the title
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(width: 10),
+                    Icon(Icons.not_listed_location, size: 30),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        content ?? "", // Display the content
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -659,42 +707,27 @@ class _ConfirmPageState extends State<ConfirmPage> {
     );
   }
 
-// Define the state variables
-  bool _isDiscount10Checked = false;
-  bool _isInsuranceFreeChecked = false;
-  bool _isCoupon50Checked = false;
-  bool requiresDeposit = true; // Change this to true/false based on your policy
-  double depositPercentage = 0.3; // 30% deposit
+
 
 // Widget to build the payment information card
   Widget _buildPaymentInfoCard() {
     if (_selectedDateTime1 == null ||
         _selectedDateTime2 == null ||
         _vehicle == null) {
-      return Container(); // Return an empty container if dates or vehicle are not selected
+      return Container();
     }
 
     int numberOfDays =
         _selectedDateTime2!.difference(_selectedDateTime1!).inDays;
-    numberOfDays = max(1, numberOfDays); // Ensure a minimum of 1 day
+    numberOfDays = max(1, numberOfDays);
 
     double totalPrice = _vehicle.rentalPrice * numberOfDays;
     double sum = totalPrice;
-    // Apply discounts based on checkbox state
-    if (_isDiscount10Checked) {
-      sum -= (sum * 0.1); // Apply a 10% discount
-    }
-    if (_isInsuranceFreeChecked) {
-      // Apply insurance discount or waive insurance fee
-      // Update totalPrice accordingly
-    }
-    if (_isCoupon50Checked) {
-      // Apply coupon discount
-      // Update totalPrice accordingly
-    }
+
     double depositAmount = 0.0;
+    final requiresDeposit = true;
     if (requiresDeposit) {
-      depositAmount = sum - (sum * depositPercentage);
+      depositAmount = totalPrice - (totalPrice * 0.3);
     }
 
     double remainingBalance = totalPrice - depositAmount;
@@ -725,54 +758,13 @@ class _ConfirmPageState extends State<ConfirmPage> {
               _buildInfoTile("Số ngày thuê", "$numberOfDays ngày"),
               _buildInfoTile("Tổng giá", "$totalPrice đ"),
               Divider(),
-              Text(
-                "Chọn khuyến mãi (nếu có)",
-                // Promotion selection (if available)
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 10),
-              CheckboxListTile(
-                title: Text("Giảm giá 10%"),
-                value: _isDiscount10Checked,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _isDiscount10Checked = value!;
-                  });
-                },
-              ),
-              CheckboxListTile(
-                title: Text("Miễn phí bảo hiểm"),
-                value: _isInsuranceFreeChecked,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _isInsuranceFreeChecked = value!;
-                  });
-                },
-              ),
-              CheckboxListTile(
-                title: Text("Coupon giảm giá 50%"),
-                value: _isCoupon50Checked,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _isCoupon50Checked = value!;
-                  });
-                },
-              ),
-              Divider(),
+              _buildVoucherList(),
               _buildInfoTile("Tổng giá", "$sum đ"),
               if (requiresDeposit) ...[
                 _buildInfoTile(
                     "Đặt cọc", "${depositAmount.toStringAsFixed(2)} đ"),
                 _buildInfoTile("Số dư còn lại",
                     "${remainingBalance.toStringAsFixed(2)} đ"),
-              ] else ...[
-                _buildInfoTile(
-                    "Thành tiền", "${totalPrice.toStringAsFixed(2)} đ"),
-                _buildInfoTile("Thanh toán khi nhận xe",
-                    "Vui lòng thanh toán ${totalPrice.toStringAsFixed(2)} đ khi nhận xe"),
               ],
               Divider(),
               Text(
@@ -805,13 +797,68 @@ class _ConfirmPageState extends State<ConfirmPage> {
               SizedBox(height: 20),
 
               // Hiển thị nút thanh toán
-
             ],
           ),
         ),
       ),
     );
   }
+  var _vouchers;
+
+  Widget _buildVoucherList() {
+    return FutureBuilder<Map<int, Map<String, dynamic>>>(
+      future: OtherService.getVouchers(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Display a loading indicator while waiting for the data
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          // Display an error message if there's an error
+          return Text('Error: ${snapshot.error}');
+        } else {
+          // Once data is fetched successfully, display it
+          final vouchers = snapshot.data;
+          _vouchers = vouchers;
+          return Container(
+            child: Column(
+              children: [
+                Text(
+                  "Chọn khuyến mãi (nếu có)", // Promotion selection (if available)
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10),
+                if (vouchers != null)
+                  Column(
+                    children: vouchers.entries.map((entry) {
+                      final voucherDetails = entry.value;
+                      final description = voucherDetails['mo_ta'];
+                      final displayText = "$description";
+
+                      return RadioListTile<int>(
+                        title: Text(displayText),
+                        value: entry.key,
+                        groupValue: _selectedVoucher,
+                        onChanged: (int? value) {
+                          setState(() {
+                            _selectedVoucher = value!;
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                Divider(),
+              ],
+            ),
+          );
+        }
+      },
+    );
+  }
+
+
 
   ListTile _buildInfoTile(String title, String trailing) {
     return ListTile(
@@ -825,14 +872,16 @@ class _ConfirmPageState extends State<ConfirmPage> {
       ),
     );
   }
- bool _isPolicyAgreed =true;
+
+  bool _isPolicyAgreed = true;
+
   Widget _buildButton() {
     return Container(
       margin: EdgeInsets.all(12),
-      child: Column(  // Wrap button with a Column for better layout
-        mainAxisSize: MainAxisSize.min,  // Prevent unnecessary space
+      child: Column(
+        mainAxisSize: MainAxisSize.min, // Prevent unnecessary space
         children: [
-          Row(  // Add a Row for checkbox and label
+          Row(
             children: [
               Checkbox(
                 activeColor: Colors.green,
@@ -843,23 +892,96 @@ class _ConfirmPageState extends State<ConfirmPage> {
                   });
                 },
               ),
-              Text(
-                "Tôi đồng ý với các điều khoản và chính sách",
-                style: TextStyle(fontSize: 14,decoration: TextDecoration.underline),
-
-              ),
+              TextButton(
+                onPressed: () {
+                  // Function to show modal bottom sheet with terms fetched from the server
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return FutureBuilder<Map<String, dynamic>>(
+                        future: OtherService.getTerm(2),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text("Error fetching terms"));
+                          } else if (snapshot.hasData) {
+                            return Container(
+                              height: 500, // Set height for bottom sheet
+                              padding: EdgeInsets.all(10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    snapshot.data!['title'],
+                                    // Title from fetched data
+                                    style: TextStyle(
+                                        color: Colors.teal,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18),
+                                  ),
+                                  Divider(
+                                    color: Colors.teal,
+                                    thickness: 2,
+                                  ),
+                                  Expanded(
+                                    child: SingleChildScrollView(
+                                      child: Text(
+                                        snapshot.data!['content'],
+                                        // Content from fetched data
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all(
+                                                      Colors.teal)),
+                                          child: Text(
+                                            "Đóng",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ))
+                                    ],
+                                  )
+                                ],
+                              ),
+                            );
+                          } else {
+                            return Center(child: Text("No data"));
+                          }
+                        },
+                      );
+                    },
+                  );
+                },
+                child: Text(
+                  "Tôi đồng ý với các điều khoản và chính sách",
+                  style: TextStyle(
+                      fontSize: 14, decoration: TextDecoration.underline),
+                ),
+              )
             ],
           ),
-          SizedBox(height: 10),  // Add spacing between checkbox and button
+          SizedBox(height: 10), // Add spacing between checkbox and button
           MaterialButton(
             onPressed: () {
               if (_isPolicyAgreed) {
-                _createBooking();  // Call booking function only if agreed
+                _createBooking(); // Call booking function only if agreed
               } else {
                 // Show message or handle user not agreeing
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("Vui lòng đồng ý với chính sách trước khi gửi yêu cầu"),
+                    content: Text(
+                        "Vui lòng đồng ý với chính sách trước khi gửi yêu cầu"),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -877,9 +999,6 @@ class _ConfirmPageState extends State<ConfirmPage> {
       ),
     );
   }
-
-
-
 
   Widget _cardTimeWidget(BuildContext context) {
     return Container(

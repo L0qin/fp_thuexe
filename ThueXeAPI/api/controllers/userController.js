@@ -141,4 +141,54 @@ exports.modifyUser = (req, res) => {
     });
 };
 
+exports.getUserNotification = (req, res) => {
+    const userId = req.params.id;
+
+    const query = `
+        SELECT tb.ma_thong_bao, tb.ma_nguoi_dung, tb.tieu_de, tb.noi_dung, tb.trang_thai_xem, tb.ngay_tao, lt.ten_loai, lt.mo_ta 
+        FROM thongbao tb
+        JOIN loaithongbao lt ON tb.ma_loai_thong_bao = lt.ma_loai_thong_bao
+        WHERE tb.ma_nguoi_dung = ?
+        ORDER BY tb.ngay_tao DESC
+    `;
+
+    db.query(query, [userId], (error, results) => {
+        if (error) {
+            console.error('Failed to retrieve user notifications:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error'
+            });
+        }
+        console.log(results);
+        res.json(results);
+    });
+};
+
+exports.getUserNewNotificationNumber = (req, res) => {
+    const userId = req.params.id;
+
+    const query = `
+        SELECT COUNT(*) AS newNotificationsCount
+        FROM thongbao
+        WHERE ma_nguoi_dung = ? AND trang_thai_xem = 0 AND ma_loai_thong_bao = 5
+    `;
+
+    db.query(query, [userId], (error, results) => {
+        if (error) {
+            console.error('Failed to retrieve user new notification count:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error'
+            });
+        }
+        
+        // Assuming the results array is not empty, results[0] will have our count
+        const count = results[0].newNotificationsCount;
+        res.json({
+            success: true,
+            newNotificationsCount: count
+        });
+    });
+};
 

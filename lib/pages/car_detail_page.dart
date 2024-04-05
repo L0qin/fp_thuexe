@@ -13,6 +13,7 @@ import 'package:responsive_builder/responsive_builder.dart';
 
 import '../models/Review.dart';
 import '../models/Vehicle.dart';
+import '../services/OtherService.dart';
 import '../services/VehicleService.dart';
 import 'confirm_page.dart';
 
@@ -32,6 +33,7 @@ class _DetailCarState extends State<DetailCar> {
   late Future<Vehicle?> _vehicleFuture;
   late Future<User?> _userFuture;
   late Future<List<Review>> _futureReviews;
+  late Future<Map<String, dynamic>>? termFuture;
 
   _DetailCarState(this.vehicle);
 
@@ -40,7 +42,8 @@ class _DetailCarState extends State<DetailCar> {
     _imagesFuture = ImageService.getAllVehicleImageURLsById(vehicle!.carId);
     _vehicleFuture = VehicleService.getVehicleById(vehicle!.carId);
     _userFuture = UserService.getUserById(vehicle.ownerId);
-    _futureReviews = VehicleService.getAllVehicleReviews(vehicle.carId) ;
+    _futureReviews = VehicleService.getAllVehicleReviews(vehicle.carId);
+    termFuture = OtherService.getTerm(termId); // Initialize your future here
     _randomContent = randomContentSelection();
     super.initState();
   }
@@ -93,221 +96,83 @@ class _DetailCarState extends State<DetailCar> {
   }
 
   late Widget _randomContent;
-  bool _showFullText = false;
+
+  bool _isExpanded = false;
+
+// Example term ID, replace with actual ID as needed
+  int termId = 1;
 
   Widget _buildInfoNote() {
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                "Giấy tờ thuê xe",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(width: 10),
-              Icon(Icons.not_listed_location, size: 30),
-            ],
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Chọn 1 trong 2 hình thức:",
-            style: TextStyle(fontSize: 16),
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(Icons.newspaper, size: 30),
-              SizedBox(width: 10),
-              Text(
-                "GPLX & CCCD gắn chíp (đối chiếu)",
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Icon(Icons.insert_drive_file, size: 30),
-              SizedBox(width: 10),
-              Text(
-                "GPLX (đối chiếu) & Passport (giữ lại)",
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-          Divider(height: 30, thickness: 1),
-          Row(
-            children: [
-              Text(
-                "Tài sản thế chấp",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(width: 10),
-              Icon(Icons.not_listed_location, size: 30),
-            ],
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  "30 triệu (tiền mặt/chuyển khoảng cho chủ xe khi nhận xe) hoặc Xe máy (kèm cà vẹt gốc) giá trị 30 triệu",
-                  style: TextStyle(fontSize: 16),
+    return FutureBuilder<Map<String, dynamic>>(
+      future: termFuture,
+      builder:
+          (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Text("Error: ${snapshot.error}");
+        } else {
+          final String title = snapshot.data?['title'] ?? 'Title not found';
+          final String content =
+              snapshot.data?['content'] ?? 'Content not found';
+
+          // Ensure we do not exceed the content's length when attempting to shorten it
+          final String displayContent = content.length > 100 && !_isExpanded
+              ? content.substring(0, 215) + '...'
+              : content;
+
+          return Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Divider(height: 30, thickness: 1),
-              Text(
-                "Điều khoản:",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              Text(
-                "Quy định khác:",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.navigate_next),
-                      SizedBox(width: 8),
-                      Text(
-                        "Sử dụng xe có mục đích.",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ],
+                SizedBox(height: 8),
+                AnimatedCrossFade(
+                  firstChild: Text(
+                    displayContent,
+                    style: TextStyle(fontSize: 16),
                   ),
-                  SizedBox(height: 4),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(Icons.navigate_next),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          "Không sử dụng thuê xe có mục đích phi pháp. Trái pháp luật",
-                          style: TextStyle(fontSize: 16),
+                  secondChild: Text(
+                    content,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  crossFadeState: _isExpanded
+                      ? CrossFadeState.showSecond
+                      : CrossFadeState.showFirst,
+                  duration: Duration(milliseconds: 200),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isExpanded = !_isExpanded;
+                        });
+                      },
+                      child: Text(
+                        _isExpanded ? "Thu gọn" : "Xem thêm",
+                        style: TextStyle(
+                          fontSize: 16,
+                          decoration: TextDecoration.underline,
+                          color: Colors.teal,
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(Icons.navigate_next),
-                      SizedBox(width: 8),
-                      Text(
-                        "Không sử dụng thuê xe cầm cố, thuế chấp.",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 4),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(Icons.navigate_next),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          "Không hút thuốc, nhả kẹo cao su, xả rác trong xe.",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(Icons.navigate_next),
-                      SizedBox(width: 8),
-                      Text(
-                        "Không chở các hàng cấm hoặc gây cháy nổ.",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                  _showFullText
-                      ? Column(
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(Icons.navigate_next),
-                                SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    "Không chở hoa quả, Thực phẩm nặng mùi trong xe.",
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                )
-                              ],
-                            ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(Icons.navigate_next),
-                                SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    "Khi trả xe nếu xe bẩn hoặc có mùi trong xe.Khách hàng"
-                                    "vui lòng vệ sinh xe sạch sẽ hoặc gửi phụ thu phí vệ sinh xe "
-                                    "Trân trọng cảm ơn. Chúc quý khách hàng có những chuyến đi tuyệt vời!.",
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                )
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: Text(
-                                  "Trân trọng cảm ơn. Chúc quý khách hàng có những chuyến đi tuyệt vời!",
-                                  style: TextStyle(fontSize: 16),
-                                ))
-                              ],
-                            )
-                          ],
-                        )
-                      : Row(
-                          children: [
-                            SizedBox(width: 1),
-                            // Khoảng cách giữa văn bản và nút "Xem thêm"
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  _showFullText = !_showFullText;
-                                });
-                              },
-                              child: Text(
-                                _showFullText ? "Thu gọn" : "Xem thêm...",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.blue,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                ],
-              ),
-              Divider(
-                height: 30,
-                thickness: 1,
-              ),
-            ],
-          )
-        ],
-      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -767,7 +632,6 @@ class _DetailCarState extends State<DetailCar> {
                     ),
                   ),
                 );
-
               } else {
                 // If there are no reviews or data is not available, display a message
                 return Text('Chưa có đánh giá nào.');
@@ -803,11 +667,13 @@ class _DetailCarState extends State<DetailCar> {
   void _showDialogFullScreen(BuildContext context, List<Review> reviews) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Allows the sheet to take full screen if needed
+      isScrollControlled: true,
+      // Allows the sheet to take full screen if needed
       builder: (BuildContext context) {
         // Use a Container to control the height of the modal bottom sheet
         return Container(
-          height: MediaQuery.of(context).size.height * 0.75, // Occupies 75% of screen height
+          height: MediaQuery.of(context).size.height *
+              0.75, // Occupies 75% of screen height
           child: Padding(
             padding: EdgeInsets.all(16.0),
             child: Column(
@@ -823,10 +689,12 @@ class _DetailCarState extends State<DetailCar> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () => Navigator.pop(context), // Closes the bottom sheet
+                  onPressed: () => Navigator.pop(context),
+                  // Closes the bottom sheet
                   child: Text('Đóng'),
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: Colors.teal, // Text color
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.teal, // Text color
                   ),
                 ),
               ],

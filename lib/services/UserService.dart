@@ -1,12 +1,54 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import '../models/Notification.dart';
 import '../models/User.dart';
 import 'AuthService.dart';
 import 'ServiceConstants.dart';
 
 class UserService {
   static const String baseUrl = "${ServiceConstants.baseUrl}/users";
+
+  static Future<int> getUserNewNotificationNumber(int userId) async {
+    final token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
+    final url = '$baseUrl/getUserNewNotificationNumber/$userId';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {'Authorization': ' $token'}, // Ensure proper formatting for the Authorization header
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      int newNotificationsCount = jsonData['newNotificationsCount'];
+      return newNotificationsCount;
+    } else {
+      throw Exception('Failed to load new notification count');
+    }
+  }
+
+  static Future<List<ThongBao>> getUserNotifications(int userId) async {
+    final token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+    final url = '$baseUrl/getUserNotification/$userId';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {'Authorization': ' $token'},
+    );
+    print(response.body);
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = jsonDecode(response.body);
+      List<ThongBao> notifications = jsonData.map((data) => ThongBao.fromJson(data)).toList();
+      return notifications;
+    } else {
+      throw Exception('Failed to load notifications');
+    }
+  }
 
   // Method to retrieve user data by ID
   static Future<User?> getUserById(int userId) async {

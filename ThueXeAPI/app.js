@@ -22,7 +22,7 @@ const vehicleRoutes = require('./api/routes/vehicleRoutes');
 const bookingRoutes = require('./api/routes/bookingRoutes');
 const imageRoutes = require('./api/routes/imageRoutes');
 const adminsRoutes = require('./api/routes/adminRoutes');
-
+const otherRoutes = require('./api/routes/otherRoutes');
 // Use the authentication middleware for protected routes
 app.use('/api/protected', authenticateToken);
 
@@ -41,6 +41,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/images', imageRoutes);
+app.use('/api/others', otherRoutes);
 app.use('/api/admins', adminsRoutes);
 
 

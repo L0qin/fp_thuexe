@@ -28,6 +28,7 @@ class _InformationState extends State<Information> {
   User? user = User.unLoadedUser();
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  int newNotificationsCount = 0;
 
   @override
   void initState() {
@@ -37,13 +38,30 @@ class _InformationState extends State<Information> {
 
   Future<void> fetchData() async {
     int? userId = await AuthService.getUserId();
-    user = await UserService.getUserById(userId!);
-    setState(() {
-      loadFetchedData(user!);
-      _fullNameController.text = user?.fullName ?? "";
-      _phoneNumberController.text = user?.phoneNumber ?? "";
-      _addressController.text = user?.address ?? "";
-    });
+    if (userId != null) {
+      try {
+        // Fetch user details
+        user = await UserService.getUserById(userId);
+        // Fetch the count of new notifications
+        newNotificationsCount =
+            await UserService.getUserNewNotificationNumber(userId);
+
+        // Update the UI
+        setState(() {
+          loadFetchedData(user!); // Assuming this method sets up data in the UI
+          _fullNameController.text = user?.fullName ?? "";
+          _phoneNumberController.text = user?.phoneNumber ?? "";
+          _addressController.text = user?.address ?? "";
+          // You can now use newNotificationsCount to update any relevant UI components
+        });
+      } catch (e) {
+        // Handle errors, for example, by showing an error message in the UI
+        print('Error fetching data: $e');
+      }
+    } else {
+      print('User ID is null');
+      // Handle the case where the user ID is null, perhaps by redirecting to a login screen
+    }
   }
 
   void loadFetchedData(User user) {
@@ -210,15 +228,48 @@ class _InformationState extends State<Information> {
                       ),
                       _buildDivider(),
                       InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ManageRentalsScreen(),
-                            ));
-                          },
-                          child: _buildMenuRow(
-                              Icons.car_rental_rounded, "Quản lý cho thuê")),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ManageRentalsScreen()),
+                          );
+                        },
+                        child: Stack(
+                          children: [
+                            _buildMenuRow(
+                                Icons.car_rental_rounded, "Quản lý cho thuê"),
+                            if (newNotificationsCount >
+                                0) // Only show the bubble if there are new notifications
+                              Positioned(
+                                right: 25,
+                                // Adjust these values as needed to position the bubble correctly
+                                top: 7,
+                                child: Container(
+                                  padding: EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(
+                                        10), // Makes it a round bubble
+                                  ),
+                                  constraints: BoxConstraints(
+                                    minWidth: 20,
+                                    // Ensures the bubble is a decent size even for small counts
+                                    minHeight: 20,
+                                  ),
+                                  child: Text(
+                                    '$newNotificationsCount',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                       _buildDivider(),
                       InkWell(
                           onTap: () {},

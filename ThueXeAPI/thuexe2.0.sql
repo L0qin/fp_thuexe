@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Apr 05, 2024 at 08:54 AM
+-- Generation Time: Apr 05, 2024 at 01:46 PM
 -- Server version: 8.0.31
 -- PHP Version: 8.0.26
 
@@ -75,26 +75,28 @@ CREATE TABLE IF NOT EXISTS `datxe` (
   `ma_chu_xe` int NOT NULL,
   `ghi_chu` text COLLATE utf8mb4_unicode_ci,
   `giam_gia` int DEFAULT NULL,
+  `ma_voucher` int DEFAULT NULL,
   PRIMARY KEY (`ma_dat_xe`),
   KEY `datxe_fk_1` (`ma_xe`),
   KEY `datxe_fk_2` (`ma_nguoi_dat_xe`),
-  KEY `datxe_fk_3` (`dia_chi_nhan_xe`)
+  KEY `datxe_fk_3` (`dia_chi_nhan_xe`),
+  KEY `fk_voucher_datxe` (`ma_voucher`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `datxe`
 --
 
-INSERT INTO `datxe` (`ma_dat_xe`, `ngay_bat_dau`, `ngay_ket_thuc`, `trang_thai_dat_xe`, `dia_chi_nhan_xe`, `tong_tien_thue`, `ma_xe`, `ma_nguoi_dat_xe`, `ma_chu_xe`, `ghi_chu`, `giam_gia`) VALUES
-(1, '2023-12-10', '2023-12-12', 1, 1, '1000000.00', 1, 1, 1, NULL, NULL),
-(2, '2023-12-15', '2023-12-20', 1, 2, '6000000.00', 2, 2, 1, NULL, NULL),
-(3, '2024-04-02', '2024-04-03', 0, 1, '0.00', 1, 101, 0, '', 0),
-(4, '2024-04-02', '2024-04-03', 2, 1, '0.00', 1, 101, 100, '', 0),
-(5, '2024-04-02', '2024-04-03', -1, 1, '0.00', 6, 101, 100, '', 0),
-(6, '2024-04-02', '2024-04-03', 0, 1, '0.00', 1, 101, 100, '', 0),
-(7, '2024-04-02', '2024-04-03', 0, 1, '0.00', 2, 101, 100, 'sf', 0),
-(8, '2024-04-02', '2024-04-03', 0, 1, '0.00', 1, 101, 100, '', 0),
-(9, '2024-04-02', '2024-04-30', 0, 1, '0.00', 1, 101, 100, 'ghhgghh', 0);
+INSERT INTO `datxe` (`ma_dat_xe`, `ngay_bat_dau`, `ngay_ket_thuc`, `trang_thai_dat_xe`, `dia_chi_nhan_xe`, `tong_tien_thue`, `ma_xe`, `ma_nguoi_dat_xe`, `ma_chu_xe`, `ghi_chu`, `giam_gia`, `ma_voucher`) VALUES
+(1, '2023-12-10', '2023-12-12', 1, 1, '1000000.00', 1, 1, 1, NULL, NULL, NULL),
+(2, '2023-12-15', '2023-12-20', 1, 2, '6000000.00', 2, 2, 1, NULL, NULL, NULL),
+(3, '2024-04-02', '2024-04-03', 0, 1, '0.00', 1, 101, 0, '', 0, NULL),
+(4, '2024-04-02', '2024-04-03', 2, 1, '0.00', 1, 101, 100, '', 0, NULL),
+(5, '2024-04-02', '2024-04-03', -1, 1, '0.00', 6, 101, 100, '', 0, NULL),
+(6, '2024-04-02', '2024-04-03', 0, 1, '0.00', 1, 101, 100, '', 0, NULL),
+(7, '2024-04-02', '2024-04-03', 0, 1, '0.00', 2, 101, 100, 'sf', 0, NULL),
+(8, '2024-04-02', '2024-04-03', 0, 1, '0.00', 1, 101, 100, '', 0, NULL),
+(9, '2024-04-02', '2024-04-30', 0, 1, '0.00', 1, 101, 100, 'ghhgghh', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -155,7 +157,11 @@ CREATE TABLE IF NOT EXISTS `dieukhoansudung` (
 
 INSERT INTO `dieukhoansudung` (`ma_dieu_khoan`, `phien_ban`, `tieu_de`, `noi_dung`, `ngay_hieu_luc`, `ngay_tao`, `ngay_cap_nhat_cuoi`, `trang_thai`) VALUES
 (1, NULL, 'Lưu Ý Quan Trọng Khi Thuê Xe', 'Kiểm Tra Danh Mục Xe: Trước khi đặt xe, hãy kiểm tra kỹ danh mục xe có sẵn trên ứng dụng của chúng tôi. Đảm bảo chọn loại xe phản ánh đúng nhu cầu và số lượng người đi cùng.\n\nXác Thực Thông Tin: Hãy chắc chắn rằng bạn cung cấp thông tin cá nhân và thanh toán chính xác. Thông tin không chính xác có thể gây trở ngại trong quá trình thuê hoặc tạo ra sự phiền toái sau này.\n\nKiểm Tra Giá và Chính Sách: Đọc kỹ chính sách thuê xe và kiểm tra giá thuê trước khi xác nhận đặt xe. Điều này giúp bạn hiểu rõ về các khoản phí bổ sung, điều kiện huỷ bỏ, và các yêu cầu khác.\n\nKiểm Tra Đánh Giá và Phản Hồi: Trước khi quyết định, hãy đọc các đánh giá và phản hồi từ các khách hàng trước đó. Điều này giúp bạn có cái nhìn tổng quan về chất lượng dịch vụ của chúng tôi.\n\nThời Gian Thuê và Trả Xe: Đảm bảo bạn hiểu rõ về thời gian thuê và trả xe. Việc trả xe muộn có thể phát sinh phí phạt. Nếu có bất kỳ thay đổi nào trong kế hoạch của bạn, vui lòng thông báo trước để chúng tôi có thể sắp xếp lại.\n\nLiên Hệ Hỗ Trợ: Trong trường hợp có bất kỳ vấn đề nào xuất hiện trong quá trình thuê hoặc sử dụng xe, hãy liên hệ ngay với dịch vụ khách hàng của chúng tôi để được hỗ trợ kịp thời.\n\nKiểm Tra Trạng Thái Xe: Trước khi nhận xe, hãy kiểm tra kỹ trạng thái của xe và ghi lại bất kỳ tổn thất nào. Điều này giúp bạn tránh việc bị buộc phải trả phí cho những tổn thất không phải do bạn gây ra.\n\nBảo Dưỡng và An Toàn: Hãy tuân thủ các quy tắc an toàn giao thông và bảo dưỡng xe đúng cách trong suốt thời gian sử dụng. Nếu gặp phải vấn đề kỹ thuật hoặc tai nạn, hãy báo ngay cho chúng tôi để được hỗ trợ.\n\nChúng tôi hy vọng rằng những lưu ý trên sẽ giúp bạn có trải nghiệm thuê xe trơn tru và tiện lợi trên ứng dụng của chúng tôi.', '2024-04-01 00:00:00', '2024-04-04 20:57:42', '2024-04-05 15:41:50', 1),
-(2, '1.0', 'Điều Khoản Sử Dụng Dịch Vụ Thuê Xe', 'Chào mừng bạn đến với ứng dụng thuê xe của chúng tôi. Trước khi bạn sử dụng dịch vụ, vui lòng đọc kỹ và hiểu rõ các điều khoản và điều kiện sau đây:\r\n\r\nĐăng Ký và Tài Khoản:\r\n\r\nBạn phải đăng ký một tài khoản để sử dụng dịch vụ thuê xe của chúng tôi.\r\nBạn cam kết cung cấp thông tin cá nhân chính xác và hoàn chỉnh khi đăng ký tài khoản.\r\nQuyền Lợi và Trách Nhiệm:\r\n\r\nBạn có quyền thuê xe theo các điều kiện đã được quy định trên ứng dụng.\r\nBạn phải chịu trách nhiệm cho việc sử dụng xe và phải tuân thủ các quy định về an toàn giao thông.\r\nThanh Toán:\r\n\r\nBạn đồng ý thanh toán phí thuê xe theo các phương thức thanh toán được chấp nhận trên ứng dụng.\r\nCác khoản phí bổ sung như phí bảo hiểm, phí nhiên liệu và phí phạt sẽ được thông báo rõ ràng trước khi bạn xác nhận đặt xe.\r\nHuỷ Đặt Xe:\r\n\r\nBạn có thể huỷ đặt xe mà không phải trả phí nếu thực hiện trước thời hạn được quy định trên ứng dụng.\r\nViệc huỷ đặt xe sau thời hạn quy định có thể phát sinh phí huỷ đặt.\r\nBảo Mật Thông Tin:\r\n\r\nChúng tôi cam kết bảo vệ thông tin cá nhân của bạn và sử dụng thông tin đó chỉ cho mục đích cung cấp dịch vụ.\r\nBạn không được chia sẻ tài khoản và thông tin đăng nhập của mình với bất kỳ ai khác.\r\nThay Đổi và Cập Nhật:\r\n\r\nChúng tôi có quyền thay đổi hoặc cập nhật các điều khoản và điều kiện này mà không cần thông báo trước.\r\nBạn có trách nhiệm kiểm tra và cập nhật thông tin về điều khoản và điều kiện mới khi chúng được cập nhật.\r\nBằng cách sử dụng dịch vụ thuê xe của chúng tôi, bạn đồng ý tuân thủ các điều khoản và điều kiện được nêu trên. Việc vi phạm các điều khoản này có thể dẫn đến hậu quả pháp lý.', '2024-04-04 20:57:42', '2024-04-04 20:57:42', '2024-04-04 20:57:42', 1);
+(2, '1.0', 'Điều Khoản Sử Dụng Dịch Vụ Thuê Xe', 'Chào mừng bạn đến với ứng dụng thuê xe của chúng tôi. Trước khi bạn sử dụng dịch vụ, vui lòng đọc kỹ và hiểu rõ các điều khoản và điều kiện sau đây:\r\n\r\nĐăng Ký và Tài Khoản:\r\n\r\nBạn phải đăng ký một tài khoản để sử dụng dịch vụ thuê xe của chúng tôi.\r\nBạn cam kết cung cấp thông tin cá nhân chính xác và hoàn chỉnh khi đăng ký tài khoản.\r\nQuyền Lợi và Trách Nhiệm:\r\n\r\nBạn có quyền thuê xe theo các điều kiện đã được quy định trên ứng dụng.\r\nBạn phải chịu trách nhiệm cho việc sử dụng xe và phải tuân thủ các quy định về an toàn giao thông.\r\nThanh Toán:\r\n\r\nBạn đồng ý thanh toán phí thuê xe theo các phương thức thanh toán được chấp nhận trên ứng dụng.\r\nCác khoản phí bổ sung như phí bảo hiểm, phí nhiên liệu và phí phạt sẽ được thông báo rõ ràng trước khi bạn xác nhận đặt xe.\r\nHuỷ Đặt Xe:\r\n\r\nBạn có thể huỷ đặt xe mà không phải trả phí nếu thực hiện trước thời hạn được quy định trên ứng dụng.\r\nViệc huỷ đặt xe sau thời hạn quy định có thể phát sinh phí huỷ đặt.\r\nBảo Mật Thông Tin:\r\n\r\nChúng tôi cam kết bảo vệ thông tin cá nhân của bạn và sử dụng thông tin đó chỉ cho mục đích cung cấp dịch vụ.\r\nBạn không được chia sẻ tài khoản và thông tin đăng nhập của mình với bất kỳ ai khác.\r\nThay Đổi và Cập Nhật:\r\n\r\nChúng tôi có quyền thay đổi hoặc cập nhật các điều khoản và điều kiện này mà không cần thông báo trước.\r\nBạn có trách nhiệm kiểm tra và cập nhật thông tin về điều khoản và điều kiện mới khi chúng được cập nhật.\r\nBằng cách sử dụng dịch vụ thuê xe của chúng tôi, bạn đồng ý tuân thủ các điều khoản và điều kiện được nêu trên. Việc vi phạm các điều khoản này có thể dẫn đến hậu quả pháp lý.', '2024-04-04 20:57:42', '2024-04-04 20:57:42', '2024-04-04 20:57:42', 1),
+(3, '1.0', 'Giấy tờ thuê xe', 'Chọn 1 trong 2 hình thức:\nGPLX & CCCD(Đối chiếu)\nGPLX & Passport(Chủ xe tạm giữ)', '2024-04-04 20:57:42', '2024-04-04 20:57:42', '2024-04-04 20:57:42', 1),
+(4, '1.0', 'Tài sản thế chấp', '30 triệu (tiền mặt/chuyển khoảng cho chủ xe khi nhận xe) hoặc Xe máy (kèm cà vẹt gốc) giá trị 30 triệu', '2024-04-04 20:57:42', '2024-04-04 20:57:42', '2024-04-04 20:57:42', 1),
+(5, '1.0', 'Lưu ý giao dịch', 'Giao dịch qua fp_thuexe để chúng tôi bảo vệ bạn tốt nhất trong trường hợp bị huỷ chuyến ngoài ý muốn & phát sinh sự cố có bảo hiểm', '2024-04-04 20:57:42', '2024-04-04 20:57:42', '2024-04-04 20:57:42', 1),
+(6, '1.0', '-', '-', '2024-04-04 20:57:42', '2024-04-04 20:57:42', '2024-04-04 20:57:42', 1);
 
 -- --------------------------------------------------------
 
@@ -290,6 +296,32 @@ INSERT INTO `lichsuthue` (`ma_lich_su`, `ma_xe`, `ma_nguoi_thue`, `ngay_bat_dau`
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `loaithongbao`
+--
+
+DROP TABLE IF EXISTS `loaithongbao`;
+CREATE TABLE IF NOT EXISTS `loaithongbao` (
+  `ma_loai_thong_bao` int NOT NULL AUTO_INCREMENT,
+  `ten_loai` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mo_ta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`ma_loai_thong_bao`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `loaithongbao`
+--
+
+INSERT INTO `loaithongbao` (`ma_loai_thong_bao`, `ten_loai`, `mo_ta`) VALUES
+(1, 'Xác Nhận Đặt Xe', 'Thông báo xác nhận việc đặt xe đã thành công.'),
+(2, 'Nhắc Nhở Thuê Xe', 'Thông báo nhắc nhở về việc thuê xe sắp tới.'),
+(3, 'Khuyến Mãi', 'Thông báo về các chương trình khuyến mãi mới hoặc giảm giá.'),
+(4, 'Yêu Cầu Phản Hồi', 'Yêu cầu gửi phản hồi sau khi thuê xe.')
+(5, 'Yêu cầu thuê xe', 'Yêu cầu thuê xe từ người dùng.')
+;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `loaixe`
 --
 
@@ -352,10 +384,49 @@ CREATE TABLE IF NOT EXISTS `nguoidung` (
 --
 
 INSERT INTO `nguoidung` (`ma_nguoi_dung`, `ten_nguoi_dung`, `mat_khau_hash`, `ho_ten`, `hinh_dai_dien`, `ngay_dang_ky`, `so_dien_thoai`, `dia_chi_nguoi_dung`, `loai_nguoi_dung`, `trang_thai`) VALUES
-(1, 'user01', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Nguyen Van A', 'avt1.jpg', '2023-12-01', '0123456789', '123 Nguyen Trai, Hanoi', 0, -1),
+(1, 'user01', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Nguyen Van A', 'avt1.jpg', '2023-12-01', '0123456789', '123 Nguyen Trai, Hanoi', 0, 1),
 (2, 'user02', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Tran Thi B', 'avt2.jpg', '2023-12-02', '9876543210', '456 Le Loi, Ho Chi Minh', 0, 1),
 (100, 'Agent', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Agent', 'agent.jpg', '2023-12-01', '0123456789', '123 Nguyen Trai, Hanoi', 1, 1),
 (101, '1', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Test User', 'img_101_1711777742824.jpg', '2024-03-29', '1234567890', '123 Test Street', 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `thongbao`
+--
+
+DROP TABLE IF EXISTS `thongbao`;
+CREATE TABLE IF NOT EXISTS `thongbao` (
+  `ma_thong_bao` int NOT NULL AUTO_INCREMENT,
+  `ma_nguoi_dung` int NOT NULL,
+  `ma_loai_thong_bao` int NOT NULL,
+  `tieu_de` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `noi_dung` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `trang_thai_xem` tinyint(1) NOT NULL DEFAULT '0',
+  `ngay_tao` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ma_thong_bao`),
+  KEY `ma_nguoi_dung_idx` (`ma_nguoi_dung`),
+  KEY `ma_loai_thong_bao_idx` (`ma_loai_thong_bao`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `thongbao`
+--
+
+INSERT INTO `thongbao` (`ma_thong_bao`, `ma_nguoi_dung`, `ma_loai_thong_bao`, `tieu_de`, `noi_dung`, `trang_thai_xem`, `ngay_tao`) VALUES
+(1, 1, 1, 'Xác Nhận Đặt Xe', 'Đơn đặt xe của bạn cho ngày 15/04/2024 đã được xác nhận. Chi tiết đơn hàng...', 0, '2024-04-05 15:56:24'),
+(2, 2, 2, 'Nhắc Nhở Thuê Xe', 'Chúng tôi muốn nhắc bạn về việc thuê xe vào ngày 20/04/2024. Vui lòng...', 0, '2024-04-05 15:56:24'),
+(3, 101, 3, 'Khuyến Mãi Hè', 'Hè này, tận hưởng mức giá ưu đãi khi thuê xe từ ngày 01/06/2024 đến ngày 31/08/2024...', 0, '2024-04-05 15:56:24'),
+(4, 1, 4, 'Yêu Cầu Phản Hồi', 'Chúng tôi rất mong nhận được phản hồi về trải nghiệm thuê xe của bạn...', 0, '2024-04-05 15:56:24'),
+(5, 1, 5, 'sdf', 'sdfsdfd', 0, '2024-04-05 16:54:17'),
+(6, 1, 5, 'sdf', 'sdfsdfd', 0, '2024-04-05 16:55:55'),
+(7, 2, 2, 'sdf', 'sdfsdfd', 0, '2024-04-05 16:55:55'),
+(8, 100, 2, 'sdf', 'sdfsdfd', 0, '2024-04-05 16:55:55'),
+(9, 101, 2, 'sdf', 'sdfsdfd', 0, '2024-04-05 16:55:55'),
+(10, 1, 4, 'asdfadsf', 'asddfasdfda', 0, '2024-04-05 16:56:14'),
+(11, 2, 4, 'asdfadsf', 'asddfasdfda', 0, '2024-04-05 16:56:14'),
+(12, 100, 4, 'asdfadsf', 'asddfasdfda', 0, '2024-04-05 16:56:14'),
+(13, 101, 4, 'asdfadsf', 'asddfasdfda', 0, '2024-04-05 16:56:14');
 
 -- --------------------------------------------------------
 
@@ -450,6 +521,35 @@ INSERT INTO `thongtinkythuatxe` (`ma_thong_tin_ky_thuat`, `ma_xe`, `nam_san_xuat
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `voucher`
+--
+
+DROP TABLE IF EXISTS `voucher`;
+CREATE TABLE IF NOT EXISTS `voucher` (
+  `ma_voucher` int NOT NULL AUTO_INCREMENT,
+  `ma_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mo_ta` text COLLATE utf8mb4_unicode_ci,
+  `phan_tram_giam` decimal(5,2) DEFAULT NULL,
+  `so_tien_giam` decimal(10,2) DEFAULT NULL,
+  `ngay_bat_dau` datetime NOT NULL,
+  `ngay_ket_thuc` datetime NOT NULL,
+  `dieukien_apdung` text COLLATE utf8mb4_unicode_ci,
+  `trang_thai` int DEFAULT '1',
+  PRIMARY KEY (`ma_voucher`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `voucher`
+--
+
+INSERT INTO `voucher` (`ma_voucher`, `ma_code`, `mo_ta`, `phan_tram_giam`, `so_tien_giam`, `ngay_bat_dau`, `ngay_ket_thuc`, `dieukien_apdung`, `trang_thai`) VALUES
+(1, 'GIAM10', 'Giảm 10% giá thuê xe cho đơn hàng trên 2.000.000đ', '10.00', NULL, '2024-01-01 00:00:00', '2024-12-31 23:59:59', 'Áp dụng cho đơn hàng từ 2.000.000đ', 1),
+(2, 'GIAM500K', 'Giảm ngay 500.000đ cho mỗi đơn hàng', NULL, '500000.00', '2024-01-01 00:00:00', '2024-06-30 23:59:59', 'Không áp dụng cùng lúc với ưu đãi khác', 1),
+(3, 'TET2024', 'Ưu đãi Tết Nguyên Đán: Giảm 15% cho tất cả các đơn đặt xe', '15.00', NULL, '2024-01-20 00:00:00', '2024-02-28 23:59:59', 'Áp dụng cho mọi đơn hàng trong dịp Tết Nguyên Đán', 1);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `xe`
 --
 
@@ -513,7 +613,8 @@ ALTER TABLE `danhgia`
 ALTER TABLE `datxe`
   ADD CONSTRAINT `datxe_fk_1` FOREIGN KEY (`ma_xe`) REFERENCES `xe` (`ma_xe`),
   ADD CONSTRAINT `datxe_fk_2` FOREIGN KEY (`ma_nguoi_dat_xe`) REFERENCES `nguoidung` (`ma_nguoi_dung`),
-  ADD CONSTRAINT `datxe_fk_3` FOREIGN KEY (`dia_chi_nhan_xe`) REFERENCES `diachi` (`ma_dia_chi`);
+  ADD CONSTRAINT `datxe_fk_3` FOREIGN KEY (`dia_chi_nhan_xe`) REFERENCES `diachi` (`ma_dia_chi`),
+  ADD CONSTRAINT `fk_voucher_datxe` FOREIGN KEY (`ma_voucher`) REFERENCES `voucher` (`ma_voucher`);
 
 --
 -- Constraints for table `hinhanh`
@@ -527,6 +628,13 @@ ALTER TABLE `hinhanh`
 ALTER TABLE `lichsuthue`
   ADD CONSTRAINT `lichsuthue_ibfk_1` FOREIGN KEY (`ma_xe`) REFERENCES `xe` (`ma_xe`),
   ADD CONSTRAINT `lichsuthue_ibfk_2` FOREIGN KEY (`ma_nguoi_thue`) REFERENCES `nguoidung` (`ma_nguoi_dung`);
+
+--
+-- Constraints for table `thongbao`
+--
+ALTER TABLE `thongbao`
+  ADD CONSTRAINT `fk_ma_loai_thong_bao` FOREIGN KEY (`ma_loai_thong_bao`) REFERENCES `loaithongbao` (`ma_loai_thong_bao`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ma_nguoi_dung` FOREIGN KEY (`ma_nguoi_dung`) REFERENCES `nguoidung` (`ma_nguoi_dung`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `thongtincobanxe`

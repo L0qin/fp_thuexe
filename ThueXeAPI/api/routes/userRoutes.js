@@ -7,7 +7,9 @@ const {
     registerUser, 
     loginUser,
     getUser,
-    modifyUser
+    modifyUser,
+    getUserNotification,
+    getUserNewNotificationNumber
  } = require('../controllers/userController');
 
 // Register route
@@ -22,5 +24,8 @@ router.get('/:id',authenticateToken, getUser);
 // Route to modify a specific user
 router.put('/:id',authenticateToken, modifyUser);
 
+router.get('/getUserNotification/:id', authenticateToken, getUserNotification);
+
+router.get('/getUserNewNotificationNumber/:id', authenticateToken, getUserNewNotificationNumber);
 
 module.exports = router;
