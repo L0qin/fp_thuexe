@@ -81,31 +81,6 @@ exports.getAllUnverifiedVehicles = (req, res) => {
             // Splitting the vehicle images and paper images into separate arrays
             const vehicleImages = vehicleJson.vehicle_images ? vehicleJson.vehicle_images.split(',') : [];
             const paperImages = vehicleJson.paper_images ? vehicleJson.paper_images.split(',') : [];
-            console.log({
-                vehicleId: vehicleJson.ma_xe,
-                vehicleName: vehicleJson.ten_xe,
-                status: vehicleJson.trang_thai,
-                model: vehicleJson.model,
-                manufacturer: vehicleJson.hang_sx,
-                description: vehicleJson.mo_ta,
-                address: {
-                    streetAddress: vehicleJson.dia_chi,
-                    city: vehicleJson.thanh_pho,
-                    country: vehicleJson.quoc_gia,
-                    zipCode: vehicleJson.zip_code,
-                },
-                rentalPrice: vehicleJson.gia_thue,
-                seats: vehicleJson.so_cho,
-                ownerId: vehicleJson.chu_so_huu,
-                vehicleTypeId: vehicleJson.ma_loai_xe,
-                owner: {
-                    name: vehicleJson.owner_name,
-                    avatar: vehicleJson.owner_avatar,
-                },
-                images: vehicleImages,
-                mainImage: vehicleImages.length > 0 ? vehicleImages[0] : null,
-                paperImages: paperImages, // Added field for paper images
-            });
             return {
                 vehicleId: vehicleJson.ma_xe,
                 vehicleName: vehicleJson.ten_xe,
@@ -416,3 +391,137 @@ exports.deactivateUser = (req, res) => {
     });
 };
 
+exports.getTerms = (req, res) => {
+    const query = `SELECT ma_dieu_khoan, phien_ban, tieu_de, noi_dung, ngay_hieu_luc, ngay_tao, ngay_cap_nhat_cuoi, trang_thai FROM dieukhoansudung`;
+
+    db.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        const terms = results.map(term => ({
+            termId: term.ma_dieu_khoan,
+            version: term.phien_ban,
+            title: term.tieu_de,
+            content: term.noi_dung,
+            effectiveDate: term.ngay_hieu_luc,
+            creationDate: term.ngay_tao,
+            lastUpdateDate: term.ngay_cap_nhat_cuoi,
+            status: term.trang_thai,
+        }));
+        res.json(terms);
+    });
+};
+
+
+exports.createTerm = (req, res) => {
+    const { phienBan, tieuDe, noiDung, ngayHieuLuc, trangThai } = req.body;
+
+    const query = `INSERT INTO dieukhoansudung (phien_ban, tieu_de, noi_dung, ngay_hieu_luc, trang_thai) VALUES (?, ?, ?, ?, ?)`;
+
+    db.query(query, [phienBan, tieuDe, noiDung, ngayHieuLuc, trangThai], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ message: "Điều khoản sử dụng đã được tạo thành công", maDieuKhoan: results.insertId });
+    });
+};
+
+exports.deleteTerm = (req, res) => {
+    const { maDieuKhoan } = req.params;
+
+    const query = `DELETE FROM dieukhoansudung WHERE ma_dieu_khoan = ?`;
+
+    db.query(query, [maDieuKhoan], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (results.affectedRows == 0) {
+            return res.status(404).json({ message: "Không tìm thấy điều khoản sử dụng với mã cung cấp" });
+        }
+        res.json({ message: "Điều khoản sử dụng đã được xoá thành công" });
+    });
+};
+
+exports.updateTerm = (req, res) => {
+    const { maDieuKhoan } = req.params;
+    const { phienBan, tieuDe, noiDung, ngayHieuLuc, trangThai } = req.body;
+
+    const query = `UPDATE dieukhoansudung SET phien_ban = ?, tieu_de = ?, noi_dung = ?, ngay_hieu_luc = ?, trang_thai = ? WHERE ma_dieu_khoan = ?`;
+
+    db.query(query, [phienBan, tieuDe, noiDung, ngayHieuLuc, trangThai, maDieuKhoan], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (results.affectedRows == 0) {
+            return res.status(404).json({ message: "Không tìm thấy điều khoản sử dụng với mã cung cấp" });
+        }
+        res.json({ message: "Điều khoản sử dụng đã được cập nhật thành công" });
+    });
+};
+
+exports.sendNotification = (req, res) => {
+    // Assuming req.body contains the notification details: ma_nguoi_dung, ma_loai_thong_bao, tieu_de, noi_dung
+    const { ma_nguoi_dung, ma_loai_thong_bao, tieu_de, noi_dung } = req.body;
+
+    // Validate the input
+    if (!ma_nguoi_dung || !ma_loai_thong_bao || !tieu_de || !noi_dung) {
+        return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Prepare the SQL query
+    const query = `
+        INSERT INTO thongbao (ma_nguoi_dung, ma_loai_thong_bao, tieu_de, noi_dung, trang_thai_xem, ngay_tao)
+        VALUES (?, ?, ?, ?, 0, NOW())
+    `;
+
+    // Assuming `db` is your database connection object
+    db.query(query, [ma_nguoi_dung, ma_loai_thong_bao, tieu_de, noi_dung], (err, results) => {
+        if (err) {
+            console.error("Error inserting notification:", err);
+            return res.status(500).json({ error: "Database error", detail: err.message });
+        }
+
+        // Successful insertion
+        res.json({ message: "Notification sent successfully", notificationId: results.insertId });
+    });
+};
+
+exports.sendNotificationToAllUsers = (req, res) => {
+    // Assuming req.body contains the notification details: ma_loai_thong_bao, tieu_de, noi_dung
+    const { ma_loai_thong_bao, tieu_de, noi_dung } = req.body;
+
+    // Validate the input
+    if (!ma_loai_thong_bao || !tieu_de || !noi_dung) {
+        return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Retrieve all user IDs from the nguoidung table
+    const userQuery = `SELECT ma_nguoi_dung FROM nguoidung`;
+
+    db.query(userQuery, (err, users) => {
+        if (err) {
+            console.error("Error retrieving users:", err);
+            return res.status(500).json({ error: "Database error", detail: err.message });
+        }
+
+        // Prepare the SQL query for inserting notifications
+        // This assumes that your SQL database supports bulk insertion syntax or you're okay with inserting one by one in a loop for simplicity
+        const insertQuery = `
+            INSERT INTO thongbao (ma_nguoi_dung, ma_loai_thong_bao, tieu_de, noi_dung, trang_thai_xem, ngay_tao)
+            VALUES ?;
+        `;
+
+        // Create an array of values to insert
+        const values = users.map(user => [user.ma_nguoi_dung, ma_loai_thong_bao, tieu_de, noi_dung, 0, new Date()]);
+
+        // Execute the bulk insertion
+        db.query(insertQuery, [values], (insertErr, results) => {
+            if (insertErr) {
+                console.error("Error inserting notifications:", insertErr);
+                return res.status(500).json({ error: "Database error during notification insertion", detail: insertErr.message });
+            }
+
+            res.json({ message: `Notifications sent successfully to ${users.length} users` });
+        });
+    });
+};

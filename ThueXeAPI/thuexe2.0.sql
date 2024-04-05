@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Mar 30, 2024 at 08:16 AM
+-- Generation Time: Apr 05, 2024 at 08:54 AM
 -- Server version: 8.0.31
 -- PHP Version: 8.0.26
 
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `danhgia` (
   `ma_xe` int NOT NULL,
   `ma_nguoi_dung` int NOT NULL,
   `so_sao` int NOT NULL,
-  `binh_luan` text COLLATE utf8mb4_unicode_ci,
+  `binh_luan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `thoi_gian` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`ma_danh_gia`),
   KEY `danhgia_fk_1` (`ma_xe`),
@@ -67,27 +67,34 @@ CREATE TABLE IF NOT EXISTS `datxe` (
   `ma_dat_xe` int NOT NULL AUTO_INCREMENT,
   `ngay_bat_dau` date NOT NULL,
   `ngay_ket_thuc` date NOT NULL,
-  `trang_thai_dat_xe` int DEFAULT 0,
+  `trang_thai_dat_xe` int DEFAULT '0',
   `dia_chi_nhan_xe` int DEFAULT NULL,
   `tong_tien_thue` decimal(10,2) DEFAULT NULL,
   `ma_xe` int DEFAULT NULL,
   `ma_nguoi_dat_xe` int NOT NULL,
   `ma_chu_xe` int NOT NULL,
-  `ghi_chu` text NULL,
-  `giam_gia` int NULL,
+  `ghi_chu` text COLLATE utf8mb4_unicode_ci,
+  `giam_gia` int DEFAULT NULL,
   PRIMARY KEY (`ma_dat_xe`),
   KEY `datxe_fk_1` (`ma_xe`),
   KEY `datxe_fk_2` (`ma_nguoi_dat_xe`),
   KEY `datxe_fk_3` (`dia_chi_nhan_xe`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `datxe`
 --
 
-INSERT INTO `datxe` (`ma_dat_xe`, `ngay_bat_dau`, `ngay_ket_thuc`, `trang_thai_dat_xe`, `dia_chi_nhan_xe`, `tong_tien_thue`, `ma_xe`, `ma_nguoi_dat_xe`,`ma_chu_xe`) VALUES
-(1, '2023-12-10', '2023-12-12', 1, 1, '1000000.00', 1, 1,1),
-(2, '2023-12-15', '2023-12-20', 1, 2, '6000000.00', 2, 2,1);
+INSERT INTO `datxe` (`ma_dat_xe`, `ngay_bat_dau`, `ngay_ket_thuc`, `trang_thai_dat_xe`, `dia_chi_nhan_xe`, `tong_tien_thue`, `ma_xe`, `ma_nguoi_dat_xe`, `ma_chu_xe`, `ghi_chu`, `giam_gia`) VALUES
+(1, '2023-12-10', '2023-12-12', 1, 1, '1000000.00', 1, 1, 1, NULL, NULL),
+(2, '2023-12-15', '2023-12-20', 1, 2, '6000000.00', 2, 2, 1, NULL, NULL),
+(3, '2024-04-02', '2024-04-03', 0, 1, '0.00', 1, 101, 0, '', 0),
+(4, '2024-04-02', '2024-04-03', 2, 1, '0.00', 1, 101, 100, '', 0),
+(5, '2024-04-02', '2024-04-03', -1, 1, '0.00', 6, 101, 100, '', 0),
+(6, '2024-04-02', '2024-04-03', 0, 1, '0.00', 1, 101, 100, '', 0),
+(7, '2024-04-02', '2024-04-03', 0, 1, '0.00', 2, 101, 100, 'sf', 0),
+(8, '2024-04-02', '2024-04-03', 0, 1, '0.00', 1, 101, 100, '', 0),
+(9, '2024-04-02', '2024-04-30', 0, 1, '0.00', 1, 101, 100, 'ghhgghh', 0);
 
 -- --------------------------------------------------------
 
@@ -98,12 +105,12 @@ INSERT INTO `datxe` (`ma_dat_xe`, `ngay_bat_dau`, `ngay_ket_thuc`, `trang_thai_d
 DROP TABLE IF EXISTS `diachi`;
 CREATE TABLE IF NOT EXISTS `diachi` (
   `ma_dia_chi` int NOT NULL AUTO_INCREMENT,
-  `dia_chi` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `thanh_pho` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `quoc_gia` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `zip_code` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dia_chi` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `thanh_pho` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `quoc_gia` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `zip_code` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`ma_dia_chi`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `diachi`
@@ -120,7 +127,35 @@ INSERT INTO `diachi` (`ma_dia_chi`, `dia_chi`, `thanh_pho`, `quoc_gia`, `zip_cod
 (8, 'Phu Quoc', 'Kien Giang', 'Vietnam', '920000'),
 (9, 'Vinh', 'Nghe An', 'Vietnam', '460000'),
 (10, 'Bien Hoa', 'Dong Nai', 'Vietnam', '810000'),
-(11, '123 Test Street, Test City', NULL, NULL, NULL);
+(11, '123 Test Street, Test City', NULL, NULL, NULL),
+(12, '123 Test Street, Test City', NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `dieukhoansudung`
+--
+
+DROP TABLE IF EXISTS `dieukhoansudung`;
+CREATE TABLE IF NOT EXISTS `dieukhoansudung` (
+  `ma_dieu_khoan` int NOT NULL AUTO_INCREMENT,
+  `phien_ban` varchar(50) DEFAULT '1.0',
+  `tieu_de` varchar(255) DEFAULT NULL,
+  `noi_dung` longtext,
+  `ngay_hieu_luc` datetime DEFAULT CURRENT_TIMESTAMP,
+  `ngay_tao` datetime DEFAULT CURRENT_TIMESTAMP,
+  `ngay_cap_nhat_cuoi` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `trang_thai` int DEFAULT '1',
+  PRIMARY KEY (`ma_dieu_khoan`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `dieukhoansudung`
+--
+
+INSERT INTO `dieukhoansudung` (`ma_dieu_khoan`, `phien_ban`, `tieu_de`, `noi_dung`, `ngay_hieu_luc`, `ngay_tao`, `ngay_cap_nhat_cuoi`, `trang_thai`) VALUES
+(1, NULL, 'Lưu Ý Quan Trọng Khi Thuê Xe', 'Kiểm Tra Danh Mục Xe: Trước khi đặt xe, hãy kiểm tra kỹ danh mục xe có sẵn trên ứng dụng của chúng tôi. Đảm bảo chọn loại xe phản ánh đúng nhu cầu và số lượng người đi cùng.\n\nXác Thực Thông Tin: Hãy chắc chắn rằng bạn cung cấp thông tin cá nhân và thanh toán chính xác. Thông tin không chính xác có thể gây trở ngại trong quá trình thuê hoặc tạo ra sự phiền toái sau này.\n\nKiểm Tra Giá và Chính Sách: Đọc kỹ chính sách thuê xe và kiểm tra giá thuê trước khi xác nhận đặt xe. Điều này giúp bạn hiểu rõ về các khoản phí bổ sung, điều kiện huỷ bỏ, và các yêu cầu khác.\n\nKiểm Tra Đánh Giá và Phản Hồi: Trước khi quyết định, hãy đọc các đánh giá và phản hồi từ các khách hàng trước đó. Điều này giúp bạn có cái nhìn tổng quan về chất lượng dịch vụ của chúng tôi.\n\nThời Gian Thuê và Trả Xe: Đảm bảo bạn hiểu rõ về thời gian thuê và trả xe. Việc trả xe muộn có thể phát sinh phí phạt. Nếu có bất kỳ thay đổi nào trong kế hoạch của bạn, vui lòng thông báo trước để chúng tôi có thể sắp xếp lại.\n\nLiên Hệ Hỗ Trợ: Trong trường hợp có bất kỳ vấn đề nào xuất hiện trong quá trình thuê hoặc sử dụng xe, hãy liên hệ ngay với dịch vụ khách hàng của chúng tôi để được hỗ trợ kịp thời.\n\nKiểm Tra Trạng Thái Xe: Trước khi nhận xe, hãy kiểm tra kỹ trạng thái của xe và ghi lại bất kỳ tổn thất nào. Điều này giúp bạn tránh việc bị buộc phải trả phí cho những tổn thất không phải do bạn gây ra.\n\nBảo Dưỡng và An Toàn: Hãy tuân thủ các quy tắc an toàn giao thông và bảo dưỡng xe đúng cách trong suốt thời gian sử dụng. Nếu gặp phải vấn đề kỹ thuật hoặc tai nạn, hãy báo ngay cho chúng tôi để được hỗ trợ.\n\nChúng tôi hy vọng rằng những lưu ý trên sẽ giúp bạn có trải nghiệm thuê xe trơn tru và tiện lợi trên ứng dụng của chúng tôi.', '2024-04-01 00:00:00', '2024-04-04 20:57:42', '2024-04-05 15:41:50', 1),
+(2, '1.0', 'Điều Khoản Sử Dụng Dịch Vụ Thuê Xe', 'Chào mừng bạn đến với ứng dụng thuê xe của chúng tôi. Trước khi bạn sử dụng dịch vụ, vui lòng đọc kỹ và hiểu rõ các điều khoản và điều kiện sau đây:\r\n\r\nĐăng Ký và Tài Khoản:\r\n\r\nBạn phải đăng ký một tài khoản để sử dụng dịch vụ thuê xe của chúng tôi.\r\nBạn cam kết cung cấp thông tin cá nhân chính xác và hoàn chỉnh khi đăng ký tài khoản.\r\nQuyền Lợi và Trách Nhiệm:\r\n\r\nBạn có quyền thuê xe theo các điều kiện đã được quy định trên ứng dụng.\r\nBạn phải chịu trách nhiệm cho việc sử dụng xe và phải tuân thủ các quy định về an toàn giao thông.\r\nThanh Toán:\r\n\r\nBạn đồng ý thanh toán phí thuê xe theo các phương thức thanh toán được chấp nhận trên ứng dụng.\r\nCác khoản phí bổ sung như phí bảo hiểm, phí nhiên liệu và phí phạt sẽ được thông báo rõ ràng trước khi bạn xác nhận đặt xe.\r\nHuỷ Đặt Xe:\r\n\r\nBạn có thể huỷ đặt xe mà không phải trả phí nếu thực hiện trước thời hạn được quy định trên ứng dụng.\r\nViệc huỷ đặt xe sau thời hạn quy định có thể phát sinh phí huỷ đặt.\r\nBảo Mật Thông Tin:\r\n\r\nChúng tôi cam kết bảo vệ thông tin cá nhân của bạn và sử dụng thông tin đó chỉ cho mục đích cung cấp dịch vụ.\r\nBạn không được chia sẻ tài khoản và thông tin đăng nhập của mình với bất kỳ ai khác.\r\nThay Đổi và Cập Nhật:\r\n\r\nChúng tôi có quyền thay đổi hoặc cập nhật các điều khoản và điều kiện này mà không cần thông báo trước.\r\nBạn có trách nhiệm kiểm tra và cập nhật thông tin về điều khoản và điều kiện mới khi chúng được cập nhật.\r\nBằng cách sử dụng dịch vụ thuê xe của chúng tôi, bạn đồng ý tuân thủ các điều khoản và điều kiện được nêu trên. Việc vi phạm các điều khoản này có thể dẫn đến hậu quả pháp lý.', '2024-04-04 20:57:42', '2024-04-04 20:57:42', '2024-04-04 20:57:42', 1);
 
 -- --------------------------------------------------------
 
@@ -132,11 +167,11 @@ DROP TABLE IF EXISTS `hinhanh`;
 CREATE TABLE IF NOT EXISTS `hinhanh` (
   `ma_hinh_anh` int NOT NULL AUTO_INCREMENT,
   `loai_hinh` int NOT NULL,
-  `hinh` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `hinh` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `ma_xe` int NOT NULL,
   PRIMARY KEY (`ma_hinh_anh`),
   KEY `hinhanh_fk_1` (`ma_xe`)
-) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `hinhanh`
@@ -209,7 +244,13 @@ INSERT INTO `hinhanh` (`ma_hinh_anh`, `loai_hinh`, `hinh`, `ma_xe`) VALUES
 (64, 1, 'hinh3.jpg', 19),
 (65, 0, 'hinh3.jpg', 19),
 (66, 0, 'hinh3.jpg', 19),
-(67, 1, 'img1201711776810448.jpg', 20);
+(67, 1, 'img1201711776810448.jpg', 20),
+(68, 1, 'img1211711951130399.jpg', 21),
+(69, 0, 'img0211711951130604.jpg', 21),
+(70, 0, 'img0211711951130708.jpg', 21),
+(71, 3, 'img3211711951130757.jpg', 21),
+(72, 3, 'img3211711951130824.jpg', 21),
+(73, 3, 'img3211711951130876.jpg', 21);
 
 -- --------------------------------------------------------
 
@@ -224,7 +265,7 @@ CREATE TABLE IF NOT EXISTS `lichsuthue` (
   `ma_nguoi_thue` int NOT NULL,
   `ngay_bat_dau` date NOT NULL,
   `ngay_ket_thuc` date NOT NULL,
-  `ghi_chu` text COLLATE utf8mb4_unicode_ci,
+  `ghi_chu` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`ma_lich_su`),
   KEY `ma_xe` (`ma_xe`),
   KEY `ma_nguoi_thue` (`ma_nguoi_thue`)
@@ -255,7 +296,7 @@ INSERT INTO `lichsuthue` (`ma_lich_su`, `ma_xe`, `ma_nguoi_thue`, `ngay_bat_dau`
 DROP TABLE IF EXISTS `loaixe`;
 CREATE TABLE IF NOT EXISTS `loaixe` (
   `ma_loai_xe` int NOT NULL AUTO_INCREMENT,
-  `ten_loai_xe` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ten_loai_xe` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`ma_loai_xe`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -294,13 +335,13 @@ INSERT INTO `loaixe` (`ma_loai_xe`, `ten_loai_xe`) VALUES
 DROP TABLE IF EXISTS `nguoidung`;
 CREATE TABLE IF NOT EXISTS `nguoidung` (
   `ma_nguoi_dung` int NOT NULL AUTO_INCREMENT,
-  `ten_nguoi_dung` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `mat_khau_hash` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ho_ten` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `hinh_dai_dien` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `ten_nguoi_dung` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mat_khau_hash` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ho_ten` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `hinh_dai_dien` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '',
   `ngay_dang_ky` date NOT NULL,
-  `so_dien_thoai` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dia_chi_nguoi_dung` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `so_dien_thoai` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dia_chi_nguoi_dung` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `loai_nguoi_dung` int DEFAULT '0',
   `trang_thai` int DEFAULT '1',
   PRIMARY KEY (`ma_nguoi_dung`)
@@ -310,11 +351,11 @@ CREATE TABLE IF NOT EXISTS `nguoidung` (
 -- Dumping data for table `nguoidung`
 --
 
-INSERT INTO `nguoidung` (`ma_nguoi_dung`, `ten_nguoi_dung`, `mat_khau_hash`, `ho_ten`, `hinh_dai_dien`, `ngay_dang_ky`, `so_dien_thoai`, `dia_chi_nguoi_dung`, `loai_nguoi_dung`) VALUES
-(1, 'user01', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Nguyen Van A', 'avt1.jpg', '2023-12-01', '0123456789', '123 Nguyen Trai, Hanoi', 0),
-(2, 'user02', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Tran Thi B', 'avt2.jpg', '2023-12-02', '9876543210', '456 Le Loi, Ho Chi Minh', 0),
-(100, 'Agent', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Agent', 'agent.jpg', '2023-12-01', '0123456789', '123 Nguyen Trai, Hanoi', 1),
-(101, '1', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Test User', 'img_101_1711777742824.jpg', '2024-03-29', '1234567890', '123 Test Street', 1);
+INSERT INTO `nguoidung` (`ma_nguoi_dung`, `ten_nguoi_dung`, `mat_khau_hash`, `ho_ten`, `hinh_dai_dien`, `ngay_dang_ky`, `so_dien_thoai`, `dia_chi_nguoi_dung`, `loai_nguoi_dung`, `trang_thai`) VALUES
+(1, 'user01', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Nguyen Van A', 'avt1.jpg', '2023-12-01', '0123456789', '123 Nguyen Trai, Hanoi', 0, -1),
+(2, 'user02', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Tran Thi B', 'avt2.jpg', '2023-12-02', '9876543210', '456 Le Loi, Ho Chi Minh', 0, 1),
+(100, 'Agent', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Agent', 'agent.jpg', '2023-12-01', '0123456789', '123 Nguyen Trai, Hanoi', 1, 1),
+(101, '1', '$2b$10$72Ux6q4WA7r4gJsQKzbm9O/GZKs7Ned8p84YLnaF3u9HJahyL80LK', 'Test User', 'img_101_1711777742824.jpg', '2024-03-29', '1234567890', '123 Test Street', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -326,12 +367,12 @@ DROP TABLE IF EXISTS `thongtincobanxe`;
 CREATE TABLE IF NOT EXISTS `thongtincobanxe` (
   `ma_thong_tin_co_ban` int NOT NULL AUTO_INCREMENT,
   `ma_xe` int NOT NULL,
-  `model` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `hang_sx` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `model` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `hang_sx` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `so_cho` int DEFAULT NULL,
   PRIMARY KEY (`ma_thong_tin_co_ban`),
   KEY `ttcbxe_fk_1` (`ma_xe`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `thongtincobanxe`
@@ -357,7 +398,8 @@ INSERT INTO `thongtincobanxe` (`ma_thong_tin_co_ban`, `ma_xe`, `model`, `hang_sx
 (17, 17, 'XC60 2019', 'Volvo', 5),
 (18, 18, '500 2018', 'Fiat', 4),
 (19, 19, '10000 2018', 'Fiat', 4),
-(20, 20, 'T2024', '', 5);
+(20, 20, 'T2024', '', 5),
+(21, 21, 'T2024', 'Honda', 5);
 
 -- --------------------------------------------------------
 
@@ -370,13 +412,13 @@ CREATE TABLE IF NOT EXISTS `thongtinkythuatxe` (
   `ma_thong_tin_ky_thuat` int NOT NULL AUTO_INCREMENT,
   `ma_xe` int NOT NULL,
   `nam_san_xuat` int DEFAULT NULL,
-  `mau_sac` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `mau_sac` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `quang_duong` int DEFAULT NULL,
-  `mo_ta` text COLLATE utf8mb4_unicode_ci,
-  `nhien_lieu` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `mo_ta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `nhien_lieu` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`ma_thong_tin_ky_thuat`),
   KEY `ttktxe_fk_1` (`ma_xe`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `thongtinkythuatxe`
@@ -402,7 +444,8 @@ INSERT INTO `thongtinkythuatxe` (`ma_thong_tin_ky_thuat`, `ma_xe`, `nam_san_xuat
 (17, 16, 2021, 'Xanh dương', 15000, 'Crossover sang trọng với nhiều tính năng an toàn', NULL),
 (18, 17, 2019, 'Xanh lá', 22000, 'SUV an toàn, thoải mái với thiết kế Scandinavia', NULL),
 (19, 18, 2018, 'Đỏ', 30000, 'Chiếc city car biểu tượng với thiết kế độc đáo', NULL),
-(20, 20, NULL, NULL, NULL, 'This is a dummy description for testing purposes.This is a dummy description for testing purposes.This is a dummy description for testing purposes.', NULL);
+(20, 20, NULL, NULL, NULL, 'This is a dummy description for testing purposes.This is a dummy description for testing purposes.This is a dummy description for testing purposes.', NULL),
+(21, 21, NULL, NULL, NULL, 'This is a dummy description for testing purposes.This is a dummy description for testing purposes.This is a dummy description for testing purposes.', NULL);
 
 -- --------------------------------------------------------
 
@@ -413,18 +456,18 @@ INSERT INTO `thongtinkythuatxe` (`ma_thong_tin_ky_thuat`, `ma_xe`, `nam_san_xuat
 DROP TABLE IF EXISTS `xe`;
 CREATE TABLE IF NOT EXISTS `xe` (
   `ma_xe` int NOT NULL AUTO_INCREMENT,
-  `ten_xe` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `trang_thai` int DEFAULT 0,
+  `ten_xe` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `trang_thai` int DEFAULT '0',
   `chu_so_huu` int NOT NULL,
   `ma_loai_xe` int NOT NULL,
-  `gia_thue` decimal(10,2) DEFAULT 0,
+  `gia_thue` decimal(10,2) DEFAULT '0.00',
   `ma_dia_chi` int DEFAULT NULL,
   `da_xac_minh` int DEFAULT '0',
   PRIMARY KEY (`ma_xe`),
   KEY `chu_so_huu` (`chu_so_huu`),
   KEY `ma_loai_xe` (`ma_loai_xe`),
   KEY `ma_dia_chi` (`ma_dia_chi`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `xe`
@@ -450,7 +493,8 @@ INSERT INTO `xe` (`ma_xe`, `ten_xe`, `trang_thai`, `chu_so_huu`, `ma_loai_xe`, `
 (17, 'Volvo XC60', 0, 100, 2, '1300000.00', 7, 0),
 (18, 'Fiat 500', 0, 100, 4, '250000.00', 8, 0),
 (19, 'Fiat 10000', 0, 100, 4, '250000.00', 8, 0),
-(20, 'TEST CAR 3123123', 0, 101, 1, '5000000.00', 11, 0);
+(20, 'TEST CAR 3123123', 0, 101, 1, '5000000.00', 11, 1),
+(21, 'TEST CAR 3123123', 0, 101, 1, '5000000.00', 12, 0);
 
 --
 -- Constraints for dumped tables

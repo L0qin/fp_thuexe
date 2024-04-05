@@ -34,6 +34,13 @@
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- CSS Files -->
   <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+  <!-- Add Select2 CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+  <!-- Add Select2 JS (ensure jQuery is included as Select2 depends on it) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
 </head>
 
 <body class="g-sidenav-show   bg-gray-100">
@@ -53,42 +60,69 @@
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/dashboard.html">
-            <div
-              class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Dashboard</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="../pages/tables.html">
-            <div
-              class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="fa fa-check text-primary text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Duyệt xe</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/vehicles.html">
-            <div
-              class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="fa fa-car text-primary text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Xe</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/users.html">
-            <div
-              class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="fa fa-user text-primary text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Người dùng</span>
-          </a>
-        </li>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link " href="../pages/dashboard.html">
+              <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="../pages/approvals.html">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="fa fa-check text-primary text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Duyệt xe</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link " href="../pages/vehicles.html">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="fa fa-car text-primary text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Xe</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link " href="../pages/users.html">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="fa fa-user text-primary text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Người dùng</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link " href="../pages/terms.html">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="fa fa-book text-primary text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Quản lý điều khoản</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link " href="../pages/vouchers.html">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="fa fa-gift text-primary text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Quản lý mã giảm giá</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link " href="../pages/notitficattions.html">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="fa fa-envelope text-primary text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Gửi thông báo</span>
+            </a>
+          </li>
       </ul>
     </div>
     <div class="sidenav-footer mx-3 ">
@@ -229,36 +263,57 @@
         <div class="col-12">
           <div class="card mb-4">
             <div class="card-header pb-0">
-              <h6>Danh sách xe chờ duyệt</h6>
+              <h6>Gửi thông báo</h6>
             </div>
-            <div class="card-body px-0 pt-0 pb-2">
-              <div class="table-responsive p-0">
-
-                <div class="table-responsive">
-                  <table class="table align-items-center mb-0">
-                    <thead>
-                      <tr>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Xe chờ duyệt
-                        </th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Chủ xe</th>
-                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                          Trạng thái</th>
-                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Hành
-                          động</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <!-- Dynamic rows will be appended here by the JavaScript -->
-                    </tbody>
-                  </table>
+            <div class="card-body px-4 pt-2 pb-2">
+              <form id="sendNotificationForm">
+                <div class="mb-3">
+                  <label for="userSelect" class="form-label">Chọn Người Nhận</label>
+                  <select class="form-select" id="userSelect" name="ma_nguoi_dung">
+                    <option value="all">Tất cả người dùng</option>
+                    <!-- User options will be added here by the script -->
+                  </select>
                 </div>
-
-              </div>
+                <div class="mb-3">
+                  <label for="title" class="form-label">Tiêu Đề</label>
+                  <input type="text" class="form-control" id="title" name="tieu_de" placeholder="Nhập tiêu đề thông báo"
+                    required>
+                </div>
+                <div class="mb-3">
+                  <label for="content" class="form-label">Nội Dung</label>
+                  <textarea class="form-control" id="content" name="noi_dung" rows="3"
+                    placeholder="Nhập nội dung thông báo" required></textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="notificationType" class="form-label">Loại Thông Báo</label>
+                  <select class="form-select" id="notificationType" name="ma_loai_thong_bao" required>
+                    <option value="">Chọn loại thông báo</option>
+                    <!-- Example Options -->
+                    <option value="1">Xác Nhận Đặt Xe</option>
+                    <option value="2">Nhắc Nhở Thuê Xe</option>
+                    <option value="3">Khuyến Mãi</option>
+                    <option value="4">Yêu Cầu Phản Hồi</option>
+                  </select>
+                </div>
+                <div class="text-center">
+                  <button type="submit" id="submit" class="btn btn-primary">Gửi Thông Báo</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+
+    <style>
+      #sendNotificationForm>fieldset>.mb-3 {
+        justify-content: center;
+      }
+    </style>
+
+
+
   </main>
   <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
@@ -342,24 +397,7 @@
     </div>
   </div>
 
-  <!-- Vehicle Details Modal -->
-  <div class="modal fade" id="vehicleDetailsModal" tabindex="-1" aria-labelledby="vehicleDetailsModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-xl"> <!-- Extra large modal -->
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="vehicleDetailsModalLabel">Vehicle Details</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Placeholder for dynamic content -->
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
 
 
@@ -382,7 +420,6 @@
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
-
 
 
 
@@ -441,261 +478,154 @@
   <!-- ======================================================================================================================================= -->
 
   <script>
-    let vehiclesMap = new Map();
-    document.addEventListener('DOMContentLoaded', function () {
-      if (!localStorage.getItem('adminToken') || !localStorage.getItem('adminId')) {
-        window.location.href = '/admin/pages/sign-in.html'; // Adjust the URL to your login page
-        return; // Stop executing the script
+    $(document).ready(function () {
+      // Initialize Select2 on the user select dropdown
+      $('#userSelect').select2({
+        placeholder: "Chọn người dùng",
+        allowClear: true,
+        width: '100%'
+      });
+
+      // Fetch users and populate the dropdown
+      function fetchUsers() {
+        fetch('/api/admins/getAllUsers', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem('adminToken')}`
+          }
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Populate the dropdown with the users' IDs and names
+            data.forEach(user => {
+              $('#userSelect').append(new Option(`${user.userId} - ${user.fullName}`, user.userId));
+            });
+            // Update Select2
+            $('#userSelect').select2({
+              placeholder: "Chọn người dùng",
+              allowClear: true,
+              width: '100%'
+            });
+          })
+          .catch(error => {
+            console.error('Error fetching users:', error);
+            alert('Không thể tải danh sách người dùng. Vui lòng kiểm tra lại.');
+          });
       }
 
-      fetch('/api/admins/getAllUnverifiedVehicles/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `${localStorage.getItem('adminToken')}` // Ensure correct format, including "Bearer"
-        },
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`Network response was not ok: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(vehicles => {
-          const tableBody = document.querySelector('table tbody');
-          vehicles.forEach(vehicle => {
-            vehiclesMap.set(vehicle.vehicleId.toString(), vehicle);
-
-            const mainImageUrl = vehicle.mainImage ? `/api/images/getimages/${vehicle.mainImage}` : '../assets/img/vehicle-placeholder.png'; // Adjust the path as needed
-            const ownerAvatarUrl = vehicle.owner.avatar ? `/api/images/getimages/${vehicle.owner.avatar}` : '../assets/img/user-placeholder.png'; // Ensure this path is correct
-            const vehiclePlaceHolderImageUrl = '../assets/img/vehicle-placeholder.png';
-
-            const vehicleNameCell = `
-                                    <td>
-                                        <div class="d-flex px-2 py-1">
-                                            <div>
-                                                <img src="${mainImageUrl}" class="avatar avatar-sm me-3" alt="Vehicle Image" onerror="this.onerror=null; this.src='${vehiclePlaceHolderImageUrl}'">
-                                            </div>
-                                            <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">${vehicle.vehicleName}</h6>
-                                                <p class="text-xs text-secondary mb-0">${vehicle.model}, ${vehicle.manufacturer}</p>
-                                            </div>
-                                        </div>
-                                    </td>`;
-
-            userPlaceHolderImageUrl = '../assets/img/user-placeholder.png';
-            const ownerCell = `
-                          <td class="align-items-center">
-                              <img src="${ownerAvatarUrl}" class="rounded-circle me-2" style="width:30px; height:30px; object-fit: cover;" alt="Owner Avatar" onerror="this.onerror=null; this.src='${userPlaceHolderImageUrl}'">
-                              <p class="text-xs font-weight-bold mb-0" style="margin-bottom: 0 !important;">${vehicle.owner.name}</p>
-                          </td>`;
-
-            const statusCell = '<td class="align-middle text-center text-sm"><span class="badge badge-sm bg-gradient-secondary">Chờ duyệt</span></td>';
-            const actionsCell = `<td class="align-middle text-center">
-                        <button class="btn btn-primary btn-sm me-1" data-action="details" data-vehicle-id="${vehicle.vehicleId}">Chi tiết</button>
-                        <button class="btn btn-success btn-sm me-1" data-action="approve" data-vehicle-id="${vehicle.vehicleId}">Duyệt</button>
-                        <button class="btn btn-danger btn-sm" data-action="deny" data-vehicle-id="${vehicle.vehicleId}">Từ chối</button>
-                    </td>`;
-
-
-            const row = document.createElement('tr');
-            row.innerHTML = vehicleNameCell + ownerCell + statusCell + actionsCell;
-            tableBody.appendChild(row);
-          });
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert(`Error: ${error.message}`);
-        });
+      fetchUsers();
     });
   </script>
 
+
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const table = document.querySelector('.table');
+    $(document).ready(function () {
+      // Handle form submission
+      $('#sendNotificationForm').on('submit', function (e) {
+        e.preventDefault(); // Prevent the default form submission
 
-      table.addEventListener('click', (e) => {
-        const vehicleId = e.target.dataset.vehicleId;
-        if (e.target.dataset.action === 'details') {
-          const vehicle = vehiclesMap.get(vehicleId); // Fetch vehicle data
-          const modalBody = document.querySelector('#vehicleDetailsModal .modal-body');
+        const userId = $('#userSelect').val();
+        const notificationType = $('#notificationType').val();
+        const title = $('#title').val();
+        const content = $('#content').val();
+        alert("testt");
 
-          
+        // Prepare the data
+        let data = {
+          ma_loai_thong_bao: notificationType,
+          tieu_de: title,
+          noi_dung: content
+        };
 
-          // Initialize dynamic content with a container for vertical layout
-          let content = `<div class="container">`;
+        let endpoint = '/api/admins/sendNotification'; // Default to sending to a specific user
 
-          // Section for vehicle images carousel
-          content += `
-            <div class="text-center mb-4">
-              <h5>Ảnh Xe</h5>
-              <div id="vehicleImagesCarousel" class="carousel slide" data-bs-ride="carousel" style="max-width: 500px; margin: auto;">
-                <div class="carousel-inner">`;
-
-          // Ensure all vehicle images are added to the carousel correctly
-          vehicle.images.forEach((image, index) => {
-            content += `
-          <div class="carousel-item ${index == 0 ? 'active' : ''}">
-            <img src="/api/images/getimages/${image}" class="d-block w-100" alt="Ảnh Xe" style="max-height: 400px;"
-                 onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">
-          </div>`;
-          });
-
-          content += `
-              </div>
-              <button class="carousel-control-prev" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Trước</span>
-              </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Tiếp theo</span>
-              </button>
-            </div>
-          </div>
-        </div>`;
-          // Thumbnails for vehicle images
-          content += `<div class="d-flex justify-content-center mt-2">`;
-          vehicle.images.forEach((image) => {
-            content += `<img src="/api/images/getimages/${image}" class="img-fluid img-thumbnail m-1" style="width: 100px; height: auto;" alt="Thumbnail" onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">`;
-          });
-          content += `</div></div>`; // Close vehicle images section
-
-
-          // Section for vehicle papers, if they exist
-          if (vehicle.paperImages && vehicle.paperImages.length > 0) {
-
-            // Section for vehicle images carousel
-            content += `
-            <div class="text-center mb-4">
-              <h5>Ảnh Xe</h5>
-              <div id="vehicleImagesCarousel" class="carousel slide" data-bs-ride="carousel" style="max-width: 500px; margin: auto;">
-                <div class="carousel-inner">`;
-
-            // Ensure all vehicle images are added to the carousel correctly
-            vehicle.paperImages.forEach((paperImage, index) => {
-              content += `
-          <div class="carousel-item ${index == 0 ? 'active' : ''}">
-            <img src="/api/images/getimages/${paperImage}" class="d-block w-100" alt="Ảnh Xe" style="max-height: 400px;"
-                 onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">
-          </div>`;
-            });
-
-            content += `
-              </div>
-              <button class="carousel-control-prev" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Trước</span>
-              </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#vehicleImagesCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Tiếp theo</span>
-              </button>
-            </div>
-          </div>
-        </div>`;
-            // Thumbnails for vehicle images
-            content += `<div class="d-flex justify-content-center mt-2">`;
-            vehicle.paperImages.forEach((paperImage) => {
-              content += `<img src="/api/images/getimages/${paperImage}" class="img-fluid img-thumbnail m-1" style="width: 100px; height: auto;" alt="Thumbnail" onerror="this.onerror=null;this.src='/admin/assets/img/vehicle-placeholder.png';">`;
-            });
-            content += `</div></div>`; // Close vehicle images section
-
-          } else {
-            content += `<div class="text-center mb-4"><p>Không có ảnh giấy tờ cho xe này.</p></div>`;
-          }
-
-          // Vehicle details section
-          content += `
-          <div class="mb-4">
-            <h4>Thông Tin Xe</h4>
-            <p><strong>Tên Xe:</strong> ${vehicle.vehicleName}</p>
-            <p><strong>Model:</strong> ${vehicle.model}</p>
-            <p><strong>Hãng SX:</strong> ${vehicle.manufacturer}</p>
-            <p><strong>Mô Tả:</strong> ${vehicle.description}</p>
-            <p><strong>Giá Thuê:</strong> ${vehicle.rentalPrice} / ngày</p>
-            <p><strong>Số Chỗ:</strong> ${vehicle.seats}</p>
-            <p><strong>Vị Trí:</strong> ${vehicle.address.streetAddress}, ${vehicle.address.city}</p>
-            <p><strong>Chủ Sở Hữu:</strong> ${vehicle.owner.name}</p>
-          </div>`;
-
-          content += `</div>`; // Close container div
-          modalBody.innerHTML = content;
-          var myModal = new bootstrap.Modal(document.getElementById('vehicleDetailsModal'));
-          myModal.show();
+        // Check if sending to all users
+        if (userId === 'all') {
+          endpoint = '/api/admins/sendNotificationToAllUsers';
+        } else {
+          data.ma_nguoi_dung = userId; // Add the user ID to the data if not sending to all
         }
+
+        // Send the request
+        fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem('adminToken')}`
+          },
+          body: JSON.stringify(data)
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            alert(data.message); // Show success message
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Error sending notification: ' + error.message);
+          });
       });
     });
   </script>
+
+
+
+
 
 
 
 
   <!-- ======================================================================================================================================= -->
+
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const table = document.querySelector('.table');
+    window.addEventListener('DOMContentLoaded', (event) => {
+      const token = localStorage.getItem('adminToken');
 
-      table.addEventListener('click', (e) => {
-        if (e.target.dataset.action === 'approve' || e.target.dataset.action === 'deny') {
-          // Confirmation step
-          const actionConfirm = e.target.dataset.action === 'approve' ? 'Xác nhận duyệt xe?' : 'Từ chối xe?';
-          if (!confirm(actionConfirm)) {
-            // If the user clicks "Cancel", stop the function
-            return;
-          }
-
-          const vehicleId = e.target.dataset.vehicleId;
-          const isApproveAction = e.target.dataset.action === 'approve';
-          const actionPath = isApproveAction ? '/api/admins/approveVehicle' : '/api/admins/denyVehicle';
-          fetch(`${actionPath}/${vehicleId}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `${localStorage.getItem('adminToken')}`
-            },
-          })
-            .then(response => {
-              if (response.ok) {
-                return response.json();
-              }
-              throw new Error('Network response was not ok.');
-            })
-            .then(data => {
-              console.log(data.message);
-              // Update the row to indicate the action
-              let clickedRow = e.target.closest('tr');
-              if (clickedRow) {
-                // Update the "Trạng thái" column
-                let statusColumn = clickedRow.children[2]; // Assuming "Trạng thái" is the third column
-                // Clear existing content
-                statusColumn.innerHTML = '';
-                // Create the badge span element
-                const statusBadge = document.createElement('span');
-                statusBadge.classList.add('badge', 'badge-sm');
-                // Set the badge's text and background color
-                if (isApproveAction) {
-                  statusBadge.textContent = 'Đã duyệt'; // "Approved"
-                  statusBadge.classList.add('bg-gradient-success'); // Assuming green color for approval
-                } else {
-                  statusBadge.textContent = 'Đã từ chối'; // "Denied"
-                  statusBadge.classList.add('bg-gradient-danger'); // Assuming red color for denial
-                }
-                // Append the badge to the status column
-                statusColumn.appendChild(statusBadge);
-
-                // Disable all action buttons in this row
-                let buttons = clickedRow.querySelectorAll('button');
-                buttons.forEach(button => button.disabled = true);
-              }
-
-            })
-            .catch(error => console.error('Error:', error));
+      // Check if the token is not present
+      if (!token) {
+        redirectToSignIn();
+      } else {
+        const isExpired = checkTokenExpiration(token);
+        if (isExpired) {
+          redirectToSignIn();
         }
-      });
+        // If the token is present and not expired, proceed with your app's logic
+      }
     });
-  </script>
 
+    function redirectToSignIn() {
+      window.location.href = '/admin/pages/sign-in.html'; // Adjust the URL to your sign-in page's route
+    }
+
+    function checkTokenExpiration(token) {
+      // Split the token into its parts
+      const payload = token.split('.')[1];
+      if (!payload) {
+        return true; // Assume expired or invalid if no payload
+      }
+
+      // Decode the payload
+      const decoded = JSON.parse(window.atob(payload));
+      if (!decoded.exp) {
+        return true; // Assume expired or invalid if no expiration field
+      }
+
+      // Get current time in seconds since the epoch, to match the exp format
+      const currentTime = Date.now() / 1000;
+      // Check if the token's expiration time has passed
+      return currentTime > decoded.exp;
+    }
+  </script>
 
 </body>
 

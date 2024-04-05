@@ -256,27 +256,23 @@
         <div class="col-12">
           <div class="card mb-4">
             <div class="card-header pb-0">
-              <h6>Danh sách người dùng</h6> <!-- Updated title to "List of Users" -->
+              <h6>Quản lý điều khoản</h6>
             </div>
             <div class="card-body px-0 pt-0 pb-2">
               <div class="table-responsive p-0">
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên người dùng
-                      </th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Họ và tên</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Số điện thoại</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Địa chỉ</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ngày đăng ký</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Trạng thái người
-                        dùng</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Hành
-                        động</th>
+                      <th scope="col">Tiêu đề</th>
+                      <th scope="col">Nội dung</th>
+                      <th scope="col">Ngày Hiệu Lực</th>
+                      <th scope="col">Ngày Tạo</th>
+                      <th scope="col">Ngày Cập Nhật Cuối</th>
+                      <th scope="col">Hành Động</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <!-- Dynamic rows will be appended here by the JavaScript -->
+                    <!-- Dữ liệu sẽ được nạp ở đây -->
                   </tbody>
                 </table>
               </div>
@@ -285,6 +281,7 @@
         </div>
       </div>
     </div>
+
 
   </main>
   <div class="fixed-plugin">
@@ -369,24 +366,51 @@
     </div>
   </div>
 
-  <!-- Vehicle Details Modal -->
-  <div class="modal fade" id="vehicleDetailsModal" tabindex="-1" aria-labelledby="vehicleDetailsModalLabel"
-    aria-hidden="true">
+
+  <div class="modal fade" id="editTermModal" tabindex="-1" aria-labelledby="editTermModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl"> <!-- Extra large modal -->
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="vehicleDetailsModalLabel">Vehicle Details</h5>
+          <h5 class="modal-title" id="editTermModalLabel">Edit Term</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <!-- Placeholder for dynamic content -->
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
+        <form id="editTermForm">
+          <div class="modal-body">
+            <!-- Placeholder for dynamic content -->
+            <input type="hidden" id="maDieuKhoan" name="maDieuKhoan">
+            <div class="mb-3">
+              <label for="phienBan" class="form-label">Phiên Bản</label>
+              <input type="text" class="form-control" id="phienBan" name="phienBan" required>
+            </div>
+            <div class="mb-3">
+              <label for="tieuDe" class="form-label">Tiêu Đề</label>
+              <input type="text" class="form-control" id="tieuDe" name="tieuDe" required>
+            </div>
+            <div class="mb-3">
+              <label for="noiDung" class="form-label">Nội Dung</label>
+              <textarea class="form-control" id="noiDung" name="noiDung" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="ngayHieuLuc" class="form-label">Ngày Hiệu Lực</label>
+              <input type="date" class="form-control" id="ngayHieuLuc" name="ngayHieuLuc" required>
+            </div>
+            <div class="mb-3">
+              <label for="trangThai" class="form-label">Trạng Thái</label>
+              <select class="form-control" id="trangThai" name="trangThai" required>
+                <option value="1">Hoạt Động</option>
+                <option value="0">Không Hoạt Động</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="saveTermButton">Save changes</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+
 
 
 
@@ -466,13 +490,13 @@
 
 
   <!-- ======================================================================================================================================= -->
-
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      fetchUsers();
+      let termsMap = new Map();
 
-      function fetchUsers() {
-        fetch('/api/admins/getAllUsers', {
+      fetchTerms();
+      function fetchTerms() {
+        fetch('/api/admins/getAllTerms', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -480,222 +504,236 @@
           }
         })
           .then(response => response.json())
-          .then(users => {
-            const tableBody = document.querySelector('.table tbody');
-            tableBody.innerHTML = ''; // Clear existing rows
-            users.forEach(user => {
-              // Construct the avatar URL
-              const avatarUrl = user.avatar ? `/api/images/getimages/${user.avatar}` : '../assets/img/default-avatar.png'; // Use a default avatar if none is provided
+          .then(terms => {
 
-              // Determine the status badge based on user.status
-              let statusBadge;
-              if (user.status == -1) {
-                statusBadge = '<span class="badge bg-gradient-danger">Đã vô hiệu</span>';
-              } else if (user.status == 1) {
-                statusBadge = '<span class="badge bg-gradient-success">Đang hoạt động</span>';
-              } else {
-                statusBadge = '<span class="badge bg-gradient-secondary">Không xác định</span>'; // Fallback for any other status
-              }
+            const tableBody = document.querySelector('.table tbody');
+            tableBody.innerHTML = '';
+
+            terms.forEach(term => {
+              termsMap.set(term.termId.toString(), term);
+
+              const trimmedContent = trimContent(term.content, 50);
 
               const row = document.createElement('tr');
               row.innerHTML = `
-            <td><img src="${avatarUrl}" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%;"> ${user.username}</td>
-            <td>${user.fullName}</td>
-            <td>${user.phoneNumber}</td>
-            <td>${user.address}</td>
-            <td>${new Date(user.registrationDate).toLocaleDateString()}</td>
-            <td>${statusBadge}</td> <!-- Updated to use statusBadge -->
-            <td class="text-center">
-              <button class="btn btn-primary btn-sm me-1" onclick="viewLicense(${user.userId})">Xem Bằng lái</button>
-              <button class="btn btn-success btn-sm" onclick="activateUser(${user.userId})">Kích hoạt</button>
-              <button class="btn btn-danger btn-sm" onclick="deactivateUser(${user.userId})">Vô hiệu hoá</button>
-            </td>
-          `;
+          <td>${term.title}</td>
+          <td>${trimmedContent}</td>
+          <td>${new Date(term.effectiveDate).toLocaleDateString()}</td>
+          <td>${new Date(term.creationDate).toLocaleDateString()}</td>
+          <td>${term.lastUpdateDate ? new Date(term.lastUpdateDate).toLocaleDateString() : ''}</td>
+          <td>
+            <button class="btn btn-success btn-sm me-1" onclick="editTerm(${term.termId})">Sửa</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTerm(${term.termId})" disabled>Xoá(disabled)</button>
+          </td>
+        `;
               tableBody.appendChild(row);
             });
           })
           .catch(error => {
-            console.error('Error fetching users:', error);
+            console.error('Error fetching terms:', error);
           });
       }
+      function trimContent(content, maxLength) {
+        // Cắt nội dung nếu dài hơn maxLength và thêm '...'
+        return content.length > maxLength ? `${content.substring(0, maxLength)}...` : content;
+      }
 
-      window.activateUser = function (userId) {
-        if (!confirm("Bạn có chắc chắn muốn kích hoạt người dùng này?")) {
+
+      window.editTerm = function editTerm(termId) {
+        const term = termsMap.get(termId.toString());
+        if (!term) {
+          console.error('Term not found:', termId);
           return;
         }
 
-        fetch(`/api/admins/activateUser/${userId}`, {
-          method: 'PUT', 
+        // Populate modal with term details
+        const modalTitle = document.querySelector('#editTermModal .modal-title');
+        modalTitle.textContent = 'Edit Term'; // Change modal title
+
+        const modalBody = document.querySelector('#editTermModal .modal-body');
+        modalBody.innerHTML = `
+    <form id="editTermForm">
+      <div class="mb-3">
+        <label for="title" class="form-label">Tiêu đề</label>
+        <input type="text" class="form-control" id="title" value="${term.title}" required>
+      </div>
+      <div class="mb-3">
+        <label for="content" class="form-label">Nội dung</label>
+        <textarea class="form-control" id="content" rows="12" required>${term.content}</textarea>
+      </div>
+      <div class="mb-3">
+        <label for="effectiveDate" class="form-label">Ngày Hiệu Lực</label>
+        <input type="date" class="form-control" id="effectiveDate" value="${term.effectiveDate.split('T')[0]}" required>
+      </div>
+      <div class="mb-3">
+        <label for="status" class="form-label">Trạng thái</label>
+        <select class="form-select" id="status" required>
+          <option value="1" ${term.status == 1 ? 'selected' : ''}>Active</option>
+          <option value="0" ${term.status == 0 ? 'selected' : ''}>Inactive</option>
+        </select>
+      </div>
+      <!-- Hidden field to store term ID -->
+      <input type="hidden" id="termId" value="${term.termId}">
+    </form>
+  `;
+
+        // Show the modal
+        const editModal = new bootstrap.Modal(document.getElementById('editTermModal'), {
+          keyboard: false
+        });
+        editModal.show();
+
+        // Attach an event listener to the modal's save button (assuming it exists)
+        document.querySelector('#saveTermButton').onclick = function () {
+          submitEditForm();
+        };
+      }
+
+      function submitEditForm() {
+        if (!confirm('Chắc chắn sửa điều khoản này?')) {
+          return; // Stop if the user cancels
+        }
+
+        // Capturing form data
+        const form = document.querySelector('#editTermForm'); // Ensure this is the correct ID for your form
+        const termId = form.querySelector('#termId').value; // The hidden field that holds the term ID
+        const title = form.querySelector('#title').value;
+        const content = form.querySelector('#content').value;
+        const effectiveDate = form.querySelector('#effectiveDate').value;
+        const status = form.querySelector('#status').value;
+
+        // Prepare the data to be sent in JSON format
+        const formData = JSON.stringify({
+          tieuDe: title,
+          noiDung: content,
+          ngayHieuLuc: effectiveDate,
+          trangThai: status
+        });
+
+        // Send data to server using PUT request
+        fetch(`/api/admins/updateTerm/${termId}`, {
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `${localStorage.getItem('adminToken')}`
+            'Authorization': `${localStorage.getItem('adminToken')}` // Ensure you have this token available
+          },
+          body: formData
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            console.log(response.body);
+            return response.json();
+          })
+          .then(data => {
+            console.log(data.message); // Logging the success message
+            alert(data.message); // Alerting the user about the success
+            // Close the modal and refresh terms list
+            const editModal = bootstrap.Modal.getInstance(document.getElementById('editTermModal')); // Make sure the ID matches your modal
+            editModal.hide();
+            fetchTerms(); // Make sure you have a function to refresh the terms list
+          })
+          .catch(error => {
+            console.error('Error updating term:', error);
+            alert(`Error: ${error.message}`); // Alerting the user about the error
+          });
+      }
+
+
+
+      window.deleteTerm = function (termId) {
+        console.log('Deleting term with ID:', termId);
+
+        // Confirmation before deletion
+        if (!confirm('Xoá điều khoản này?')) {
+          return; // Stop if the user cancels
+        }
+
+        // The URL should match your API endpoint for deleting a term
+        const deleteUrl = `/api/admins/deleteTerm/${termId}`;
+
+        // Make a DELETE request to the backend
+        fetch(deleteUrl, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem('adminToken')}`, // Assuming you use a token for authorization
           }
         })
           .then(response => {
             if (!response.ok) {
-              throw new Error('Network response was not ok.');
+              throw new Error('Network response was not ok');
             }
             return response.json();
           })
           .then(data => {
-            console.log(data.message);
-            alert(data.message);
-            fetchUsers(); // Refresh the list after activation
+            console.log(data.message); // Logging the success message from the server
+            alert(data.message); // Inform the user of success
+            // Here you might want to refresh the list of terms to reflect the deletion
+            fetchTerms(); // Assuming you have a function like this
           })
           .catch(error => {
-            console.error('Error activating user:', error);
-            alert(`Error: ${error.message}`);
+            console.error('Error deleting term:', error);
+            alert(`Error: ${error.message}`); // Inform the user of an error
           });
       };
 
-      window.deactivateUser = function (userId) {
-        if (!confirm("Bạn có chắc chắn muốn vô hiệu hóa người dùng này?")) {
-          return;
-        }
-
-        fetch(`/api/admins/deactivateUser/${userId}`, {
-          method: 'PUT', // Assuming the deactivation endpoint uses PUT
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `${localStorage.getItem('adminToken')}`
-          }
-        })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok.');
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log(data.message);
-            alert(data.message);
-            fetchUsers(); // Refresh the list after deactivation
-          })
-          .catch(error => {
-            console.error('Error deactivating user:', error);
-            alert(`Error: ${error.message}`);
-          });
-      }
-
-
-      window.viewLicense = function (userId) {
-        // Implement the logic to view the user's driver's license
-        // This could involve navigating to a new page or opening a modal with the information
-        console.log('Viewing license for user ID:', userId);
-        // For example, you could redirect to a page like this (make sure to implement it):
-        // window.location.href = `/viewLicense/${userId}`;
-      }
     });
   </script>
+
+
+
+
+
+
+
 
 
 
 
 
   <!-- ======================================================================================================================================= -->
+
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const table = document.querySelector('.table');
+    window.addEventListener('DOMContentLoaded', (event) => {
+      const token = localStorage.getItem('adminToken');
 
-      table.addEventListener('click', (e) => {
-        if (e.target.dataset.action === 'approve' || e.target.dataset.action === 'deny') {
-          // Confirmation step
-          const actionConfirm = e.target.dataset.action === 'approve' ? 'Xác nhận duyệt xe?' : 'Từ chối xe?';
-          if (!confirm(actionConfirm)) {
-            // If the user clicks "Cancel", stop the function
-            return;
-          }
-
-          const vehicleId = e.target.dataset.vehicleId;
-          const isApproveAction = e.target.dataset.action === 'approve';
-          const actionPath = isApproveAction ? '/api/admins/approveVehicle' : '/api/admins/denyVehicle';
-          fetch(`${actionPath}/${vehicleId}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `${localStorage.getItem('adminToken')}`
-            },
-          })
-            .then(response => {
-              if (response.ok) {
-                return response.json();
-              }
-              throw new Error('Network response was not ok.');
-            })
-            .then(data => {
-              console.log(data.message);
-              // Update the row to indicate the action
-              let clickedRow = e.target.closest('tr');
-              if (clickedRow) {
-                // Update the "Trạng thái" column
-                let statusColumn = clickedRow.children[2]; // Assuming "Trạng thái" is the third column
-                // Clear existing content
-                statusColumn.innerHTML = '';
-                // Create the badge span element
-                const statusBadge = document.createElement('span');
-                statusBadge.classList.add('badge', 'badge-sm');
-                // Set the badge's text and background color
-                if (isApproveAction) {
-                  statusBadge.textContent = 'Đã duyệt'; // "Approved"
-                  statusBadge.classList.add('bg-gradient-success'); // Assuming green color for approval
-                } else {
-                  statusBadge.textContent = 'Đã từ chối'; // "Denied"
-                  statusBadge.classList.add('bg-gradient-danger'); // Assuming red color for denial
-                }
-                // Append the badge to the status column
-                statusColumn.appendChild(statusBadge);
-
-                // Disable all action buttons in this row
-                let buttons = clickedRow.querySelectorAll('button');
-                buttons.forEach(button => button.disabled = true);
-              }
-
-            })
-            .catch(error => console.error('Error:', error));
-        }
-      });
-    });
-  </script>
-
-<script>
-  window.addEventListener('DOMContentLoaded', (event) => {
-    const token = localStorage.getItem('adminToken');
-    
-    // Check if the token is not present
-    if (!token) {
-      redirectToSignIn();
-    } else {
-      const isExpired = checkTokenExpiration(token);
-      if (isExpired) {
+      // Check if the token is not present
+      if (!token) {
         redirectToSignIn();
+      } else {
+        const isExpired = checkTokenExpiration(token);
+        if (isExpired) {
+          redirectToSignIn();
+        }
+        // If the token is present and not expired, proceed with your app's logic
       }
-      // If the token is present and not expired, proceed with your app's logic
-    }
-  });
+    });
 
-  function redirectToSignIn() {
-    window.location.href = '/admin/pages/sign-in.html'; // Adjust the URL to your sign-in page's route
-  }
-
-  function checkTokenExpiration(token) {
-    // Split the token into its parts
-    const payload = token.split('.')[1];
-    if (!payload) {
-      return true; // Assume expired or invalid if no payload
-    }
-    
-    // Decode the payload
-    const decoded = JSON.parse(window.atob(payload));
-    if (!decoded.exp) {
-      return true; // Assume expired or invalid if no expiration field
+    function redirectToSignIn() {
+      window.location.href = '/admin/pages/sign-in.html'; // Adjust the URL to your sign-in page's route
     }
 
-    // Get current time in seconds since the epoch, to match the exp format
-    const currentTime = Date.now() / 1000;
-    // Check if the token's expiration time has passed
-    return currentTime > decoded.exp;
-  }
-</script>
+    function checkTokenExpiration(token) {
+      // Split the token into its parts
+      const payload = token.split('.')[1];
+      if (!payload) {
+        return true; // Assume expired or invalid if no payload
+      }
+
+      // Decode the payload
+      const decoded = JSON.parse(window.atob(payload));
+      if (!decoded.exp) {
+        return true; // Assume expired or invalid if no expiration field
+      }
+
+      // Get current time in seconds since the epoch, to match the exp format
+      const currentTime = Date.now() / 1000;
+      // Check if the token's expiration time has passed
+      return currentTime > decoded.exp;
+    }
+  </script>
 
 </body>
 

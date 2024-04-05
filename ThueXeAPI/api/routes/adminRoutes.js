@@ -12,12 +12,20 @@ const {
     activateUser,
     deactivateUser,
     getAllUsers,
-    deleteVehicle
+    deleteVehicle,
+    getTerms,
+    createTerm,
+    deleteTerm,
+    updateTerm,
+    sendNotification,
+    sendNotificationToAllUsers
 } = require('../controllers/adminController');
 
 router.post('/login', loginAdmin);
 
 router.delete('/deleteVehicle/:ma_xe', authenticateToken, deleteVehicle);
+
+router.get('/getAllTerms', authenticateToken, getTerms);
 
 router.get('/getAllUsers', authenticateToken, getAllUsers);
 
@@ -34,5 +42,16 @@ router.put('/denyVehicle/:ma_xe', authenticateToken, denyVehicle);
 router.put('/activateUser/:ma_nguoi_dung', authenticateToken, activateUser);
 
 router.put('/deactivateUser/:ma_nguoi_dung', authenticateToken, deactivateUser);
+
+
+router.post('/createTerm', authenticateToken, createTerm);
+
+router.delete('/deleteTerm/:maDieuKhoan', authenticateToken, deleteTerm);
+
+router.put('/updateTerm/:maDieuKhoan', authenticateToken, updateTerm);
+
+router.post('/sendnotification', authenticateToken, sendNotification);
+
+router.post('/sendnotificationtoallusers', authenticateToken, sendNotificationToAllUsers);
 
 module.exports = router;

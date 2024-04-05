@@ -81,7 +81,7 @@ class _DetailCarState extends State<DetailCar> {
             _buildCarInfo2(),
             _buildOwnerInfo(),
             _buildReview(vehicle.carId),
-            _buildInfroNote(),
+            _buildInfoNote(),
             _buildContactRow(),
 
             //_buildElevatedButton(),
@@ -95,7 +95,7 @@ class _DetailCarState extends State<DetailCar> {
   late Widget _randomContent;
   bool _showFullText = false;
 
-  Widget _buildInfroNote() {
+  Widget _buildInfoNote() {
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
