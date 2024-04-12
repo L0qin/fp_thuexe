@@ -525,3 +525,144 @@ exports.sendNotificationToAllUsers = (req, res) => {
         });
     });
 };
+
+// Activate Voucher
+exports.activateVoucher = (req, res) => {
+    const { ma_voucher } = req.params; // Get the ma_voucher from URL parameters
+
+    // SQL to activate voucher
+    const sqlActivate = `
+        UPDATE voucher
+        SET trang_thai = 1
+        WHERE ma_voucher = ?;
+    `;
+
+    db.query(sqlActivate, [ma_voucher], (err, result) => {
+        if (err) {
+            console.error("Error activating voucher:", err);
+            return res.status(500).json({ error: "Database error", detail: err.message });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Voucher not found" });
+        }
+
+        res.json({ message: "Voucher activated successfully" });
+    });
+};
+
+// Deactivate Voucher
+exports.deactivateVoucher = (req, res) => {
+    const { ma_voucher } = req.params; // Get the ma_voucher from URL parameters
+
+    // SQL to deactivate voucher
+    const sqlDeactivate = `
+        UPDATE voucher
+        SET trang_thai = 0
+        WHERE ma_voucher = ?;
+    `;
+
+    db.query(sqlDeactivate, [ma_voucher], (err, result) => {
+        if (err) {
+            console.error("Error deactivating voucher:", err);
+            return res.status(500).json({ error: "Database error", detail: err.message });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Voucher not found" });
+        }
+
+        res.json({ message: "Voucher deactivated successfully" });
+    });
+};
+
+// Edit Voucher
+exports.editVoucher = (req, res) => {
+    const { ma_voucher } = req.params; // Get the ma_voucher from URL parameters
+    const { ma_code, mo_ta, phan_tram_giam, so_tien_giam, ngay_bat_dau, ngay_ket_thuc, dieukien_apdung, trang_thai } = req.body;
+
+    // SQL to update voucher details
+    const sqlUpdateVoucher = `
+        UPDATE voucher
+        SET ma_code = ?, 
+            mo_ta = ?, 
+            phan_tram_giam = ?, 
+            so_tien_giam = ?, 
+            ngay_bat_dau = ?, 
+            ngay_ket_thuc = ?, 
+            dieukien_apdung = ?, 
+            trang_thai = ?
+        WHERE ma_voucher = ?;
+    `;
+
+    db.query(sqlUpdateVoucher, [ma_code, mo_ta, phan_tram_giam, so_tien_giam, ngay_bat_dau, ngay_ket_thuc, dieukien_apdung, trang_thai, ma_voucher], (err, result) => {
+        if (err) {
+            console.error("Error updating voucher:", err);
+            return res.status(500).json({ error: "Database error", detail: err.message });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Voucher not found" });
+        }
+
+        res.json({ message: "Voucher updated successfully" });
+    });
+};
+
+exports.createVoucher = (req, res) => {
+    const { ma_code, mo_ta, phan_tram_giam, so_tien_giam, ngay_bat_dau, ngay_ket_thuc, dieukien_apdung, trang_thai } = req.body;
+
+    // Validate input (Example: Check if mandatory fields are present)
+    if (!ma_code || !ngay_bat_dau || !ngay_ket_thuc) {
+        return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // SQL query to insert a new voucher
+    const sqlInsertVoucher = `
+        INSERT INTO voucher (ma_code, mo_ta, phan_tram_giam, so_tien_giam, ngay_bat_dau, ngay_ket_thuc, dieukien_apdung, trang_thai)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+    `;
+
+    db.query(sqlInsertVoucher, [ma_code, mo_ta, phan_tram_giam, so_tien_giam, ngay_bat_dau, ngay_ket_thuc, dieukien_apdung, trang_thai], (err, result) => {
+        if (err) {
+            console.error("Error creating voucher:", err);
+            return res.status(500).json({ error: "Database error", detail: err.message });
+        }
+
+        res.json({ message: "Voucher created successfully", voucherId: result.insertId });
+    });
+};
+
+// In voucherController.js or wherever you manage your controller logic
+exports.getAllVouchers = (req, res) => {
+    const sqlQuery = 'SELECT * FROM voucher';
+
+    db.query(sqlQuery, (err, results) => {
+        if (err) {
+            console.error("Error fetching vouchers:", err);
+            return res.status(500).json({ error: "Database error", detail: err.message });
+        }
+
+        res.json(results );
+    });
+};
+
+exports.getVoucherDetails = (req, res) => {
+    const { ma_voucher } = req.params;
+
+    const sqlQuery = 'SELECT * FROM voucher WHERE ma_voucher = ?';
+
+    db.query(sqlQuery, [ma_voucher], (err, results) => {
+        if (err) {
+            console.error("Error fetching voucher:", err);
+            return res.status(500).json({ error: "Database error", detail: err.message });
+        }
+
+        if (results.length > 0) {
+            res.json(results[0]);
+        } else {
+            res.status(404).json({ message: "Voucher not found" });
+        }
+    });
+};
+

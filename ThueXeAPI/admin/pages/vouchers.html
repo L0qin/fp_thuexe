@@ -56,14 +56,15 @@
         <ul class="navbar-nav">
           <li class="nav-item">
             <a class="nav-link " href="../pages/dashboard.html">
-              <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <div
+                class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                 <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
               </div>
               <span class="nav-link-text ms-1">Dashboard</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="../pages/approvals.html">
+            <a class="nav-link " href="../pages/approvals.html">
               <div
                 class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                 <i class="fa fa-check text-primary text-sm opacity-10"></i>
@@ -116,7 +117,7 @@
               <span class="nav-link-text ms-1">Gửi thông báo</span>
             </a>
           </li>
-      </ul>
+        </ul>
     </div>
     <div class="sidenav-footer mx-3 ">
     </div>
@@ -255,28 +256,32 @@
       <div class="row">
         <div class="col-12">
           <div class="card mb-4">
-            <div class="card-header pb-0">
-              <h6>Danh sách người dùng</h6> <!-- Updated title to "List of Users" -->
+            <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+              <h6>Danh sách voucher</h6> <!-- Changed title to "List of Vouchers" -->
+              <button class="btn btn-primary btn-sm" id="createVoucherBtn">Tạo Voucher</button>
+              <!-- Create Voucher Button -->
             </div>
             <div class="card-body px-0 pt-0 pb-2">
               <div class="table-responsive p-0">
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên người dùng
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Mã Voucher</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Mô Tả</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Phần Trăm Giảm
                       </th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Họ và tên</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Số điện thoại</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Địa chỉ</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ngày đăng ký</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Trạng thái người
-                        dùng</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Số Tiền Giảm</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ngày Bắt Đầu</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ngày Kết Thúc</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Điều Kiện Áp Dụng
+                      </th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Trạng Thái</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Hành
-                        động</th>
+                        Động</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <!-- Dynamic rows will be appended here by the JavaScript -->
+                    <!-- Dynamic rows with voucher information will be appended here by JavaScript -->
                   </tbody>
                 </table>
               </div>
@@ -369,25 +374,105 @@
     </div>
   </div>
 
-  <!-- Vehicle Details Modal -->
-  <div class="modal fade" id="vehicleDetailsModal" tabindex="-1" aria-labelledby="vehicleDetailsModalLabel"
+  <!-- Create Voucher Modal -->
+  <div class="modal fade" id="createVoucherModal" tabindex="-1" aria-labelledby="createVoucherModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-xl"> <!-- Extra large modal -->
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="vehicleDetailsModalLabel">Vehicle Details</h5>
+          <h5 class="modal-title" id="createVoucherModalLabel">Create New Voucher</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <!-- Placeholder for dynamic content -->
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
+        <form id="createVoucherForm">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="voucherCode" class="form-label">Voucher Code</label>
+              <input type="text" class="form-control" id="voucherCode" required>
+            </div>
+            <div class="mb-3">
+              <label for="voucherDescription" class="form-label">Description</label>
+              <textarea class="form-control" id="voucherDescription"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="discountPercentage" class="form-label">Discount Percentage</label>
+              <input type="number" class="form-control" id="discountPercentage">
+            </div>
+            <div class="mb-3">
+              <label for="discountAmount" class="form-label">Discount Amount</label>
+              <input type="number" class="form-control" id="discountAmount">
+            </div>
+            <div class="mb-3">
+              <label for="startDate" class="form-label">Start Date</label>
+              <input type="date" class="form-control" id="startDate" required>
+            </div>
+            <div class="mb-3">
+              <label for="endDate" class="form-label">End Date</label>
+              <input type="date" class="form-control" id="endDate" required>
+            </div>
+            <div class="mb-3">
+              <label for="applicableConditions" class="form-label">Applicable Conditions</label>
+              <textarea class="form-control" id="applicableConditions"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="voucherStatus" class="form-label">Status</label>
+              <select class="form-select" id="voucherStatus">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Create Voucher</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 
+  <!-- Edit Voucher Modal -->
+  <div id="editVoucherModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Voucher</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="editVoucherForm">
+            <!-- Voucher Code (You might not want to edit this, or handle with caution) -->
+            <div class="form-group">
+              <label for="editVoucherCode">Voucher Code</label>
+              <input type="text" class="form-control" id="editVoucherCode" disabled>
+            </div>
+            <!-- Description -->
+            <div class="form-group">
+              <label for="editVoucherDescription">Description</label>
+              <textarea class="form-control" id="editVoucherDescription"></textarea>
+            </div>
+            <!-- Discount Percentage -->
+            <div class="form-group">
+              <label for="editDiscountPercentage">Discount Percentage</label>
+              <input type="number" class="form-control" id="editDiscountPercentage">
+            </div>
+            <!-- Discount Amount -->
+            <div class="form-group">
+              <label for="editDiscountAmount">Discount Amount</label>
+              <input type="number" class="form-control" id="editDiscountAmount">
+            </div>
+            <!-- Other fields like Start Date, End Date, Conditions -->
+            <!-- ... -->
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="submitEditVoucher()">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 
@@ -414,8 +499,6 @@
 
 
   <!-- ======================================================================================================================================= -->
-
-
 
   <script>
     // Function to handle logout
@@ -466,13 +549,77 @@
 
 
   <!-- ======================================================================================================================================= -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Select the button by its ID
+      var createVoucherButton = document.getElementById('createVoucherBtn');
+
+      // Add click event listener to the button
+      createVoucherButton.addEventListener('click', function () {
+        // Use Bootstrap's modal method to show the modal
+        var createVoucherModal = new bootstrap.Modal(document.getElementById('createVoucherModal'), {
+          keyboard: false // Optional: set to false if you want the modal to not close when the escape key is pressed
+        });
+        createVoucherModal.show();
+      });
+    });
+  </script>
+
+  <script>
+    document.getElementById('createVoucherForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      // Collect form data
+      const formData = {
+        ma_code: document.getElementById('voucherCode').value,
+        mo_ta: document.getElementById('voucherDescription').value,
+        phan_tram_giam: document.getElementById('discountPercentage').value,
+        so_tien_giam: document.getElementById('discountAmount').value,
+        ngay_bat_dau: document.getElementById('startDate').value,
+        ngay_ket_thuc: document.getElementById('endDate').value,
+        dieukien_apdung: document.getElementById('applicableConditions').value,
+        trang_thai: document.getElementById('voucherStatus').value,
+      };
+
+      // Example POST method implementation:
+      fetch('/api/admins/createVoucher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify(formData),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Success:', data);
+          alert('Tạo voucher thành công');
+          var createVoucherModal = bootstrap.Modal.getInstance(document.getElementById('createVoucherModal'));
+          createVoucherModal.hide();
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    });
+
+
+  </script>
+  <!-- ======================================================================================================================================= -->
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      fetchUsers();
+      fetchVouchers();
 
-      function fetchUsers() {
-        fetch('/api/admins/getAllUsers', {
+      function truncateString(str, num) {
+        if (str.length > num) {
+          return str.slice(0, num) + "...";
+        } else {
+          return str;
+        }
+      }
+
+      function fetchVouchers() {
+        fetch('/api/admins/getAllVouchers', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -480,113 +627,144 @@
           }
         })
           .then(response => response.json())
-          .then(users => {
+          .then(vouchers => {
             const tableBody = document.querySelector('.table tbody');
             tableBody.innerHTML = ''; // Clear existing rows
-            users.forEach(user => {
-              // Construct the avatar URL
-              const avatarUrl = user.avatar ? `/api/images/getimages/${user.avatar}` : '../assets/img/default-avatar.png'; // Use a default avatar if none is provided
-
-              // Determine the status badge based on user.status
-              let statusBadge;
-              if (user.status == -1) {
-                statusBadge = '<span class="badge bg-gradient-danger">Đã vô hiệu</span>';
-              } else if (user.status == 1) {
-                statusBadge = '<span class="badge bg-gradient-success">Đang hoạt động</span>';
-              } else {
-                statusBadge = '<span class="badge bg-gradient-secondary">Không xác định</span>'; // Fallback for any other status
-              }
+            vouchers.forEach(voucher => {
+              // Determine the status badge based on voucher.status
+              let statusBadge = voucher.trang_thai === 1
+                ? '<span class="badge bg-gradient-success">Đang hoạt động</span>'
+                : '<span class="badge bg-gradient-secondary">Ngừng hoạt động</span>';
 
               const row = document.createElement('tr');
               row.innerHTML = `
-            <td><img src="${avatarUrl}" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%;"> ${user.username}</td>
-            <td>${user.fullName}</td>
-            <td>${user.phoneNumber}</td>
-            <td>${user.address}</td>
-            <td>${new Date(user.registrationDate).toLocaleDateString()}</td>
-            <td>${statusBadge}</td> <!-- Updated to use statusBadge -->
-            <td class="text-center">
-              <button class="btn btn-primary btn-sm me-1" onclick="viewLicense(${user.userId})">Xem Bằng lái</button>
-              <button class="btn btn-success btn-sm" onclick="activateUser(${user.userId})">Kích hoạt</button>
-              <button class="btn btn-danger btn-sm" onclick="deactivateUser(${user.userId})">Vô hiệu hoá</button>
-            </td>
-          `;
+          <td>${voucher.ma_code}</td>
+          <td>${truncateString(voucher.mo_ta, 12)}</td> <!-- Truncate description -->
+          <td>${voucher.phan_tram_giam ? `${voucher.phan_tram_giam}%` : 'N/A'}</td>
+          <td>${voucher.so_tien_giam ? `${voucher.so_tien_giam} VND` : 'N/A'}</td>
+          <td>${new Date(voucher.ngay_bat_dau).toLocaleDateString()}</td>
+          <td>${new Date(voucher.ngay_ket_thuc).toLocaleDateString()}</td>
+          <td>${truncateString(voucher.dieukien_apdung, 12)}</td> <!-- Truncate conditions -->
+          <td>${statusBadge}</td>
+          <td class="text-center">
+            <button class="btn btn-success btn-sm me-1" onclick="activateVoucher(${voucher.ma_voucher})">Kích hoạt</button>
+            <button class="btn btn-warning btn-sm me-1" onclick="deactivateVoucher(${voucher.ma_voucher})">Vô hiệu</button>
+
+          </td>
+        `;
+
+        //            <button class="btn btn-info btn-sm" onclick="editVoucher(${voucher.ma_voucher})">Edit</button>
               tableBody.appendChild(row);
             });
           })
           .catch(error => {
-            console.error('Error fetching users:', error);
+            console.error('Error fetching vouchers:', error);
           });
       }
 
-      window.activateUser = function (userId) {
-        if (!confirm("Bạn có chắc chắn muốn kích hoạt người dùng này?")) {
-          return;
-        }
+      window.activateVoucher = function (ma_voucher) {
+        if (!confirm("Are you sure you want to activate this voucher?")) return;
 
-        fetch(`/api/admins/activateUser/${userId}`, {
+        fetch(`/api/admins/activateVoucher/${ma_voucher}`, {
+          method: 'PATCH', 
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem('adminToken')}` // Adjust according to your auth setup
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log(data.message);
+            alert(data.message);
+            location.reload(); // Refresh the page or re-fetch vouchers to update the UI
+          })
+          .catch(error => {
+            console.error('Error activating voucher:', error);
+            alert('Error activating voucher.');
+          });
+      };
+
+      window.deactivateVoucher = function (ma_voucher) {
+        if (!confirm("Are you sure you want to deactivate this voucher?")) return;
+
+        fetch(`/api/admins/deactivateVoucher/${ma_voucher}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem('adminToken')}`
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log(data.message);
+            alert(data.message);
+            location.reload(); // Refresh the page or re-fetch vouchers to update the UI
+          })
+          .catch(error => {
+            console.error('Error deactivating voucher:', error);
+            alert('Error deactivating voucher.');
+          });
+      };
+
+      window.editVoucher = function (ma_voucher) {
+        fetch(`/api/getVoucher/${ma_voucher}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem('adminToken')}`
+          }
+        })
+          .then(response => response.json())
+          .then(voucher => {
+            // Populate the modal fields
+            document.getElementById('editVoucherCode').value = voucher.ma_code;
+            document.getElementById('editVoucherDescription').value = voucher.mo_ta;
+            document.getElementById('editDiscountPercentage').value = voucher.phan_tram_giam;
+            document.getElementById('editDiscountAmount').value = voucher.so_tien_giam;
+            // Populate other fields like dates and conditions
+            // ...
+
+            // Show the modal
+            $('#editVoucherModal').modal('show');
+          })
+          .catch(error => {
+            console.error('Error fetching voucher details:', error);
+            alert('Could not load voucher details.');
+          });
+      };
+
+      function submitEditVoucher() {
+        const ma_voucher = document.getElementById('editVoucherCode').value; // Assuming you store the ID here or find another way to keep track of it
+        const editedDetails = {
+          mo_ta: document.getElementById('editVoucherDescription').value,
+          phan_tram_giam: document.getElementById('editDiscountPercentage').value,
+          so_tien_giam: document.getElementById('editDiscountAmount').value,
+          // Include other fields as necessary
+        };
+
+        fetch(`/api/admins/editVoucher/${ma_voucher}`, {
           method: 'PUT', 
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `${localStorage.getItem('adminToken')}`
-          }
+          },
+          body: JSON.stringify(editedDetails)
         })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok.');
-            }
-            return response.json();
-          })
+          .then(response => response.json())
           .then(data => {
-            console.log(data.message);
-            alert(data.message);
-            fetchUsers(); // Refresh the list after activation
+            alert('Voucher updated successfully');
+            $('#editVoucherModal').modal('hide');
+            // Refresh the list of vouchers or update the UI as needed
           })
           .catch(error => {
-            console.error('Error activating user:', error);
-            alert(`Error: ${error.message}`);
-          });
-      };
-
-      window.deactivateUser = function (userId) {
-        if (!confirm("Bạn có chắc chắn muốn vô hiệu hóa người dùng này?")) {
-          return;
-        }
-
-        fetch(`/api/admins/deactivateUser/${userId}`, {
-          method: 'PUT', // Assuming the deactivation endpoint uses PUT
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `${localStorage.getItem('adminToken')}`
-          }
-        })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok.');
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log(data.message);
-            alert(data.message);
-            fetchUsers(); // Refresh the list after deactivation
-          })
-          .catch(error => {
-            console.error('Error deactivating user:', error);
-            alert(`Error: ${error.message}`);
+            console.error('Error updating voucher:', error);
+            alert('Error updating voucher.');
           });
       }
 
-
-      window.viewLicense = function (userId) {
-        // Implement the logic to view the user's driver's license
-        // This could involve navigating to a new page or opening a modal with the information
-        console.log('Viewing license for user ID:', userId);
-        // For example, you could redirect to a page like this (make sure to implement it):
-        // window.location.href = `/viewLicense/${userId}`;
-      }
     });
   </script>
+
 
 
 
@@ -657,45 +835,45 @@
     });
   </script>
 
-<script>
-  window.addEventListener('DOMContentLoaded', (event) => {
-    const token = localStorage.getItem('adminToken');
-    
-    // Check if the token is not present
-    if (!token) {
-      redirectToSignIn();
-    } else {
-      const isExpired = checkTokenExpiration(token);
-      if (isExpired) {
+  <script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+      const token = localStorage.getItem('adminToken');
+
+      // Check if the token is not present
+      if (!token) {
         redirectToSignIn();
+      } else {
+        const isExpired = checkTokenExpiration(token);
+        if (isExpired) {
+          redirectToSignIn();
+        }
+        // If the token is present and not expired, proceed with your app's logic
       }
-      // If the token is present and not expired, proceed with your app's logic
-    }
-  });
+    });
 
-  function redirectToSignIn() {
-    window.location.href = '/admin/pages/sign-in.html'; // Adjust the URL to your sign-in page's route
-  }
-
-  function checkTokenExpiration(token) {
-    // Split the token into its parts
-    const payload = token.split('.')[1];
-    if (!payload) {
-      return true; // Assume expired or invalid if no payload
-    }
-    
-    // Decode the payload
-    const decoded = JSON.parse(window.atob(payload));
-    if (!decoded.exp) {
-      return true; // Assume expired or invalid if no expiration field
+    function redirectToSignIn() {
+      window.location.href = '/admin/pages/sign-in.html'; // Adjust the URL to your sign-in page's route
     }
 
-    // Get current time in seconds since the epoch, to match the exp format
-    const currentTime = Date.now() / 1000;
-    // Check if the token's expiration time has passed
-    return currentTime > decoded.exp;
-  }
-</script>
+    function checkTokenExpiration(token) {
+      // Split the token into its parts
+      const payload = token.split('.')[1];
+      if (!payload) {
+        return true; // Assume expired or invalid if no payload
+      }
+
+      // Decode the payload
+      const decoded = JSON.parse(window.atob(payload));
+      if (!decoded.exp) {
+        return true; // Assume expired or invalid if no expiration field
+      }
+
+      // Get current time in seconds since the epoch, to match the exp format
+      const currentTime = Date.now() / 1000;
+      // Check if the token's expiration time has passed
+      return currentTime > decoded.exp;
+    }
+  </script>
 
 </body>
 
