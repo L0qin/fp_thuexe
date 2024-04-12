@@ -707,7 +707,8 @@ class _ConfirmPageState extends State<ConfirmPage> {
     );
   }
 
-
+  bool _isDiscount10Checked = false;
+  bool _isCoupon500Checked = false;
 
 // Widget to build the payment information card
   Widget _buildPaymentInfoCard() {
@@ -723,14 +724,20 @@ class _ConfirmPageState extends State<ConfirmPage> {
 
     double totalPrice = _vehicle.rentalPrice * numberOfDays;
     double sum = totalPrice;
+    if (_selectedVoucher==1) { // nếu có đơn 2tr  && totalPrice >=2000000
 
+      sum -= (sum * 0.1); // Apply a 10% discount
+    } else if (_selectedVoucher==2)
+      {
+        sum -= 500;
+      }
     double depositAmount = 0.0;
     final requiresDeposit = true;
     if (requiresDeposit) {
       depositAmount = totalPrice - (totalPrice * 0.3);
     }
 
-    double remainingBalance = totalPrice - depositAmount;
+    double remainingBalance = sum - depositAmount;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
