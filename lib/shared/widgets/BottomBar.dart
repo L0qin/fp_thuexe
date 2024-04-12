@@ -11,59 +11,31 @@ import '../../pages/notification_page.dart';
 import '../../services/UserService.dart';
 
 class BottomBar extends StatefulWidget {
-  const BottomBar({super.key});
+  var unreadThongBaoCount;
+
+  BottomBar(this.unreadThongBaoCount, {super.key});
 
   @override
-  _BottomBarState createState() => _BottomBarState();
+  _BottomBarState createState() => _BottomBarState(unreadThongBaoCount);
 }
 
 class _BottomBarState extends State<BottomBar> {
   int _currentIndex = 0;
-  int _unreadThongBaoCount = 0; // Track unread ThongBaos
+   int _unreadThongBaoCount=100;
+
+  _BottomBarState(this._unreadThongBaoCount);
 
   @override
   void initState() {
     super.initState();
-    _fetchAndSetThongBaos();
   }
 
-  List<Widget> _pages = [
+  final List<Widget> _pages = [
     HomePage(),
     JourneyHistoryPage(),
     NotificationPage([]),
     Information(),
   ];
-
-  Future<void> _fetchAndSetThongBaos() async {
-    List<ThongBao> ThongBaos = await fetchThongBaos();
-    int unreadCount = countUnreadThongBaos(ThongBaos);
-
-    setState(() {
-      _unreadThongBaoCount = unreadCount;
-      // Assuming ThongBaoPage takes a list of ThongBaos as a parameter
-      _pages[2] = NotificationPage(ThongBaos);
-    });
-  }
-
-  Future<List<ThongBao>> fetchThongBaos() async {
-    final int? userId = await AuthService.getUserId();
-    if (userId == null || userId == -1) {
-      // Handle the case where the user ID is not available or invalid
-      print("User ID not found or invalid.");
-      return [];
-    } else {
-      List<ThongBao> ThongBaos =
-          (await UserService.getUserNotifications(userId)).cast<ThongBao>();
-      return ThongBaos;
-    }
-  }
-
-  int countUnreadThongBaos(List<ThongBao> ThongBaos) {
-    // Assuming ThongBao model has a `trangThaiXem` boolean indicating if it's read
-    return ThongBaos
-        .where((ThongBao) => ThongBao.trangThaiXem)
-        .length;
-  }
 
   @override
   Widget build(BuildContext context) {

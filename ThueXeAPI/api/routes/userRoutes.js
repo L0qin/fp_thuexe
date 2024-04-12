@@ -9,7 +9,11 @@ const {
     getUser,
     modifyUser,
     getUserNotification,
-    getUserNewNotificationNumber
+    getUserNewNotificationNumber,
+    deleteNotification,
+    markNotificationAsRead,
+    getUserUnreadNotification,
+    readAllBookingNotifications
  } = require('../controllers/userController');
 
 // Register route
@@ -26,6 +30,14 @@ router.put('/:id',authenticateToken, modifyUser);
 
 router.get('/getUserNotification/:id', authenticateToken, getUserNotification);
 
+router.get('/getUserUnreadNotification/:id', authenticateToken, getUserUnreadNotification);
+
 router.get('/getUserNewNotificationNumber/:id', authenticateToken, getUserNewNotificationNumber);
+
+router.put('/deleteNotification/:notificationId', authenticateToken, deleteNotification);
+
+router.put('/markNotificationAsRead/:notificationId', authenticateToken, markNotificationAsRead);
+
+router.put('/readAllBookingNotifications/:id', authenticateToken, readAllBookingNotifications);
 
 module.exports = router;

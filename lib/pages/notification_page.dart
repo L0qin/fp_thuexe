@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/Notification.dart';
+import '../services/AuthService.dart';
 import '../services/UserService.dart';
 
 class NotificationPage extends StatefulWidget {
@@ -14,6 +15,7 @@ class NotificationPage extends StatefulWidget {
 
 class _NotificationPageState extends State<NotificationPage> {
   _NotificationPageState();
+
   List<ThongBao> notifications = [];
 
   @override
@@ -24,7 +26,10 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Future<void> _fetchNotifications() async {
     try {
-      int userId = 1; // Example user ID, replace with actual user ID
+      final userId = await AuthService.getUserId();
+      if (userId == null) {
+        throw Exception('Token not found');
+      }
       notifications = await UserService.getUserNotifications(userId);
       setState(() {});
     } catch (e) {
@@ -74,9 +79,9 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Widget _buildListItem(BuildContext context, int index) {
     final item = notifications[index];
+
     return Dismissible(
       key: Key(item.maThongBao.toString()),
-      // Use the notification ID as a unique key
       background: Container(
         color: Colors.red,
         alignment: Alignment.centerLeft,
@@ -90,43 +95,61 @@ class _NotificationPageState extends State<NotificationPage> {
         child: Icon(Icons.delete, color: Colors.white),
       ),
       confirmDismiss: (direction) async {
+        // Show a confirmation dialog
         return showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text("Confirm"),
-              content: const Text("Are you sure you wish to delete this item?"),
+              title: const Text("Xác nhận"),
+              content: const Text("Bạn có chắc chắn muốn xoá thông báo này?"),
               actions: <Widget>[
                 TextButton(
                     onPressed: () => Navigator.of(context).pop(true),
-                    child: const Text("DELETE")),
+                    child: const Text("XOÁ")),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text("CANCEL"),
+                  child: const Text("HỦY BỎ"),
                 ),
               ],
             );
           },
         );
       },
-      onDismissed: (direction) {
-        setState(() {
-          notifications.removeAt(index);
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text("${item.tieuDe} dismissed"),
-              behavior: SnackBarBehavior.floating),
-        );
+      onDismissed: (direction) async {
+        try {
+          await UserService.deleteNotification(item.maThongBao);
+          // Update UI after successfully deleting the notification
+          setState(() {
+            notifications.removeAt(index);
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Đã xoá: ${item.tieuDe}"),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        } catch (e) {
+          // Handle errors, such as displaying an error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Lỗi khi xoá: ${e.toString()}"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       },
       child: ListTile(
         leading: CircleAvatar(
-          backgroundImage: NetworkImage(''),
-          child: Icon(Icons.doorbell),
+          backgroundImage: NetworkImage('"' ?? ''),
+          // Assuming `imageUrl` is a field in your item
+          child: Icon(Icons.notifications, color: Colors.white),
         ),
         title: Text(item.tieuDe),
         subtitle: Text(item.noiDung),
+        trailing: Icon(
+          item.trangThaiXem == 0 ? Icons.visibility_off : Icons.check,
+          color: item.trangThaiXem == 0 ? Colors.transparent : Colors.green,
+        ),
         onTap: () => _showBottomSheet(context, item),
       ),
     );
@@ -164,6 +187,24 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   void _showBottomSheet(BuildContext context, ThongBao notification) {
+    UserService.markNotificationAsRead(notification.maThongBao).then((_) {
+      if (mounted) {
+        setState(() {
+          int index = notifications.indexOf(notification);
+          if (index != -1) {
+            notifications[index].trangThaiXem = 1;
+          }
+        });
+      }
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to mark as read: ${error.toString()}"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    });
+
     showModalBottomSheet(
       context: context,
       builder: (context) {

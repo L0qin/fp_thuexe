@@ -11,7 +11,7 @@ void main() {
       visualDensity: VisualDensity.adaptivePlatformDensity,
     ),
     home: const Scaffold(
-      bottomNavigationBar: BottomBar(),
+      // bottomNavigationBar: BottomBar(),
     ),
   ));
 }

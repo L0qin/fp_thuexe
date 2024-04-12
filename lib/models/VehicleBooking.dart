@@ -10,6 +10,8 @@ class Booking {
   int ownerId;
   String? notes;
   int? discount;
+  String? delivery;
+
 
   Booking({
     this.id,
@@ -23,6 +25,7 @@ class Booking {
     required this.ownerId,
     this.notes,
     this.discount,
+    this.delivery,
   });
 
   // Convert a Booking object into a map object

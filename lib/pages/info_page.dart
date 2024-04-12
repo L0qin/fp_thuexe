@@ -35,6 +35,19 @@ class _InformationState extends State<Information> {
     super.initState();
     fetchData();
   }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {
+      newNotificationsCount = 0;
+    });
+  }
+  void refresh(){
+    setState(() {
+      newNotificationsCount = 0;
+    });
+  }
+
 
   Future<void> fetchData() async {
     int? userId = await AuthService.getUserId();

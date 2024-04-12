@@ -148,7 +148,7 @@ exports.getUserNotification = (req, res) => {
         SELECT tb.ma_thong_bao, tb.ma_nguoi_dung, tb.tieu_de, tb.noi_dung, tb.trang_thai_xem, tb.ngay_tao, lt.ten_loai, lt.mo_ta 
         FROM thongbao tb
         JOIN loaithongbao lt ON tb.ma_loai_thong_bao = lt.ma_loai_thong_bao
-        WHERE tb.ma_nguoi_dung = ?
+        WHERE tb.ma_nguoi_dung = ? AND tb.trang_thai_xem <> -1
         ORDER BY tb.ngay_tao DESC
     `;
 
@@ -188,6 +188,134 @@ exports.getUserNewNotificationNumber = (req, res) => {
         res.json({
             success: true,
             newNotificationsCount: count
+        });
+    });
+};
+
+exports.readAllBookingNotifications = (req, res) => {
+    const userId = req.params.id; // Get the user ID from the URL parameter
+
+    // SQL query to update the notification status
+    const updateQuery = `
+        UPDATE thongbao
+        SET trang_thai_xem = 1
+        WHERE ma_nguoi_dung = ? AND ma_loai_thong_bao = 5 AND trang_thai_xem = 0
+    `;
+
+    // Execute the query with the user ID
+    db.query(updateQuery, [userId], (error, results) => {
+        if (error) {
+            console.error('Failed to update booking notifications:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error'
+            });
+        }
+
+        if (results.affectedRows === 0) {
+            // No rows were updated, which means either no notifications were found or they were already marked as read
+            return res.json({
+                success: true,
+                message: 'No notifications to update'
+            });
+        }
+
+        // Successfully updated the notifications
+        res.json({
+            success: true,
+            message: 'All booking notifications marked as read',
+            updatedRows: results.affectedRows
+        });
+    });
+};
+
+
+exports.getUserUnreadNotification = (req, res) => {
+    const userId = req.params.id;
+
+    const query = `
+        SELECT COUNT(*) AS newNotificationsCount
+        FROM thongbao
+        WHERE ma_nguoi_dung = ? AND trang_thai_xem = 0
+    `;
+
+    db.query(query, [userId], (error, results) => {
+        if (error) {
+            console.error('Failed to retrieve user new notification count:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error'
+            });
+        }
+        
+        const count = results[0].newNotificationsCount;
+        res.json({
+            success: true,
+            newNotificationsCount: count
+        });
+    });
+};
+
+exports.deleteNotification = (req, res) => {
+    const notificationId = req.params.notificationId;
+
+    const updateQuery = `
+        UPDATE thongbao
+        SET trang_thai_xem = -1
+        WHERE ma_thong_bao = ?
+    `;
+
+    db.query(updateQuery, [notificationId], (error, results) => {
+        if (error) {
+            console.error('Failed to delete notification:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error'
+            });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Notification not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Notification deleted successfully'
+        });
+    });
+};
+
+exports.markNotificationAsRead = (req, res) => {
+    const notificationId = req.params.notificationId;
+
+    const updateQuery = `
+        UPDATE thongbao
+        SET trang_thai_xem = 1
+        WHERE ma_thong_bao = ?
+    `;
+
+    db.query(updateQuery, [notificationId], (error, results) => {
+        if (error) {
+            console.error('Failed to mark notification as read:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error'
+            });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Notification not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Notification marked as read successfully'
         });
     });
 };

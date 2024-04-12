@@ -26,6 +26,7 @@ class ConfirmPage extends StatefulWidget {
 }
 
 class _ConfirmPageState extends State<ConfirmPage> {
+  String _deliveryOption = 'Giao xe tận nơi';
   late Timer _timer;
   late User _user;
   late User _userOwner;
@@ -56,7 +57,7 @@ class _ConfirmPageState extends State<ConfirmPage> {
     int userId = _user.userId;
     int ownerId = _userOwner.userId;
     int carId = _vehicle.carId;
-    int voucherId = _selectedVoucher;
+    int voucherId = _selectedVoucher ?? -1;
 
     // Check if the user is trying to rent their own vehicle
     if (customerId == _userOwner.userId) {
@@ -86,30 +87,25 @@ class _ConfirmPageState extends State<ConfirmPage> {
       startDate: startDate,
       endDate: endDate,
       pickupAddressId: pickupAddressId,
-      totalRental: 0,
-      // This value needs to be calculated or provided accordingly
+      totalRental: totalAmount,
       carId: carId,
       userId: userId,
       ownerId: ownerId,
       notes: notes,
-      discount: 0, // Provide this value if applicable
+      discount: 0,
+      delivery: _deliveryOption,
     );
 
     try {
-      // Attempting to create a booking via the BookingService
       bool bookingCreated = await BookingService.createBooking(booking);
       if (bookingCreated) {
-        // Navigate to the SuccessPage on successful booking
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                SuccessPage(), // Ensure SuccessPage is defined in your application
+            builder: (context) => SuccessPage(),
           ),
         );
       } else {
-        // You may choose to handle this case differently since bookingCreated being false
-        // does not necessarily indicate an exception but rather an unsuccessful booking attempt.
         throw Exception('The booking could not be created.');
       }
     } catch (e) {
@@ -699,7 +695,35 @@ class _ConfirmPageState extends State<ConfirmPage> {
               Container(
                 height: 10,
               ),
-              _cardTimeWidget(context)
+              _cardTimeWidget(context),
+              Container(
+                height: 10,
+              ),
+// Radio buttons for delivery options
+              ListTile(
+                title: const Text('Giao xe tận nơi'),
+                leading: Radio<String>(
+                  value: 'Giao xe tận nơi',
+                  groupValue: _deliveryOption,
+                  onChanged: (value) {
+                    setState(() {
+                      _deliveryOption = value!;
+                    });
+                  },
+                ),
+              ),
+              ListTile(
+                title: const Text('Người thuê tới lấy'),
+                leading: Radio<String>(
+                  value: 'Người thuê tới lấy',
+                  groupValue: _deliveryOption,
+                  onChanged: (value) {
+                    setState(() {
+                      _deliveryOption = value!;
+                    });
+                  },
+                ),
+              ),
             ],
           ),
         ),
@@ -709,6 +733,7 @@ class _ConfirmPageState extends State<ConfirmPage> {
 
   bool _isDiscount10Checked = false;
   bool _isCoupon500Checked = false;
+  double totalAmount = 0;
 
 // Widget to build the payment information card
   Widget _buildPaymentInfoCard() {
@@ -724,13 +749,11 @@ class _ConfirmPageState extends State<ConfirmPage> {
 
     double totalPrice = _vehicle.rentalPrice * numberOfDays;
     double sum = totalPrice;
-    if (_selectedVoucher==1) { // nếu có đơn 2tr  && totalPrice >=2000000
-
+    if (_selectedVoucher == 1) {
       sum -= (sum * 0.1); // Apply a 10% discount
-    } else if (_selectedVoucher==2)
-      {
-        sum -= 500;
-      }
+    } else if (_selectedVoucher == 2) {
+      sum -= 500;
+    }
     double depositAmount = 0.0;
     final requiresDeposit = true;
     if (requiresDeposit) {
@@ -738,6 +761,7 @@ class _ConfirmPageState extends State<ConfirmPage> {
     }
 
     double remainingBalance = sum - depositAmount;
+    totalAmount = remainingBalance;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -810,6 +834,7 @@ class _ConfirmPageState extends State<ConfirmPage> {
       ),
     );
   }
+
   var _vouchers;
 
   Widget _buildVoucherList() {
@@ -830,7 +855,8 @@ class _ConfirmPageState extends State<ConfirmPage> {
             child: Column(
               children: [
                 Text(
-                  "Chọn khuyến mãi (nếu có)", // Promotion selection (if available)
+                  "Chọn khuyến mãi (nếu có)",
+                  // Promotion selection (if available)
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
@@ -864,8 +890,6 @@ class _ConfirmPageState extends State<ConfirmPage> {
       },
     );
   }
-
-
 
   ListTile _buildInfoTile(String title, String trailing) {
     return ListTile(
@@ -980,27 +1004,43 @@ class _ConfirmPageState extends State<ConfirmPage> {
           ),
           SizedBox(height: 10), // Add spacing between checkbox and button
           MaterialButton(
-            onPressed: () {
-              if (_isPolicyAgreed) {
-                _createBooking(); // Call booking function only if agreed
-              } else {
-                // Show message or handle user not agreeing
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                        "Vui lòng đồng ý với chính sách trước khi gửi yêu cầu"),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            height: 50,
             minWidth: double.infinity,
+            onPressed: _user.userId == -1
+                ? null
+                : () async {
+                    if (_isPolicyAgreed) {
+                      bool isBookable =
+                          await BookingService.checkBookable(_user.userId);
+                      if (isBookable) {
+                        _createBooking(); // Proceed with booking creation
+                      } else {
+                        // Inform the user they cannot book right now and return to home page
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                "Bạn không thể đặt thêm xe vì đã có một đặt xe đang chờ xử lý hoặc chưa hoàn thành."),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        Navigator.of(context)
+                            .pop(); // Assuming you want to pop back to the home page
+                      }
+                    } else {
+                      // Show message or handle user not agreeing
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              "Vui lòng đồng ý với chính sách trước khi gửi yêu cầu"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+            child: Text('Đặt Xe'),
             color: Colors.teal,
-            child: Text(
-              "Gửi yêu cầu thuê xe",
-              style: TextStyle(color: Colors.white, fontSize: 25),
-            ),
+            textColor: Colors.white,
+            disabledColor:
+                Colors.grey, // Optional: Set a different color when disabled
           ),
         ],
       ),

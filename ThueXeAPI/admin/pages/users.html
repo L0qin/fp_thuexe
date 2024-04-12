@@ -506,11 +506,12 @@
             <td>${new Date(user.registrationDate).toLocaleDateString()}</td>
             <td>${statusBadge}</td> <!-- Updated to use statusBadge -->
             <td class="text-center">
-              <button class="btn btn-primary btn-sm me-1" onclick="viewLicense(${user.userId})">Xem Bằng lái</button>
+
               <button class="btn btn-success btn-sm" onclick="activateUser(${user.userId})">Kích hoạt</button>
               <button class="btn btn-danger btn-sm" onclick="deactivateUser(${user.userId})">Vô hiệu hoá</button>
             </td>
           `;
+          // <button class="btn btn-primary btn-sm me-1" onclick="viewLicense(${user.userId})">Xem Bằng lái</button>
               tableBody.appendChild(row);
             });
           })

@@ -8,6 +8,29 @@ import 'AuthService.dart';
 class BookingService {
   static const String baseUrl = "${ServiceConstants.baseUrl}/bookings";
 
+  static Future<bool> checkBookable(int userId) async {
+    final token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
+    final url = '$baseUrl/checkBookable/$userId';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Authorization': ' $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      return jsonResponse['isBookable'];
+    } else {
+      // Handle different status codes or throw an error
+      throw Exception('Failed to check bookability');
+    }
+  }
+
   static Future<List<Booking>?> getAllUserBookings(int userId) async {
     final token = await AuthService.getToken();
     if (token == null) {
@@ -59,6 +82,7 @@ class BookingService {
         'ma_chu_xe': booking.ownerId,
         'ghi_chu': booking.notes,
         'giam_gia': booking.discount,
+        'giao_xe': booking.delivery,
       }),
     );
 

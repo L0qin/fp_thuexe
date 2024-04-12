@@ -2,7 +2,7 @@ class ThongBao {
   final int maThongBao;
   final String tieuDe;
   final String noiDung;
-  final bool trangThaiXem;
+  late final int trangThaiXem;
   final DateTime ngayTao;
   final String tenLoai;
   final String moTa;
@@ -22,7 +22,7 @@ class ThongBao {
       maThongBao: json['ma_thong_bao'],
       tieuDe: json['tieu_de'],
       noiDung: json['noi_dung'],
-      trangThaiXem: json['trang_thai_xem'] == 1,
+      trangThaiXem: json['trang_thai_xem'],
       ngayTao: DateTime.parse(json['ngay_tao']),
       tenLoai: json['ten_loai'],
       moTa: json['mo_ta'],

@@ -44,6 +44,7 @@ class _JourneyHistoryPageState extends State<JourneyHistoryPage> {
         title: Text('Hành Trình Thuê Xe'),
         backgroundColor: Colors.teal.shade700,
 
+
       ),
       body: FutureBuilder<List<Booking?>>(
         future: futureBookings,

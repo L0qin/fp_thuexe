@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/ManageBooking.dart';
 import '../services/BookingService.dart';
 import '../services/ImageService.dart';
+import '../services/UserService.dart';
 
 class ManageRentalsScreen extends StatefulWidget {
   @override
@@ -12,15 +13,33 @@ class ManageRentalsScreen extends StatefulWidget {
 
 class _ManageRentalsScreenState extends State<ManageRentalsScreen> {
   int? ownerId;
+  late Future<List<ManageBooking>?>? manageBookingFuture;
 
   @override
   void initState() {
     super.initState();
-    getUserId().then((id) {
-      setState(() {
-        ownerId = id;
-      });
-    });
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    try {
+      final id = await getUserId();
+      if (id != null && id != -1) {
+        setState(() {
+          ownerId = id;
+        });
+        manageBookingFuture = BookingService.getManagedBookings(ownerId ?? -1);
+
+        await UserService.readAllBookingNotifications(ownerId ?? -1);
+      } else {
+        setState(() {
+          ownerId = -1;
+        });
+        manageBookingFuture = Future.value(null);
+      }
+    } catch (e) {
+      print('Initialization failed: $e');
+    }
   }
 
   static Future<int?> getUserId() async {
@@ -34,11 +53,19 @@ class _ManageRentalsScreenState extends State<ManageRentalsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Quản lý cho thuê'),
+        title: Text('Hành Trình Thuê Xe'),
         backgroundColor: Colors.teal.shade700,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context, 'refresh');
+            } else {}
+          },
+        ),
       ),
       body: FutureBuilder<List<ManageBooking>?>(
-        future: BookingService.getManagedBookings(ownerId ?? -1),
+        future: manageBookingFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -80,7 +107,7 @@ class _ManageRentalsScreenState extends State<ManageRentalsScreen> {
                                   Text('Tổng tiển: ${booking.rentalCost}'),
                                   Text(
                                       'Ghi chú của người thuê: ${booking.notes.isEmpty ? "Không có" : booking.notes}'),
-                                   _buildBookingStatusText(booking),
+                                  _buildBookingStatusText(booking),
                                 ],
                               ),
                             ),
@@ -89,7 +116,9 @@ class _ManageRentalsScreenState extends State<ManageRentalsScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            _buildActionCard(booking),
+                            ActionCard(
+                                booking: booking,
+                                onActionTaken: refreshBookings),
                           ],
                         ),
                       ],
@@ -104,79 +133,14 @@ class _ManageRentalsScreenState extends State<ManageRentalsScreen> {
     );
   }
 
-  Widget _buildActionCard(ManageBooking booking) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            // Other widget elements like booking details
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      final result = await BookingService.confirmBooking(booking.bookingId);
-                      if (result) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Đặt xe được xác nhận')));
-                        // Optionally refresh or update the UI here if needed
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Lỗi khi xác nhận Đặt xe: $e')));
-                    }
-                  },
-                  child: Text('Đồng ý', style: TextStyle(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      final result = await BookingService.cancelBooking(booking.bookingId);
-                      if (result) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Đặt xe đã bị hủy')));
-                        // Optionally refresh or update the UI here if needed
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Lỗi khi hủy Đặt xe: $e')));
-                    }
-                  },
-                  child: Text('Từ chối', style: TextStyle(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      final result = await BookingService.completeBooking(booking.bookingId);
-                      if (result) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Đặt xe đã hoàn thành')));
-                        // Optionally refresh or update the UI here if needed
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Lỗi khi hoàn thành Đặt xe: $e')));
-                    }
-                  },
-                  child: Text('Hoàn thành', style: TextStyle(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+  void refreshBookings() {
+    setState(() {
+      // Reset the Future to re-fetch the bookings data
+      // You might need to ensure ownerId is set before calling this
+      if (ownerId != null) {
+        manageBookingFuture = BookingService.getManagedBookings(ownerId ?? -1);
+      }
+    });
   }
 
   Widget _buildBookingStatusText(ManageBooking booking) {
@@ -204,6 +168,122 @@ class _ManageRentalsScreenState extends State<ManageRentalsScreen> {
     return Text(
       'Trạng thái: $statusText',
       style: TextStyle(color: textColor),
+    );
+  }
+}
+
+class ActionCard extends StatefulWidget {
+  final ManageBooking booking;
+  final VoidCallback onActionTaken;
+
+  ActionCard({required this.booking, required this.onActionTaken});
+
+  @override
+  _ActionCardState createState() => _ActionCardState();
+}
+
+class _ActionCardState extends State<ActionCard> {
+  bool _isConfirmDisabled = false;
+  bool _isCancelDisabled = false;
+  bool _isCompleteDisabled = true; // Initially, the complete button is disabled
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize button states based on the booking status
+    if (widget.booking.bookingStatus == 2 ||
+        widget.booking.bookingStatus == -1) {
+      // If the booking status is 'hoàn thành' (completed)
+      _isConfirmDisabled = true;
+      _isCancelDisabled = true;
+      _isCompleteDisabled = true;
+    }
+    if (widget.booking.bookingStatus == 1) {
+      // If the booking status is 'hoàn thành' (completed)
+      _isConfirmDisabled = true;
+      _isCancelDisabled = true;
+      _isCompleteDisabled = false;
+    }
+  }
+
+  void _handleConfirmOrCancel() async {
+    try {
+      // Simulate either confirm or cancel action here
+      bool result = await BookingService.confirmBooking(
+          widget.booking.bookingId); // or cancelBooking
+      if (result) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                'Đã xác nhận giao địch đặt xe, hãy liên hệ với người đặt và giao xe')));
+        setState(() {
+          // Disable both confirm and cancel buttons
+          _isConfirmDisabled = true;
+          _isCancelDisabled = true;
+          // Enable the complete button
+          _isCompleteDisabled = false;
+          widget.onActionTaken();
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+    }
+  }
+
+  void _handleComplete() async {
+    try {
+      bool result =
+          await BookingService.completeBooking(widget.booking.bookingId);
+      if (result) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Đã hoàn thành giao dịch đặt xe')));
+        setState(() {
+          // Disable the complete button after successful completion
+          _isCompleteDisabled = true;
+          widget.onActionTaken();
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Có lỗi trong quá trình thựch iện: $e')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: _isConfirmDisabled
+                      ? null
+                      : () => _handleConfirmOrCancel(),
+                  child: Text('Đồng ý', style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+                ),
+                ElevatedButton(
+                  onPressed:
+                      _isCancelDisabled ? null : () => _handleConfirmOrCancel(),
+                  child: Text('Từ chối', style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                ),
+                ElevatedButton(
+                  onPressed:
+                      _isCompleteDisabled ? null : () => _handleComplete(),
+                  child:
+                      Text('Hoàn thành', style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -1,35 +1,53 @@
 const db = require('../../config/db');
 
 exports.createBooking = async (req, res) => {
-    const { ngay_bat_dau, ngay_ket_thuc, dia_chi_nhan_xe, tong_tien_thue, ma_xe, ma_nguoi_dat_xe,ma_chu_xe, ghi_chu, giam_gia } = req.body;
-    const trang_thai_dat_xe = 0;
-  
-    try {
-      const query = `
-        INSERT INTO datxe (ngay_bat_dau, ngay_ket_thuc, trang_thai_dat_xe, dia_chi_nhan_xe, tong_tien_thue, ma_xe, ma_nguoi_dat_xe, ma_chu_xe, ghi_chu, giam_gia)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  const { ngay_bat_dau, ngay_ket_thuc, dia_chi_nhan_xe, tong_tien_thue, ma_xe, ma_nguoi_dat_xe, ma_chu_xe, ghi_chu, giam_gia, giao_xe } = req.body;
+  const trang_thai_dat_xe = 0;
+
+  try {
+      const bookingQuery = `
+          INSERT INTO datxe (ngay_bat_dau, ngay_ket_thuc, trang_thai_dat_xe, dia_chi_nhan_xe, tong_tien_thue, ma_xe, ma_nguoi_dat_xe, ma_chu_xe, ghi_chu, giam_gia,giao_xe)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
       `;
-      const values = [ngay_bat_dau, ngay_ket_thuc, trang_thai_dat_xe, dia_chi_nhan_xe, tong_tien_thue, ma_xe, ma_nguoi_dat_xe,ma_chu_xe, ghi_chu, giam_gia];
-  
-      // Use db.query instead of db.execute
-      db.query(query, values, (error, results, fields) => {
-        if (error) {
-          console.log(error.message);
-          res.status(500).json({ message: "Error creating booking", error: error.message });
-          return;
-        }
-  
-        // Assuming your MySQL version returns an insertId on successful insertion
-        res.status(201).json({ message: "Booking created successfully", bookingId: results.insertId });
-  
-        // Schedule a task to cancel the booking if not confirmed after 24 hours
-        const bookingId = results.insertId;
-        scheduleCancellationTask(bookingId);
+      const bookingValues = [ngay_bat_dau, ngay_ket_thuc, trang_thai_dat_xe, dia_chi_nhan_xe, tong_tien_thue, ma_xe, ma_nguoi_dat_xe, ma_chu_xe, ghi_chu, giam_gia,giao_xe];
+
+      // Execute booking query
+      db.query(bookingQuery, bookingValues, async (error, results, fields) => {
+          if (error) {
+              console.log(error.message);
+              res.status(500).json({ message: "Error creating booking", error: error.message });
+              return;
+          }
+
+          // Assuming your MySQL version returns an insertId on successful insertion
+          const bookingId = results.insertId;
+          res.status(201).json({ message: "Booking created successfully", bookingId });
+
+          // Schedule a task to cancel the booking if not confirmed after 24 hours
+          scheduleCancellationTask(bookingId);
+
+          // Send notification to the vehicle owner
+          const notificationTitle = "Giao dịch đặt xe mới";
+          const notificationContent = `Bạn có yêu cầu đặt xe mới từ ngày ${ngay_bat_dau} đến ${ngay_ket_thuc}. Hãy kiểm tra.`;
+          const notificationType = 5; 
+          
+          const notificationQuery = `
+              INSERT INTO thongbao (ma_nguoi_dung, ma_loai_thong_bao, tieu_de, noi_dung, trang_thai_xem)
+              VALUES (?, ?, ?, ?, 0)
+          `;
+          const notificationValues = [ma_chu_xe, notificationType, notificationTitle, notificationContent];
+
+          db.query(notificationQuery, notificationValues, (notifError, notifResults) => {
+              if (notifError) {
+                  console.error('Failed to send notification:', notifError);
+                  // Note: Not failing the overall response as booking is already created
+              }
+          });
       });
-    } catch (error) {
+  } catch (error) {
       res.status(500).json({ message: "Error creating booking", error: error.message });
-    }
-  };
+  }
+};
 
 function scheduleCancellationTask(bookingId) {
     // Calculate when 24 hours from now will be in terms of a cron schedule
@@ -99,7 +117,6 @@ function scheduleCancellationTask(bookingId) {
             return res.status(500).json({ message: "Error confirming booking", error: error.message });
         }
         
-        console.log(bookingResult.affectedRows);
         if (bookingResult.affectedRows === 0) {
             return res.status(404).json({ message: "Booking not found" });
         }
@@ -217,20 +234,23 @@ exports.cancelBooking = (req, res) => {
   };
   
   exports.checkBookable = async (req, res) => {
-    const { ma_nguoi_dat_xe } = req.query; // Assuming the user ID is passed as a query parameter
+    const { ma_nguoi_dat_xe } = req.params; 
+    console.log(req.params);
+
   
     const query = `
       SELECT COUNT(*) AS bookingCount
       FROM datxe
-      WHERE ma_nguoi_dat_xe = ? AND trang_thai_dat_xe = 1
+      WHERE ma_nguoi_dat_xe = ? AND (trang_thai_dat_xe = 1 OR trang_thai_dat_xe = 0) 
     `;
   
     db.query(query, [ma_nguoi_dat_xe], (error, results) => {
       if (error) {
         return res.status(500).json({ message: "Error checking bookability", error: error.message });
       }
-  
-      const isBookable = results[0].bookingCount === 0; // true if no active bookings, false otherwise
+      console.log(results[0]);
+      const isBookable = results[0].bookingCount == 0; 
+      console.log(isBookable);
       res.json({ isBookable });
     });
   };
